@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SFSU Associated Students Farmers Market — Traced Local</title>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=IBM+Plex+Mono:wght@300;400;500&display=swap" rel="stylesheet">
+  <style>
+    :root { --black:#080806; --cream:#f0ede4; --red:#c8392b; --green:#2d5a27; --green-light:#4a8a42; --muted:#8a8678; --border:#1a1a16; --border-mid:#222; }
+    * { margin:0; padding:0; box-sizing:border-box; }
+    body { background:var(--black); color:var(--cream); font-family:'IBM Plex Mono',monospace; min-height:100vh; }
+    header { display:flex; align-items:center; justify-content:space-between; padding:18px 20px; border-bottom:1px solid var(--border); position:sticky; top:0; background:var(--black); z-index:100; }
+    .logo-group { display:flex; align-items:baseline; gap:8px; }
+    .logo-traced { font-size:12px; letter-spacing:0.25em; color:var(--red); font-weight:500; }
+    .logo-divider { color:#222; }
+    .logo-local { font-family:'Playfair Display',serif; font-size:17px; color:var(--cream); }
+    .back-link { font-size:9px; letter-spacing:0.15em; color:var(--muted); text-decoration:none; border:1px solid var(--border); padding:5px 10px; }
+    .market-hero { padding:32px 20px 24px; border-bottom:1px solid var(--border); background:linear-gradient(180deg,rgba(45,90,39,0.05) 0%,transparent 100%); }
+    .market-eyebrow { font-size:7px; letter-spacing:0.25em; color:var(--green-light); margin-bottom:10px; }
+    .market-name { font-family:'Playfair Display',serif; font-size:clamp(24px,6vw,36px); line-height:1.1; color:var(--cream); margin-bottom:6px; }
+    .market-operator { font-size:9px; letter-spacing:0.12em; color:var(--muted); margin-bottom:18px; }
+    .market-hours-grid { display:grid; grid-template-columns:1fr 1fr; gap:8px; margin-bottom:16px; }
+    .hours-card { padding:10px 12px; border:1px solid var(--border-mid); background:rgba(255,255,255,0.02); }
+    .hours-day { font-size:8px; letter-spacing:0.2em; color:var(--green-light); margin-bottom:3px; }
+    .hours-time { font-size:12px; color:var(--cream); }
+    .hours-note { font-size:8px; color:var(--muted); margin-top:2px; }
+    .market-tags { display:flex; flex-wrap:wrap; gap:5px; margin-bottom:16px; }
+    .mtag { font-size:7px; letter-spacing:0.12em; color:var(--muted); border:1px solid var(--border-mid); padding:3px 8px; }
+    .mtag.green { color:var(--green-light); border-color:rgba(74,138,66,0.3); }
+    .map-btn { display:inline-flex; align-items:center; gap:6px; font-size:9px; letter-spacing:0.15em; color:var(--green-light); text-decoration:none; border:1px solid rgba(74,138,66,0.4); background:rgba(45,90,39,0.1); padding:8px 14px; }
+    .section { padding:24px 20px; border-bottom:1px solid var(--border); }
+    .section-label { font-size:7px; letter-spacing:0.22em; color:var(--muted); margin-bottom:16px; }
+    .section-label span { color:var(--green-light); }
+    .vendor-card { border:1px solid var(--border-mid); margin-bottom:12px; overflow:hidden; }
+    .vendor-card.featured { border-color:rgba(74,138,66,0.35); }
+    .vendor-header { padding:14px 14px 10px; cursor:pointer; display:flex; align-items:flex-start; justify-content:space-between; gap:8px; }
+    .vendor-left { flex:1; }
+    .vendor-name { font-family:'Playfair Display',serif; font-size:17px; color:var(--cream); line-height:1.2; margin-bottom:3px; }
+    .vendor-tagline { font-size:10px; color:var(--muted); line-height:1.4; }
+    .vendor-right { display:flex; flex-direction:column; align-items:flex-end; gap:4px; flex-shrink:0; }
+    .vendor-chevron { font-size:10px; color:#444; margin-top:4px; transition:transform 0.2s; }
+    .vendor-chevron.open { transform:rotate(180deg); }
+    .vendor-body { display:none; padding:0 14px 14px; }
+    .vendor-body.open { display:block; }
+    .vendor-story { font-size:11px; color:#ccc; line-height:1.7; margin-bottom:12px; padding-bottom:12px; border-bottom:1px solid var(--border); }
+    .about-text { font-size:11px; color:#bbb; line-height:1.8; }
+    .about-text + .about-text { margin-top:12px; }
+    footer { padding:20px; border-top:1px solid var(--border); display:flex; align-items:center; justify-content:space-between; }
+    .footer-logo { font-size:9px; letter-spacing:0.18em; color:#2a2a2a; }
+    .footer-logo span { color:var(--red); }
+    .footer-link { font-size:9px; color:#333; text-decoration:none; }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="logo-group">
+      <span class="logo-traced">TRACED</span>
+      <span class="logo-divider">/</span>
+      <span class="logo-local">Local</span>
+    </div>
+    <a href="https://traced-local.vercel.app" class="back-link">← ALL MARKETS</a>
+  </header>
+
+  <section class="market-hero">
+    <div class="market-eyebrow">↑ SAN FRANCISCO · SF STATE CAMPUS</div>
+    <h1 class="market-name">Associated Students<br>Farmers Market</h1>
+    <div class="market-operator">Operated by SFSU Associated Students · Thursday</div>
+    <div class="market-hours-grid">
+      <div class="hours-card">
+        <div class="hours-day">THURSDAY</div>
+        <div class="hours-time">Daytime</div>
+        <div class="hours-note">SF State campus · 1600 Holloway Ave</div>
+      </div>
+      <div class="hours-card">
+        <div class="hours-day">ACCESS</div>
+        <div class="hours-time">Campus / Public</div>
+        <div class="hours-note">Open to students, staff & community</div>
+      </div>
+    </div>
+    <div class="market-tags">
+      <span class="mtag green">CALFRESH / EBT</span>
+      <span class="mtag">SFSU CAMPUS</span>
+      <span class="mtag">CALIFORNIA CERTIFIED</span>
+      <span class="mtag">STUDENT-RUN</span>
+    </div>
+    <a href="https://maps.google.com/?q=1600+Holloway+Ave+San+Francisco+CA" target="_blank" class="map-btn">
+      ↗ OPEN IN MAPS · 1600 Holloway Ave (SF State), San Francisco
+    </a>
+  </section>
+
+  <section class="section">
+    <div class="section-label">ABOUT THIS MARKET</div>
+    <p class="about-text">
+      The Associated Students Farmers Market at SF State operates on the SF State University campus on Thursdays. It is run through the university's Associated Students organization and serves primarily SFSU students, faculty, and staff, though it is open to the surrounding community. Campus farmers markets exist to make fresh produce accessible to students who may otherwise rely entirely on campus dining or convenience stores. The Lake Merced / Lakeshore neighborhood surrounding SFSU has limited walkable fresh food options, making this market a genuine food access point.
+    </p>
+    <p class="about-text">
+      Vendor details and schedules may vary by semester. For current hours and vendor information, check with the SFSU Associated Students office or the campus events calendar.
+    </p>
+  </section>
+
+  <footer>
+    <div class="footer-logo"><span>TRACED</span> / LOCAL</div>
+    <a href="https://traced-local.vercel.app" class="footer-link">← all markets</a>
+  </footer>
+
+  <script>
+    function toggle(header) {
+      const body = header.nextElementSibling;
+      const chevron = header.querySelector('.vendor-chevron');
+      const isOpen = body.classList.contains('open');
+      body.classList.toggle('open', !isOpen);
+      chevron.classList.toggle('open', !isOpen);
+    }
+  </script>
+</body>
+</html>

@@ -1,0 +1,962 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Daily Mind Games Directory</title>
+  <meta name="description" content="A calm, curated directory of daily puzzle games. One bookmark for your morning brain menu." />
+  <meta name="theme-color" content="#0b0b0c" />
+
+  <!-- Favicon (expects logo.png in repo root) -->
+  <link rel="icon" type="image/png" href="./logo.png" />
+
+  <style>
+    :root{
+      --bg:#0b0b0c;
+      --muted:#9a9aa6;
+      --text:#f5f5f8;
+      --border:#262630;
+      --border2:#30303b;
+      --shadow: 0 12px 34px rgba(0,0,0,.38);
+      --radius:18px;
+      --max:1120px;
+
+      /* Typography */
+      --base:16px;
+      --h1:22px;
+      --h2:15px;
+      --h3:13px;
+      --sub:14px;
+      --chipText:12px;
+    }
+
+    *{box-sizing:border-box}
+    html,body{height:100%}
+    body{
+      margin:0;
+      font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, "Apple Color Emoji","Segoe UI Emoji";
+      font-size: var(--base);
+      background:
+        radial-gradient(1200px 520px at 50% -55%, rgba(255,255,255,.10), transparent 60%),
+        radial-gradient(900px 430px at 0% 0%, rgba(255,255,255,.07), transparent 55%),
+        radial-gradient(700px 380px at 100% 10%, rgba(255,255,255,.05), transparent 55%),
+        var(--bg);
+      color:var(--text);
+      line-height:1.45;
+    }
+    a{color:inherit}
+    .wrap{max-width:var(--max); margin:0 auto; padding:26px 18px 70px}
+
+    header{
+      display:flex; gap:16px; align-items:flex-end; justify-content:space-between;
+      padding:10px 0 14px;
+      border-bottom:1px solid var(--border);
+      position:sticky; top:0;
+      backdrop-filter: blur(12px);
+      background: rgba(11,11,12,.78);
+      z-index:20;
+    }
+
+    .brand{
+      display:flex;
+      gap:12px;
+      align-items:center;
+      min-width: 0;
+      text-decoration:none;
+      color:inherit;
+    }
+    .logo{
+      width:44px; height:44px;
+      border-radius: 14px;
+      border: 1px solid rgba(255,255,255,.12);
+      box-shadow: 0 10px 30px rgba(0,0,0,.35);
+      background: rgba(255,255,255,.03);
+      flex: 0 0 auto;
+      object-fit: cover;
+    }
+    .title{display:flex; flex-direction:column; gap:6px; min-width:0;}
+    h1{margin:0; font-size:var(--h1); letter-spacing:.2px; font-weight:760; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;}
+    .sub{margin:0; color:var(--muted); font-size:var(--sub); white-space:nowrap; overflow:hidden; text-overflow:ellipsis;}
+
+    .right{display:flex; gap:10px; align-items:center; flex-wrap:wrap; justify-content:flex-end;}
+    .pill{
+      display:inline-flex; gap:8px; align-items:center;
+      border:1px solid var(--border2);
+      background: rgba(18,18,22,.75);
+      padding:9px 12px;
+      border-radius:999px;
+      color:var(--muted);
+      font-size:13px;
+      white-space:nowrap;
+    }
+    .btn{
+      cursor:pointer;
+      border:1px solid var(--border2);
+      background: linear-gradient(180deg, rgba(255,255,255,.08), rgba(255,255,255,.02));
+      color:var(--text);
+      border-radius:14px;
+      padding:10px 12px;
+      font-weight:720;
+      font-size:13px;
+      box-shadow: 0 1px 0 rgba(255,255,255,.07) inset;
+    }
+    .btn:hover{border-color:#3a3a46}
+    .btn:focus{outline:2px solid rgba(255,255,255,.18); outline-offset:2px}
+    .btn.secondary{
+      background: rgba(255,255,255,.04);
+      box-shadow:none;
+      color:var(--muted);
+      font-weight:650;
+    }
+
+    .grid{
+      display:grid;
+      grid-template-columns: repeat(12, 1fr);
+      gap:14px;
+      margin-top:16px;
+    }
+
+    .card{
+      grid-column: span 12;
+      background: rgba(18,18,22,.88);
+      border:1px solid var(--border);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      overflow:hidden;
+    }
+
+    .filtersCard{
+      position: sticky;
+      top: 72px; /* under header */
+      z-index: 15;
+    }
+    @media (max-width: 520px){
+      .filtersCard{ top: 86px; }
+    }
+
+    .filters{
+      display:grid;
+      grid-template-columns: 2.2fr 1fr 1fr 1fr 1fr 1fr;
+      gap:10px;
+      align-items:end;
+      padding:14px;
+    }
+    @media (max-width: 980px){
+      .filters{grid-template-columns: 1fr 1fr; align-items:stretch}
+    }
+
+    label{display:block; font-size:12px; color:var(--muted); margin:0 0 6px}
+    input, select{
+      width:100%;
+      border:1px solid var(--border2);
+      background: rgba(10,10,12,.55);
+      color:var(--text);
+      border-radius:14px;
+      padding:11px 11px;
+      font-size:14px;
+    }
+    input::placeholder{color:#7a7a86}
+    input:focus, select:focus{outline:2px solid rgba(255,255,255,.16); outline-offset:2px}
+
+    .filtersFooter{
+      display:flex;
+      justify-content:space-between;
+      align-items:center;
+      gap:10px;
+      flex-wrap:wrap;
+      padding:0 14px 14px;
+    }
+    .hint{color:var(--muted); font-size:13px}
+    .quick{
+      display:flex;
+      gap:8px;
+      flex-wrap:wrap;
+      align-items:center;
+      justify-content:flex-end;
+    }
+    .chipBtn{
+      cursor:pointer;
+      font-size:12px;
+      color:var(--text);
+      background: rgba(255,255,255,.04);
+      border:1px solid rgba(255,255,255,.10);
+      padding:7px 10px;
+      border-radius:999px;
+    }
+    .chipBtn:hover{border-color: rgba(255,255,255,.22);}
+
+    .section{padding:14px; border-top:1px solid var(--border);}
+    .section-head{
+      display:flex; align-items:center; justify-content:space-between; gap:10px;
+      margin-bottom:10px;
+    }
+    .section-title{display:flex; align-items:baseline; gap:10px}
+    .section-title h3{
+      margin:0; font-size:var(--h3); font-weight:850; letter-spacing:.35px; text-transform:uppercase
+    }
+    .count{color:var(--muted); font-size:13px}
+
+    .cards{
+      display:grid;
+      grid-template-columns: repeat(12, 1fr);
+      gap:12px;
+    }
+    @media (max-width: 980px){ .cards{grid-template-columns: repeat(6, 1fr)} }
+    @media (max-width: 620px){ .cards{grid-template-columns: repeat(1, 1fr)} }
+
+    .game{
+      grid-column: span 4;
+      background: rgba(12,12,15,.62);
+      border:1px solid var(--border2);
+      border-radius: 16px;
+      padding:13px;
+      display:flex;
+      flex-direction:column;
+      gap:10px;
+      min-height: 152px;
+      transition: transform .15s ease, border-color .15s ease;
+    }
+    .game:hover{
+      border-color: rgba(255,255,255,.24);
+      transform: translateY(-3px);
+    }
+    @media (max-width: 980px){ .game{grid-column: span 3} }
+    @media (max-width: 620px){ .game{grid-column: span 1} }
+
+    .game-top{
+      display:flex;
+      justify-content:space-between;
+      gap:12px;
+      align-items:flex-start;
+    }
+    .game-name{
+      margin:0;
+      font-size:var(--h2);
+      font-weight:820;
+      letter-spacing:.2px;
+    }
+    .game-desc{
+      margin:4px 0 0;
+      color:var(--muted);
+      font-size:13.5px;
+    }
+
+    .chips{display:flex; flex-wrap:wrap; gap:7px}
+    .chip{
+      font-size:var(--chipText);
+      color: rgba(245,245,248,.92);
+      background: rgba(255,255,255,.04);
+      border:1px solid rgba(255,255,255,.08);
+      padding:6px 9px;
+      border-radius:999px;
+      white-space:nowrap;
+    }
+
+    .game-actions{
+      margin-top:auto;
+      display:flex;
+      gap:8px;
+      align-items:center;
+      justify-content:space-between;
+    }
+    .play{
+      display:inline-flex;
+      align-items:center;
+      justify-content:center;
+      gap:8px;
+      text-decoration:none;
+      border:1px solid var(--border2);
+      background: linear-gradient(180deg, rgba(255,255,255,.10), rgba(255,255,255,.03));
+      padding:10px 12px;
+      border-radius:14px;
+      font-weight:820;
+      font-size:14px;
+      flex:1;
+    }
+    .play:hover{border-color:#3a3a46}
+
+    .star{
+      width:40px;
+      height:40px;
+      display:inline-flex;
+      align-items:center;
+      justify-content:center;
+      border-radius:14px;
+      border:1px solid var(--border2);
+      background: rgba(255,255,255,.03);
+      cursor:pointer;
+      font-size:16px;
+    }
+    .star[aria-pressed="true"]{
+      border-color: rgba(255,255,255,.25);
+      background: rgba(255,255,255,.09);
+    }
+
+    .links a{
+      color: rgba(245,245,248,.90);
+      text-decoration:none;
+      border-bottom:1px solid rgba(255,255,255,.16)
+    }
+    .links a:hover{border-bottom-color: rgba(255,255,255,.40)}
+
+    .k{
+      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+      font-size: 12px;
+      border:1px solid rgba(255,255,255,.10);
+      background: rgba(255,255,255,.04);
+      padding:2px 7px;
+      border-radius: 10px;
+      color: rgba(245,245,248,.92);
+    }
+
+    footer{
+      margin-top:22px;
+      color:var(--muted);
+      font-size:13px;
+      display:flex;
+      justify-content:space-between;
+      gap:10px;
+      flex-wrap:wrap;
+      border-top:1px solid var(--border);
+      padding-top:14px;
+    }
+
+    /* Search highlight */
+    mark{
+      background: rgba(255,255,255,.18);
+      color: var(--text);
+      padding:2px 4px;
+      border-radius:4px;
+    }
+
+    /* Mobile polish */
+    @media (max-width: 620px){
+      header{
+        flex-wrap: wrap;
+        align-items: center;
+        gap: 10px;
+      }
+      .brand{ width: 100%; }
+      h1, .sub{
+        white-space: normal;
+        overflow: visible;
+        text-overflow: clip;
+      }
+      .right{
+        width:100%;
+        justify-content:flex-start;
+      }
+      .pill{ display:none; }
+      .btn{ padding: 9px 11px; border-radius: 12px; }
+      .filtersCard{ position: static; }
+    }
+  </style>
+</head>
+
+<body>
+  <div class="wrap">
+    <header>
+      <a href="./" class="brand" aria-label="Home">
+        <img class="logo" alt="Daily Mind Games Directory logo" src="./logo.png" />
+        <div class="title">
+          <h1>Daily Mind Games Directory</h1>
+          <p class="sub">One bookmark for your daily puzzle routine.</p>
+        </div>
+      </a>
+
+      <div class="right">
+        <div class="pill" id="todayPill">Today</div>
+        <button class="btn secondary" id="clearFiltersBtn" title="Clear search and filters">Clear filters</button>
+        <button class="btn" id="clearFavBtn" title="Clear favorites">Clear favorites</button>
+      </div>
+    </header>
+
+    <div class="grid">
+
+      <!-- Filters -->
+      <section class="card filtersCard" id="filtersCard">
+        <div class="filters">
+          <div>
+            <label for="q">Search</label>
+            <input id="q" type="search" placeholder="Try: chess, wordle, sudoku…" autocomplete="off" />
+          </div>
+          <div>
+            <label for="category">Category</label>
+            <select id="category"></select>
+          </div>
+          <div>
+            <label for="resetType">Reset</label>
+            <select id="resetType"></select>
+          </div>
+          <div>
+            <label for="difficulty">Difficulty</label>
+            <select id="difficulty"></select>
+          </div>
+          <div>
+            <label for="timeBucket">Avg time</label>
+            <select id="timeBucket"></select>
+          </div>
+          <div>
+            <label for="sort">Sort</label>
+            <select id="sort"></select>
+          </div>
+        </div>
+        <div class="filtersFooter">
+          <div class="hint" id="resultsHint">Tip: Use filters to build a “10-minute morning brain warmup.”</div>
+          <div class="quick">
+            <button class="chipBtn" id="quickDaily">Daily only</button>
+            <button class="chipBtn" id="quickWarmup">≤10 min warmup</button>
+            <button class="chipBtn" id="quickWord">Word games</button>
+          </div>
+        </div>
+      </section>
+
+      <!-- Favorites -->
+      <section class="card" id="favoritesCard" style="display:none;">
+        <div class="section">
+          <div class="section-head">
+            <div class="section-title">
+              <h3>My Morning Menu</h3>
+              <span class="count" id="favCount"></span>
+            </div>
+          </div>
+          <div class="cards" id="favorites"></div>
+        </div>
+      </section>
+
+      <!-- Essentials -->
+      <section class="card" id="essentialsCard">
+        <div class="section">
+          <div class="section-head">
+            <div class="section-title">
+              <h3>Essentials</h3>
+              <span class="count">The four staples (fast habit loop).</span>
+            </div>
+          </div>
+          <div class="cards" id="essentials"></div>
+        </div>
+      </section>
+
+      <!-- Trending -->
+      <section class="card" id="trendingCard">
+        <div class="section">
+          <div class="section-head">
+            <div class="section-title">
+              <h3>Trending this week</h3>
+              <span class="count">MVP placeholder — edit in code.</span>
+            </div>
+          </div>
+          <div class="cards" id="trending"></div>
+        </div>
+      </section>
+
+      <!-- Browse / Results -->
+      <section class="card" id="browseCard">
+        <div class="section">
+          <div class="section-head">
+            <div class="section-title">
+              <h3 id="browseTitle">Browse</h3>
+              <span class="count" id="browseCount"></span>
+            </div>
+            <div class="links" style="display:flex; gap:12px; flex-wrap:wrap; font-size:13px;">
+              <a href="?c=games-like-wordle">Games like Wordle</a>
+              <a href="?c=geography-like-wordle">Geography like Wordle</a>
+              <a href="?c=hard-word-games">Hard word games</a>
+              <a href="?c=daily-puzzle-games">Best daily puzzle games</a>
+            </div>
+          </div>
+          <div id="sections"></div>
+        </div>
+      </section>
+
+    </div>
+
+    <footer>
+      <div>Tip: star your go-tos → they show up in <span class="k">My Morning Menu</span>.</div>
+      <div class="links">Edit by updating the <span class="k">GAMES</span> array inside <span class="k">index.html</span>.</div>
+    </footer>
+  </div>
+
+<script>
+(() => {
+  "use strict";
+
+  /** ---------------------------
+   * DATA
+   * --------------------------- */
+
+  const CATEGORY_ORDER = [
+    "Word Games",
+    "Geography",
+    "Logic",
+    "Strategy",
+    "Trivia/Knowledge",
+    "Visual/Pattern",
+    "Math/Programming"
+  ];
+
+  const GAMES = [
+    // Word Games
+    { id:"wordle", name:"Wordle", category:"Word Games", description:"Daily word guess in six tries.", url:"https://www.nytimes.com/games/wordle/index.html", difficulty:"Medium", avgTimeMin:3, resetType:"Daily", popularityRank:1, tags:["word","daily","classic"] },
+    { id:"nyt-connections", name:"NYT Connections", category:"Word Games", description:"Group words into hidden categories.", url:"https://www.nytimes.com/games/connections", difficulty:"Medium", avgTimeMin:5, resetType:"Daily", popularityRank:2, tags:["word","logic","daily"] },
+    { id:"nyt-spelling-bee", name:"NYT Spelling Bee", category:"Word Games", description:"Make words from 7 letters; chase Genius.", url:"https://www.nytimes.com/puzzles/spelling-bee", difficulty:"Medium", avgTimeMin:10, resetType:"Daily", popularityRank:6, tags:["word","daily"] },
+    { id:"nyt-crossword", name:"NYT Crossword", category:"Word Games", description:"The iconic daily crossword.", url:"https://www.nytimes.com/crosswords", difficulty:"Hard", avgTimeMin:15, resetType:"Daily", popularityRank:4, tags:["crossword","daily"] },
+    { id:"nyt-mini", name:"The Mini Crossword", category:"Trivia/Knowledge", description:"A fast daily mini crossword.", url:"https://www.nytimes.com/crosswords/game/mini", difficulty:"Easy", avgTimeMin:3, resetType:"Daily", popularityRank:7, tags:["crossword","daily","quick"] },
+    { id:"quordle", name:"Quordle", category:"Word Games", description:"Solve four Wordles at once.", url:"https://www.merriam-webster.com/games/quordle/", difficulty:"Hard", avgTimeMin:10, resetType:"Daily", popularityRank:10, tags:["word","daily"] },
+    { id:"octordle", name:"Octordle", category:"Word Games", description:"Eight boards. Pure chaos.", url:"https://octordle.com/", difficulty:"Hard", avgTimeMin:12, resetType:"Daily", popularityRank:18, tags:["word","daily","hardcore"] },
+    { id:"waffle", name:"Waffle", category:"Word Games", description:"Swap letters to solve across + down.", url:"https://wafflegame.net/", difficulty:"Medium", avgTimeMin:7, resetType:"Daily", popularityRank:16, tags:["word","daily"] },
+    { id:"semantle", name:"Semantle", category:"Word Games", description:"Guess the secret word by meaning similarity.", url:"https://semantle.com/", difficulty:"Hard", avgTimeMin:10, resetType:"Daily", popularityRank:20, tags:["word","daily","semantic"] },
+    { id:"contexto", name:"Contexto", category:"Word Games", description:"Find the secret word by context ranking.", url:"https://contexto.me/", difficulty:"Medium", avgTimeMin:6, resetType:"Daily", popularityRank:14, tags:["word","daily","semantic"] },
+    { id:"absurdle", name:"Absurdle", category:"Word Games", description:"Adversarial Wordle that avoids your guesses.", url:"https://qntm.org/files/absurdle/absurdle.html", difficulty:"Hard", avgTimeMin:8, resetType:"Unlimited", popularityRank:26, tags:["word","adversarial"] },
+
+    // Geography
+    { id:"worldle", name:"Worldle", category:"Geography", description:"Guess the country by silhouette.", url:"https://worldle.teuteuf.fr/", difficulty:"Easy", avgTimeMin:3, resetType:"Daily", popularityRank:8, tags:["geo","daily"] },
+    { id:"globle", name:"Globle", category:"Geography", description:"Hot/cold country guessing.", url:"https://globle-game.com/", difficulty:"Easy", avgTimeMin:4, resetType:"Daily", popularityRank:19, tags:["geo","daily"] },
+    { id:"countryle", name:"Countryle", category:"Geography", description:"Guess the mystery country with hints.", url:"https://countryle.com/", difficulty:"Medium", avgTimeMin:4, resetType:"Daily", popularityRank:24, tags:["geo","daily"] },
+    { id:"geoguessr", name:"GeoGuessr", category:"Geography", description:"Street View location guessing.", url:"https://www.geoguessr.com/", difficulty:"Medium", avgTimeMin:10, resetType:"Unlimited", popularityRank:5, tags:["geo","exploration"] },
+    { id:"travle", name:"Travle", category:"Geography", description:"Route puzzle between countries.", url:"https://travle.earth/", difficulty:"Medium", avgTimeMin:6, resetType:"Daily", popularityRank:22, tags:["geo","daily","route"] },
+
+    // Logic
+    { id:"sudoku", name:"Sudoku", category:"Logic", description:"Classic number logic (daily).", url:"https://sudoku.com/", difficulty:"Medium", avgTimeMin:10, resetType:"Daily", popularityRank:9, tags:["logic","numbers"] },
+    { id:"kenken", name:"KenKen", category:"Logic", description:"Math + Sudoku hybrid cages.", url:"https://www.kenkenpuzzle.com/", difficulty:"Medium", avgTimeMin:10, resetType:"Daily", popularityRank:28, tags:["logic","numbers"] },
+    { id:"nonogram", name:"Nonogram (Picross)", category:"Logic", description:"Fill the grid using row/col clues.", url:"https://www.puzzle-nonograms.com/", difficulty:"Medium", avgTimeMin:10, resetType:"Unlimited", popularityRank:25, tags:["logic","visual"] },
+    { id:"kakuro", name:"Kakuro", category:"Logic", description:"Crossword-style sums puzzle.", url:"https://www.kakuros.com/", difficulty:"Hard", avgTimeMin:12, resetType:"Daily", popularityRank:29, tags:["logic","numbers"] },
+
+    // Strategy
+    { id:"chesscom-daily", name:"Chess.com Daily Puzzle", category:"Strategy", description:"One tactical shot per day.", url:"https://www.chess.com/puzzles/daily", difficulty:"Medium", avgTimeMin:5, resetType:"Daily", popularityRank:3, tags:["strategy","chess","daily"] },
+    { id:"lichess-daily", name:"Lichess Daily Puzzle", category:"Strategy", description:"Clean daily tactic on Lichess.", url:"https://lichess.org/training/daily", difficulty:"Medium", avgTimeMin:5, resetType:"Daily", popularityRank:12, tags:["strategy","chess","daily"] },
+    { id:"ogs-go", name:"Online Go (OGS)", category:"Strategy", description:"Play Go + study problems (tsumego).", url:"https://online-go.com/", difficulty:"Hard", avgTimeMin:10, resetType:"Unlimited", popularityRank:27, tags:["strategy","go"] },
+
+    // Trivia/Knowledge
+    { id:"sporcle", name:"Sporcle", category:"Trivia/Knowledge", description:"Quizzes across topics (browse daily picks).", url:"https://www.sporcle.com/", difficulty:"Easy", avgTimeMin:5, resetType:"Daily", popularityRank:21, tags:["trivia","daily"] },
+    { id:"redactle", name:"Redactle", category:"Trivia/Knowledge", description:"Guess a redacted Wikipedia article.", url:"https://redactle.net/", difficulty:"Hard", avgTimeMin:12, resetType:"Daily", popularityRank:23, tags:["trivia","daily","wiki"] },
+
+    // Visual/Pattern
+    { id:"ilovehue", name:"I Love Hue", category:"Visual/Pattern", description:"Color ordering and perception puzzles.", url:"https://www.zutgames.com/i-love-hue/", difficulty:"Easy", avgTimeMin:6, resetType:"Unlimited", popularityRank:30, tags:["visual","color"] },
+    { id:"seterra", name:"Seterra", category:"Visual/Pattern", description:"Map quizzes (countries, capitals, flags).", url:"https://www.seterra.com/", difficulty:"Easy", avgTimeMin:5, resetType:"Unlimited", popularityRank:17, tags:["geo","visual"] },
+
+    // Math/Programming
+    { id:"brilliant", name:"Brilliant", category:"Math/Programming", description:"Interactive STEM challenges.", url:"https://brilliant.org/", difficulty:"Medium", avgTimeMin:10, resetType:"Unlimited", popularityRank:11, tags:["math","learning"] },
+    { id:"project-euler", name:"Project Euler", category:"Math/Programming", description:"Math/programming problems (cult classic).", url:"https://projecteuler.net/", difficulty:"Hard", avgTimeMin:20, resetType:"Unlimited", popularityRank:15, tags:["math","programming"] }
+  ];
+
+  const TRENDING = [
+    { id:"contexto", why:"Fast, shareable semantic guessing." },
+    { id:"travle", why:"Great for geography brains." },
+    { id:"waffle", why:"Satisfying letter swaps." },
+    { id:"lichess-daily", why:"Quick tactics streak." },
+    { id:"redactle", why:"Deep rabbit-hole solving." }
+  ];
+
+  const ESSENTIAL_IDS = ["wordle","nyt-connections","sudoku","chesscom-daily"];
+
+  const COLLECTIONS = {
+    "games-like-wordle": {
+      title: "Games like Wordle",
+      note: "Word/guessing games inspired by Wordle.",
+      matcher: g => g.category === "Word Games" || (g.tags || []).includes("semantic")
+    },
+    "geography-like-wordle": {
+      title: "Geography like Wordle",
+      note: "Daily geography guessing games: countries, maps, routes.",
+      matcher: g => g.category === "Geography" || ((g.tags || []).includes("geo") && g.resetType === "Daily")
+    },
+    "hard-word-games": {
+      title: "Hard word games",
+      note: "For when you want to suffer a little (in a good way).",
+      matcher: g => g.category === "Word Games" && (g.difficulty === "Hard" || g.avgTimeMin >= 8)
+    },
+    "daily-puzzle-games": {
+      title: "Best daily puzzle games",
+      note: "Daily-reset staples — perfect for a morning routine.",
+      matcher: g => g.resetType === "Daily"
+    }
+  };
+
+  /** ---------------------------
+   * HELPERS
+   * --------------------------- */
+
+  const $ = (sel) => document.querySelector(sel);
+  const el = (tag, attrs={}, ...children) => {
+    const n = document.createElement(tag);
+    for (const [k,v] of Object.entries(attrs)) {
+      if (k === "class") n.className = v;
+      else if (k === "html") n.innerHTML = v;
+      else if (k.startsWith("on") && typeof v === "function") n.addEventListener(k.slice(2), v);
+      else n.setAttribute(k, v);
+    }
+    for (const c of children) n.append(c);
+    return n;
+  };
+
+  const LS_KEY = "dailyMindGames.favorites.v6";
+  const loadFavs = () => {
+    try { return new Set(JSON.parse(localStorage.getItem(LS_KEY) || "[]")); }
+    catch { return new Set(); }
+  };
+  const saveFavs = (set) => localStorage.setItem(LS_KEY, JSON.stringify([...set]));
+
+  const fmtDate = (d) => d.toLocaleDateString(undefined, { weekday:"long", year:"numeric", month:"long", day:"numeric" });
+
+  function resetInText(now = new Date()){
+    const next = new Date(now);
+    next.setHours(24,0,0,0);
+    const ms = next - now;
+    const hrs = Math.max(0, Math.floor(ms / 36e5));
+    const mins = Math.max(0, Math.floor((ms % 36e5) / 6e4));
+    if (hrs === 0) return `${mins}m`;
+    return `${hrs}h ${mins}m`;
+  }
+
+  function timeBucketLabel(min){
+    if (min <= 3) return "≤ 3 min";
+    if (min <= 10) return "4–10 min";
+    return "10+ min";
+  }
+
+  function buildOptions(selectEl, options, {allLabel="All"}={}){
+    selectEl.innerHTML = "";
+    selectEl.append(el("option", { value:"" }, allLabel));
+    for (const o of options) selectEl.append(el("option", { value:o }, o));
+  }
+
+  function escapeHtml(s){
+    return s.replaceAll("&","&amp;").replaceAll("<","&lt;").replaceAll(">","&gt;").replaceAll('"',"&quot;").replaceAll("'","&#39;");
+  }
+
+  function highlightHtml(text, query){
+    const safeText = escapeHtml(text);
+    const q = (query || "").trim();
+    if (!q) return safeText;
+    // Escape regex metacharacters
+    const safe = q.replace(/[.*+?^${}()|[\]\\]/g,'\\$&');
+    try {
+      return safeText.replace(new RegExp(`(${safe})`, "ig"), "<mark>$1</mark>");
+    } catch {
+      return safeText; // fallback if regex fails
+    }
+  }
+
+  /** ---------------------------
+   * STATE
+   * --------------------------- */
+
+  let favs = loadFavs();
+
+  const state = {
+    q:"",
+    category:"",
+    resetType:"",
+    difficulty:"",
+    timeBucket:"",
+    sort:"Popular",
+    collection:"",
+    maxTime: null
+  };
+
+  function anyFiltersActive(){
+    return Boolean(
+      state.q.trim() ||
+      state.category ||
+      state.resetType ||
+      state.difficulty ||
+      state.timeBucket ||
+      state.maxTime !== null ||
+      (state.collection && COLLECTIONS[state.collection])
+    );
+  }
+
+  function applyCollectionFromUrl(){
+    const params = new URLSearchParams(location.search);
+    const c = params.get("c") || "";
+    state.collection = (c && COLLECTIONS[c]) ? c : "";
+  }
+
+  function setHintText(){
+    const hint = $("#resultsHint");
+    if (!hint) return;
+
+    if (state.collection && COLLECTIONS[state.collection]){
+      const cfg = COLLECTIONS[state.collection];
+      hint.textContent = `Collection: ${cfg.title} — ${cfg.note}`;
+      return;
+    }
+
+    if (anyFiltersActive()){
+      hint.textContent = "Results mode: essentials + trending hidden while you filter.";
+    } else {
+      hint.textContent = "Tip: Use filters to build a “10-minute morning brain warmup.”";
+    }
+  }
+
+  function getFilteredGames(){
+    let list = [...GAMES];
+
+    if (state.collection && COLLECTIONS[state.collection]) {
+      list = list.filter(COLLECTIONS[state.collection].matcher);
+    }
+
+    const q = state.q.trim().toLowerCase();
+    if (q) list = list.filter(g =>
+      g.name.toLowerCase().includes(q) ||
+      g.description.toLowerCase().includes(q) ||
+      (g.tags || []).join(" ").toLowerCase().includes(q)
+    );
+
+    if (state.category) list = list.filter(g => g.category === state.category);
+    if (state.resetType) list = list.filter(g => g.resetType === state.resetType);
+    if (state.difficulty) list = list.filter(g => g.difficulty === state.difficulty);
+
+    if (state.timeBucket) {
+      list = list.filter(g => timeBucketLabel(g.avgTimeMin) === state.timeBucket);
+    } else if (state.maxTime !== null) {
+      list = list.filter(g => g.avgTimeMin <= state.maxTime);
+    }
+
+    if (state.sort === "Popular") list.sort((a,b) => a.popularityRank - b.popularityRank);
+    else if (state.sort === "Avg time") list.sort((a,b) => a.avgTimeMin - b.avgTimeMin);
+    else if (state.sort === "Difficulty") {
+      const order = { "Easy":1, "Medium":2, "Hard":3 };
+      list.sort((a,b) => (order[a.difficulty]||9) - (order[b.difficulty]||9));
+    }
+
+    return list;
+  }
+
+  /** ---------------------------
+   * RENDER
+   * --------------------------- */
+
+  function renderGameCard(g){
+    const daily = g.resetType === "Daily";
+    const resetText = daily ? `Resets in ~${resetInText()}` : "Unlimited";
+
+    const star = el("button", {
+      class:"star",
+      "aria-label": `Favorite ${g.name}`,
+      "aria-pressed": favs.has(g.id) ? "true" : "false",
+      onclick: () => {
+        if (favs.has(g.id)) favs.delete(g.id);
+        else favs.add(g.id);
+        saveFavs(favs);
+        renderAll();
+      }
+    }, document.createTextNode(favs.has(g.id) ? "★" : "☆"));
+
+    const chips = el("div", { class:"chips" },
+      el("span", { class:"chip" }, g.category),
+      el("span", { class:"chip" }, g.difficulty),
+      el("span", { class:"chip" }, `${g.avgTimeMin} min`),
+      el("span", { class:"chip" }, resetText)
+    );
+
+    const play = el("a", {
+      class:"play",
+      href:g.url,
+      target:"_blank",
+      rel:"noopener noreferrer",
+      title:`Play ${g.name}`
+    }, "Play ↗");
+
+    // Use innerHTML only for highlighted fields (we escape first)
+    const nameNode = el("div", { class:"game-name", html: highlightHtml(g.name, state.q) });
+    const descNode = el("div", { class:"game-desc", html: highlightHtml(g.description, state.q) });
+
+    const top = el("div", { class:"game-top" },
+      el("div", {}, nameNode, descNode),
+      star
+    );
+
+    return el("div", { class:"game" },
+      top,
+      chips,
+      el("div", { class:"game-actions" }, play, el("span", { style:"width:40px" }))
+    );
+  }
+
+  function renderFavorites(){
+    const favList = [...favs].map(id => GAMES.find(g => g.id === id)).filter(Boolean);
+    $("#favorites").innerHTML = "";
+    if (favList.length === 0){
+      $("#favoritesCard").style.display = "none";
+      return;
+    }
+    $("#favoritesCard").style.display = "block";
+    $("#favCount").textContent = `${favList.length} saved`;
+    favList.sort((a,b) => a.popularityRank - b.popularityRank);
+    for (const g of favList) $("#favorites").append(renderGameCard(g));
+  }
+
+  function renderEssentials(){
+    $("#essentials").innerHTML = "";
+    const list = ESSENTIAL_IDS.map(id => GAMES.find(g => g.id === id)).filter(Boolean);
+    for (const g of list) $("#essentials").append(renderGameCard(g));
+  }
+
+  function renderTrending(){
+    $("#trending").innerHTML = "";
+    const list = TRENDING.map(t => {
+      const g = GAMES.find(x => x.id === t.id);
+      if (!g) return null;
+      return { ...g, description: `${g.description} · Trending: ${t.why}` };
+    }).filter(Boolean);
+    for (const g of list) $("#trending").append(renderGameCard(g));
+  }
+
+  function renderSection(title, games){
+    const container = el("div", { style:"margin-top:14px" });
+    container.append(el("div", { class:"section-head" },
+      el("div", { class:"section-title" },
+        el("h3", {}, title),
+        el("span", { class:"count" }, `${games.length} game${games.length===1?"":"s"}`)
+      )
+    ));
+    const grid = el("div", { class:"cards" });
+    for (const g of games) grid.append(renderGameCard(g));
+    container.append(grid);
+    return container;
+  }
+
+  function renderBrowse(){
+    const list = getFilteredGames();
+
+    const filtering = anyFiltersActive();
+    $("#browseTitle").textContent = filtering ? "Results" : "Browse";
+    $("#browseCount").textContent = `${list.length} shown`;
+
+    const byCat = new Map();
+    for (const c of CATEGORY_ORDER) byCat.set(c, []);
+    for (const g of list){
+      if (!byCat.has(g.category)) byCat.set(g.category, []);
+      byCat.get(g.category).push(g);
+    }
+
+    const sections = $("#sections");
+    sections.innerHTML = "";
+
+    if (list.length === 0){
+      sections.append(el("div", { style:"color: var(--muted); padding: 8px 2px; font-size: 14px;" },
+        "No matches. Try clearing filters."
+      ));
+      return;
+    }
+
+    for (const c of CATEGORY_ORDER){
+      const games = byCat.get(c) || [];
+      if (games.length === 0) continue;
+      sections.append(renderSection(c, games));
+    }
+  }
+
+  function clearFilters({alsoClearCollection=false}={}){
+    state.q = "";
+    state.category = "";
+    state.resetType = "";
+    state.difficulty = "";
+    state.timeBucket = "";
+    state.sort = "Popular";
+    state.maxTime = null;
+
+    $("#q").value = "";
+    $("#category").value = "";
+    $("#resetType").value = "";
+    $("#difficulty").value = "";
+    $("#timeBucket").value = "";
+    $("#sort").value = "Popular";
+
+    if (alsoClearCollection){
+      const u = new URL(location.href);
+      u.searchParams.delete("c");
+      history.replaceState({}, "", u.toString());
+      state.collection = "";
+    }
+
+    setHintText();
+    renderAll();
+  }
+
+  function renderAll(){
+    applyCollectionFromUrl();
+    setHintText();
+
+    const filtering = anyFiltersActive();
+    $("#essentialsCard").style.display = filtering ? "none" : "block";
+    $("#trendingCard").style.display = filtering ? "none" : "block";
+
+    renderFavorites();
+    if (!filtering){
+      renderEssentials();
+      renderTrending();
+    }
+    renderBrowse();
+  }
+
+  /** ---------------------------
+   * INIT
+   * --------------------------- */
+
+  function init(){
+    $("#todayPill").textContent = fmtDate(new Date());
+
+    buildOptions($("#category"), CATEGORY_ORDER, { allLabel:"All categories" });
+    buildOptions($("#resetType"), ["Daily","Unlimited"], { allLabel:"All resets" });
+    buildOptions($("#difficulty"), ["Easy","Medium","Hard"], { allLabel:"All difficulties" });
+    buildOptions($("#timeBucket"), ["≤ 3 min","4–10 min","10+ min"], { allLabel:"All times" });
+
+    const sortEl = $("#sort");
+    sortEl.innerHTML = "";
+    ["Popular","Avg time","Difficulty"].forEach(s => sortEl.append(el("option",{value:s},s)));
+
+    $("#q").addEventListener("input", (e) => { state.q = e.target.value; renderAll(); });
+    $("#category").addEventListener("change", (e) => { state.category = e.target.value; renderAll(); });
+    $("#resetType").addEventListener("change", (e) => { state.resetType = e.target.value; renderAll(); });
+    $("#difficulty").addEventListener("change", (e) => { state.difficulty = e.target.value; renderAll(); });
+
+    $("#timeBucket").addEventListener("change", (e) => {
+      state.timeBucket = e.target.value;
+      if (state.timeBucket) state.maxTime = null; // avoid double-filter confusion
+      renderAll();
+    });
+
+    $("#sort").addEventListener("change", (e) => { state.sort = e.target.value; renderAll(); });
+
+    $("#clearFavBtn").addEventListener("click", () => {
+      favs = new Set();
+      saveFavs(favs);
+      renderAll();
+    });
+
+    $("#clearFiltersBtn").addEventListener("click", () => {
+      clearFilters({alsoClearCollection:true});
+    });
+
+    // Quick actions
+    $("#quickDaily").addEventListener("click", () => {
+      state.resetType = "Daily";
+      $("#resetType").value = "Daily";
+      renderAll();
+    });
+
+    $("#quickWarmup").addEventListener("click", () => {
+      state.timeBucket = "";
+      $("#timeBucket").value = "";
+      state.maxTime = 10;
+      renderAll();
+    });
+
+    $("#quickWord").addEventListener("click", () => {
+      state.category = "Word Games";
+      $("#category").value = "Word Games";
+      renderAll();
+    });
+
+    renderAll();
+    setInterval(() => renderAll(), 60_000);
+  }
+
+  init();
+})();
+</script>
+</body>
+</html>

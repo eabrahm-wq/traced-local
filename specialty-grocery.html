@@ -1,0 +1,341 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Specialty Grocery — Traced Local</title>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=IBM+Plex+Mono:wght@300;400;500&display=swap" rel="stylesheet">
+  <style>
+    :root { --black:#080806; --cream:#f0ede4; --red:#c8392b; --green:#2d5a27; --green-light:#4a8a42; --muted:#8a8678; --border:#1e1e1a; --border-mid:#222; }
+    * { margin:0; padding:0; box-sizing:border-box; }
+    body { background:var(--black); color:var(--cream); font-family:'IBM Plex Mono',monospace; min-height:100vh; }
+
+    header { display:flex; align-items:center; justify-content:space-between; padding:20px 24px; border-bottom:1px solid var(--border); position:sticky; top:0; background:var(--black); z-index:100; }
+    .logo-group { display:flex; align-items:baseline; gap:10px; }
+    .logo-traced { font-size:13px; letter-spacing:0.25em; color:var(--red); font-weight:500; }
+    .logo-divider { color:var(--border); }
+    .logo-local { font-family:'Playfair Display',serif; font-size:18px; color:var(--cream); }
+    .back-link { font-size:9px; letter-spacing:0.18em; color:var(--muted); text-decoration:none; border:1px solid var(--border); padding:6px 12px; }
+    .back-link:hover { color:var(--cream); border-color:#444; }
+
+    .hero { padding:48px 24px 36px; border-bottom:1px solid var(--border); position:relative; overflow:hidden; }
+    .hero::before { content:''; position:absolute; top:-40px; right:-60px; width:280px; height:280px; background:radial-gradient(circle,rgba(45,90,39,0.1) 0%,transparent 70%); pointer-events:none; }
+    .hero-eyebrow { font-size:7px; letter-spacing:0.25em; color:var(--green-light); margin-bottom:14px; }
+    .hero-title { font-family:'Playfair Display',serif; font-size:clamp(28px,7vw,44px); line-height:1.1; color:var(--cream); margin-bottom:16px; }
+    .hero-sub { font-size:11px; color:var(--muted); line-height:1.75; max-width:400px; }
+    .hero-sub strong { color:var(--cream); font-weight:400; }
+
+    .editorial { padding:28px 24px; border-bottom:1px solid var(--border); background:#0a0a08; }
+    .editorial-label { font-size:7px; letter-spacing:0.22em; color:var(--red); margin-bottom:10px; }
+    .editorial-text { font-family:'Playfair Display',serif; font-size:14px; line-height:1.75; color:#bbb; max-width:440px; }
+    .editorial-text strong { color:var(--cream); font-style:italic; }
+
+    .listings-section { padding:28px 24px; border-bottom:1px solid var(--border); }
+    .section-eyebrow { font-size:7px; letter-spacing:0.22em; color:var(--muted); margin-bottom:18px; }
+    .section-eyebrow span { color:var(--green-light); }
+
+    .store-card { border:1px solid var(--border-mid); margin-bottom:14px; overflow:hidden; }
+    .store-card.featured { border-color:rgba(74,138,66,0.35); }
+    .store-header { padding:16px 16px 12px; cursor:pointer; display:flex; align-items:flex-start; justify-content:space-between; gap:8px; }
+    .store-left { flex:1; }
+    .store-name { font-family:'Playfair Display',serif; font-size:18px; color:var(--cream); line-height:1.2; margin-bottom:3px; }
+    .store-tagline { font-size:10px; color:var(--muted); line-height:1.4; }
+    .store-right { display:flex; flex-direction:column; align-items:flex-end; gap:4px; flex-shrink:0; }
+    .store-badge { font-size:7px; letter-spacing:0.12em; padding:2px 7px; color:var(--green-light); border:1px solid rgba(74,138,66,0.3); background:rgba(45,90,39,0.1); }
+    .store-chevron { font-size:10px; color:#444; margin-top:4px; transition:transform 0.2s; }
+    .store-chevron.open { transform:rotate(180deg); }
+    .store-body { display:none; padding:0 16px 16px; }
+    .store-body.open { display:block; }
+    .store-story { font-size:11px; color:#ccc; line-height:1.7; margin-bottom:12px; padding-bottom:12px; border-bottom:1px solid var(--border); }
+    .detail-label { font-size:7px; letter-spacing:0.2em; color:var(--muted); margin-bottom:7px; }
+    .strength-list { display:flex; flex-wrap:wrap; gap:5px; margin-bottom:12px; }
+    .stag { font-size:9px; color:#aaa; border:1px solid var(--border-mid); padding:3px 8px; }
+    .stag.green { color:var(--green-light); border-color:rgba(74,138,66,0.25); }
+    .store-locations { margin-bottom:10px; }
+    .loc-row { display:flex; align-items:baseline; gap:8px; padding:6px 0; border-bottom:1px solid #111; font-size:9px; }
+    .loc-name { color:var(--cream); min-width:100px; }
+    .loc-addr { color:var(--muted); }
+    .store-meta { font-size:9px; color:var(--muted); line-height:1.8; }
+    .store-meta strong { color:#888; font-weight:400; }
+
+    .what-sets-apart { padding:24px; border-bottom:1px solid var(--border); }
+    .criteria-grid { display:grid; grid-template-columns:1fr 1fr; gap:8px; margin-top:14px; }
+    .criterion { padding:12px; border:1px solid var(--border-mid); }
+    .crit-title { font-size:10px; color:var(--cream); margin-bottom:4px; }
+    .crit-note { font-size:9px; color:var(--muted); line-height:1.5; }
+
+    .horizon-section { padding:24px; background:#0a0a08; border-bottom:1px solid var(--border); }
+    .horizon-text { font-family:'Playfair Display',serif; font-size:14px; line-height:1.7; color:#bbb; max-width:420px; }
+    .horizon-text strong { color:var(--cream); font-style:italic; }
+
+    footer { padding:22px 24px; border-top:1px solid var(--border); display:flex; align-items:center; justify-content:space-between; }
+    .footer-logo { font-size:9px; letter-spacing:0.2em; color:#333; }
+    .footer-logo span { color:var(--red); }
+    .footer-link { font-size:9px; color:#444; text-decoration:none; }
+  </style>
+</head>
+<body>
+
+  <header>
+    <div class="logo-group">
+      <span class="logo-traced">TRACED</span>
+      <span class="logo-divider">/</span>
+      <span class="logo-local">Local</span>
+    </div>
+    <a href="index.html" class="back-link">← ALL CATEGORIES</a>
+  </header>
+
+  <section class="hero">
+    <div class="hero-eyebrow">↑ TRACED LOCAL · SAN FRANCISCO</div>
+    <h1 class="hero-title">Specialty<br>Grocery</h1>
+    <p class="hero-sub">
+      Independent grocers who name their suppliers, pay fair prices, and stock products that have a story. The alternative to buying everything from a company that owns 40 other brands.<br><br>
+      <strong>Every supplier named. Every product chosen deliberately.</strong>
+    </p>
+  </section>
+
+  <section class="editorial">
+    <div class="editorial-label">THE DIFFERENCE</div>
+    <p class="editorial-text">
+      A conventional grocery store buys from distributors who buy from whoever offers the lowest price. The store doesn't know who grew it or how. The buyer never visited the farm. "Local" and "organic" on the shelf are marketing categories, not relationships.<br><br>
+      An independent specialty grocer <strong>has a relationship with the producers on their shelves</strong>. They visited the farm. They know the family. They can answer when you ask where something comes from.
+    </p>
+  </section>
+
+  <section class="listings-section">
+    <div class="section-eyebrow">SF INDEPENDENT GROCERS · <span>PROFILED</span></div>
+
+    <div class="store-card featured">
+      <div class="store-header" onclick="toggle(this)">
+        <div class="store-left">
+          <div class="store-name">Bi-Rite Market</div>
+          <div class="store-tagline">The gold standard · Mission & Divisadero · Est. 1940</div>
+        </div>
+        <div class="store-right">
+          <span class="store-badge">GOLD STANDARD</span>
+          <span class="store-chevron">▼</span>
+        </div>
+      </div>
+      <div class="store-body">
+        <div class="store-story">
+          Sam Mogannam reopened Bi-Rite in 1997 with a specific mandate: name every supplier, build direct relationships with producers, and tell customers exactly where everything comes from. In the intervening decades, Bi-Rite has become the reference point for what an independent San Francisco grocery store can be. The Mission original on 18th Street is small — under 3,000 square feet — which forces curation. Everything on the shelf was chosen deliberately, with a direct relationship to the supplier. The Divisadero location (Bi-Rite Market at Divisadero) expanded the footprint while maintaining the model. Bi-Rite's community kitchen produces prepared foods using the same sourcing standards as the retail floor. Their creamery on 18th makes ice cream from Straus Family Creamery organic dairy.
+        </div>
+        <div class="detail-label">WHAT SETS THEM APART</div>
+        <div class="strength-list">
+          <span class="stag green">Named suppliers on every product</span>
+          <span class="stag green">Direct farm relationships</span>
+          <span class="stag">Exceptional produce curation</span>
+          <span class="stag">Local dairy, eggs, meat</span>
+          <span class="stag">Prepared foods from same sourcing</span>
+          <span class="stag">Community programs & gleaning</span>
+        </div>
+        <div class="detail-label">LOCATIONS</div>
+        <div class="store-locations">
+          <div class="loc-row"><span class="loc-name">Bi-Rite Market</span><span class="loc-addr">3639 18th St, Mission · Mon–Sun 8 AM–9 PM</span></div>
+          <div class="loc-row"><span class="loc-name">Bi-Rite at Divis</span><span class="loc-addr">550 Divisadero St, NoPa · Mon–Sun 8 AM–9 PM</span></div>
+          <div class="loc-row"><span class="loc-name">Bi-Rite Creamery</span><span class="loc-addr">3692 18th St, Mission · Separate entrance</span></div>
+        </div>
+        <div class="store-meta">
+          <strong>Owned by:</strong> Sam & Raphael Mogannam, family-owned<br>
+          <strong>Known for:</strong> Straus dairy, Marin Sun Farms meat, exceptional cheese counter
+        </div>
+      </div>
+    </div>
+
+    <div class="store-card featured">
+      <div class="store-header" onclick="toggle(this)">
+        <div class="store-left">
+          <div class="store-name">Rainbow Grocery</div>
+          <div class="store-tagline">Worker-owned cooperative · SoMa · Est. 1975</div>
+        </div>
+        <div class="store-right">
+          <span class="store-badge">WORKER COOPERATIVE</span>
+          <span class="store-chevron">▼</span>
+        </div>
+      </div>
+      <div class="store-body">
+        <div class="store-story">
+          Rainbow Grocery has been a worker-owned cooperative on Folsom Street since 1975. It is one of the largest worker cooperatives in the US and the largest in San Francisco. Every employee is an owner. Decisions are made collectively. The business model doesn't extract profit to shareholders — surpluses go back into the cooperative and wages. Rainbow is almost entirely vegetarian and vegan, with the deepest bulk section in SF, an exceptional cheese and dairy department, and an ethos that has remained consistent across five decades. It is also one of the most affordable specialty grocery stores in the city, because the worker-cooperative structure eliminates the investor margin.
+        </div>
+        <div class="detail-label">WHAT SETS THEM APART</div>
+        <div class="strength-list">
+          <span class="stag green">Worker-owned, no outside investors</span>
+          <span class="stag green">Deepest bulk section in SF</span>
+          <span class="stag">Exceptional cheese counter</span>
+          <span class="stag">Strong local produce</span>
+          <span class="stag">Affordable for specialty quality</span>
+          <span class="stag">Veg/vegan-focused</span>
+        </div>
+        <div class="detail-label">LOCATIONS</div>
+        <div class="store-locations">
+          <div class="loc-row"><span class="loc-name">Rainbow Grocery</span><span class="loc-addr">1745 Folsom St, SoMa · Mon–Sat 9 AM–9 PM, Sun 10 AM–9 PM</span></div>
+        </div>
+        <div class="store-meta">
+          <strong>Structure:</strong> Worker-owned cooperative since 1975<br>
+          <strong>Known for:</strong> Bulk goods, cheese, affordable specialty pricing
+        </div>
+      </div>
+    </div>
+
+    <div class="store-card featured">
+      <div class="store-header" onclick="toggle(this)">
+        <div class="store-left">
+          <div class="store-name">Gus's Community Market</div>
+          <div class="store-tagline">Neighborhood independent · 5 SF locations · Local-first buying</div>
+        </div>
+        <div class="store-right">
+          <span class="store-badge">LOCAL-FIRST</span>
+          <span class="store-chevron">▼</span>
+        </div>
+      </div>
+      <div class="store-body">
+        <div class="store-story">
+          Gus's Community Market operates five stores across SF — Castro, Noe Valley, Haight, Bernal Heights, and Parnassus — with a buying philosophy that prioritizes local producers, independent brands, and direct sourcing. Gus's was explicitly founded to offer an alternative to both Whole Foods (too corporate) and conventional supermarkets (not enough quality). Their produce departments carry many of the same farms that appear at SF farmers markets. Their private-label house brand is sourced with the same standards as the named brands they carry.
+        </div>
+        <div class="detail-label">WHAT SETS THEM APART</div>
+        <div class="strength-list">
+          <span class="stag green">5 neighborhood SF locations</span>
+          <span class="stag green">Local-first produce sourcing</span>
+          <span class="stag">Independent ownership</span>
+          <span class="stag">Competitive pricing vs. Whole Foods</span>
+          <span class="stag">Strong prepared foods</span>
+        </div>
+        <div class="detail-label">LOCATIONS</div>
+        <div class="store-locations">
+          <div class="loc-row"><span class="loc-name">Castro</span><span class="loc-addr">575 Castro St</span></div>
+          <div class="loc-row"><span class="loc-name">Noe Valley</span><span class="loc-addr">3945 24th St</span></div>
+          <div class="loc-row"><span class="loc-name">Haight</span><span class="loc-addr">1530 Haight St</span></div>
+          <div class="loc-row"><span class="loc-name">Bernal Heights</span><span class="loc-addr">3980 Mission St</span></div>
+          <div class="loc-row"><span class="loc-name">Parnassus</span><span class="loc-addr">505 Frederick St</span></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="store-card">
+      <div class="store-header" onclick="toggle(this)">
+        <div class="store-left">
+          <div class="store-name">Other Avenues Food Store</div>
+          <div class="store-tagline">Worker-owned cooperative · Outer Sunset · Est. 1974</div>
+        </div>
+        <div class="store-right">
+          <span class="store-badge">WORKER CO-OP</span>
+          <span class="store-chevron">▼</span>
+        </div>
+      </div>
+      <div class="store-body">
+        <div class="store-story">
+          Other Avenues has operated as a worker-owned cooperative in the Outer Sunset since 1974 — one of the oldest food cooperatives in California. The store is small, deeply local in character, and serves the residential far-west SF neighborhoods that often lack specialty food options. Their produce sourcing emphasizes local farms, and their bulk section rivals Rainbow's for depth relative to store size. The Outer Sunset co-op is a natural complement to the Outer Sunset Farmers Market at 37th Avenue, which operates on Sundays a few blocks away.
+        </div>
+        <div class="strength-list">
+          <span class="stag green">Worker-owned since 1974</span>
+          <span class="stag">Outer Sunset food anchor</span>
+          <span class="stag">Deep bulk section</span>
+          <span class="stag">Local produce focus</span>
+        </div>
+        <div class="detail-label">LOCATIONS</div>
+        <div class="store-locations">
+          <div class="loc-row"><span class="loc-name">Other Avenues</span><span class="loc-addr">3930 Judah St, Outer Sunset</span></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="store-card">
+      <div class="store-header" onclick="toggle(this)">
+        <div class="store-left">
+          <div class="store-name">Foodwise Market Hub</div>
+          <div class="store-tagline">Year-round indoor market · Ferry Building & online</div>
+        </div>
+        <div class="store-right">
+          <span class="store-chevron">▼</span>
+        </div>
+      </div>
+      <div class="store-body">
+        <div class="store-story">
+          Foodwise — the nonprofit that runs Ferry Plaza and Alemany markets — also operates a year-round market hub at the Ferry Building that stocks produce and goods from their certified farmers and vendors. This functions as a grocery-style extension of the markets, providing access to the same farms on days when the outdoor market isn't running. It is particularly useful for weekday shoppers who can't make Saturday or Sunday markets but want to maintain relationships with the same producers.
+        </div>
+        <div class="strength-list">
+          <span class="stag green">Same farms as Ferry Plaza</span>
+          <span class="stag">Nonprofit operated</span>
+          <span class="stag">Ferry Building location</span>
+          <span class="stag">Year-round access</span>
+        </div>
+        <div class="detail-label">LOCATIONS</div>
+        <div class="store-locations">
+          <div class="loc-row"><span class="loc-name">Ferry Building Hub</span><span class="loc-addr">1 Ferry Building, Embarcadero</span></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="store-card">
+      <div class="store-header" onclick="toggle(this)">
+        <div class="store-left">
+          <div class="store-name">Haight Street Market</div>
+          <div class="store-tagline">Independent neighborhood grocer · Lower Haight</div>
+        </div>
+        <div class="store-right">
+          <span class="store-chevron">▼</span>
+        </div>
+      </div>
+      <div class="store-body">
+        <div class="store-story">
+          Haight Street Market is an independent neighborhood grocery serving the Lower Haight with a focus on local and organic products. In a neighborhood between Divisadero and the Haight — both with Sunday farmers markets — it functions as the weekday fresh-food option for residents who build their week around market shopping. Their produce and dairy sections lean heavily local.
+        </div>
+        <div class="strength-list">
+          <span class="stag green">Independent, neighborhood-owned</span>
+          <span class="stag">Local & organic focus</span>
+          <span class="stag">Walkable from Divisadero market</span>
+        </div>
+        <div class="detail-label">LOCATIONS</div>
+        <div class="store-locations">
+          <div class="loc-row"><span class="loc-name">Haight Street Market</span><span class="loc-addr">1895 Haight St, Lower Haight</span></div>
+        </div>
+      </div>
+    </div>
+
+  </section>
+
+  <!-- WHAT SETS A SPECIALTY GROCER APART -->
+  <section class="what-sets-apart">
+    <div class="section-eyebrow">HOW TO EVALUATE · <span>WHAT MAKES A REAL SPECIALTY GROCER</span></div>
+    <div class="criteria-grid">
+      <div class="criterion">
+        <div class="crit-title">Named suppliers</div>
+        <div class="crit-note">The shelf tag or website lists the specific farm or producer. Not just "local" — a name and a location.</div>
+      </div>
+      <div class="criterion">
+        <div class="crit-title">Seasonal produce</div>
+        <div class="crit-note">The produce selection changes with the season because it's actually following what's available, not what's cheap from distribution.</div>
+      </div>
+      <div class="criterion">
+        <div class="crit-title">Independent ownership</div>
+        <div class="crit-note">Not a division of a national chain. Decisions are made locally, by people who shop in the same neighborhood.</div>
+      </div>
+      <div class="criterion">
+        <div class="crit-title">Staff who know the products</div>
+        <div class="crit-note">Ask "where does this come from?" A good specialty grocer has staff who can answer that for most items.</div>
+      </div>
+    </div>
+  </section>
+
+  <section class="horizon-section">
+    <div class="section-eyebrow">TRACED LOCAL · <span>EXPANDING</span></div>
+    <p class="horizon-text">
+      The SF independent grocery guide is the first chapter. <strong>Los Angeles has a different independent grocery landscape — smaller stores, more ethnic specialty grocers, CSA-adjacent operations</strong>. Oakland and Berkeley have their own cooperative tradition going back to the 1970s. The national version of this guide will map independent grocers city by city, with the same depth of ownership and sourcing information.
+    </p>
+  </section>
+
+  <footer>
+    <div class="footer-logo"><span>TRACED</span> / LOCAL</div>
+    <a href="index.html" class="footer-link">← all categories</a>
+  </footer>
+
+  <script>
+    function toggle(header) {
+      const body = header.nextElementSibling;
+      const chevron = header.querySelector('.store-chevron');
+      body.classList.toggle('open');
+      chevron.classList.toggle('open');
+    }
+  </script>
+</body>
+</html>

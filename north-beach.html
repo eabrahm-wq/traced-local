@@ -1,0 +1,247 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>North Beach Farmers Market — Traced Local</title>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=IBM+Plex+Mono:wght@300;400;500&display=swap" rel="stylesheet">
+  <style>
+    :root { --black:#080806; --cream:#f0ede4; --red:#c8392b; --green:#2d5a27; --green-light:#4a8a42; --muted:#8a8678; --border:#1a1a16; --border-mid:#222; }
+    * { margin:0; padding:0; box-sizing:border-box; }
+    body { background:var(--black); color:var(--cream); font-family:'IBM Plex Mono',monospace; min-height:100vh; }
+    header { display:flex; align-items:center; justify-content:space-between; padding:18px 20px; border-bottom:1px solid var(--border); position:sticky; top:0; background:var(--black); z-index:100; }
+    .logo-group { display:flex; align-items:baseline; gap:8px; }
+    .logo-traced { font-size:12px; letter-spacing:0.25em; color:var(--red); font-weight:500; }
+    .logo-divider { color:#222; }
+    .logo-local { font-family:'Playfair Display',serif; font-size:17px; color:var(--cream); }
+    .back-link { font-size:9px; letter-spacing:0.15em; color:var(--muted); text-decoration:none; border:1px solid var(--border); padding:5px 10px; }
+    .market-hero { padding:32px 20px 24px; border-bottom:1px solid var(--border); background:linear-gradient(180deg,rgba(45,90,39,0.05) 0%,transparent 100%); }
+    .market-eyebrow { font-size:7px; letter-spacing:0.25em; color:var(--green-light); margin-bottom:10px; }
+    .market-name { font-family:'Playfair Display',serif; font-size:clamp(24px,6vw,36px); line-height:1.1; color:var(--cream); margin-bottom:6px; }
+    .market-operator { font-size:9px; letter-spacing:0.12em; color:var(--muted); margin-bottom:18px; }
+    .market-hours-grid { display:grid; grid-template-columns:1fr 1fr; gap:8px; margin-bottom:16px; }
+    .hours-card { padding:10px 12px; border:1px solid var(--border-mid); background:rgba(255,255,255,0.02); }
+    .hours-day { font-size:8px; letter-spacing:0.2em; color:var(--green-light); margin-bottom:3px; }
+    .hours-time { font-size:12px; color:var(--cream); }
+    .hours-note { font-size:8px; color:var(--muted); margin-top:2px; }
+    .market-tags { display:flex; flex-wrap:wrap; gap:5px; margin-bottom:16px; }
+    .mtag { font-size:7px; letter-spacing:0.12em; color:var(--muted); border:1px solid var(--border-mid); padding:3px 8px; }
+    .mtag.green { color:var(--green-light); border-color:rgba(74,138,66,0.3); }
+    .mtag.yellow { color:#8a7a00; border-color:rgba(138,122,0,0.3); }
+    .map-btn { display:inline-flex; align-items:center; gap:6px; font-size:9px; letter-spacing:0.15em; color:var(--green-light); text-decoration:none; border:1px solid rgba(74,138,66,0.4); background:rgba(45,90,39,0.1); padding:8px 14px; }
+    .section { padding:24px 20px; border-bottom:1px solid var(--border); }
+    .section-label { font-size:7px; letter-spacing:0.22em; color:var(--muted); margin-bottom:16px; }
+    .section-label span { color:var(--green-light); }
+    .vendor-card { border:1px solid var(--border-mid); margin-bottom:12px; overflow:hidden; }
+    .vendor-card.featured { border-color:rgba(74,138,66,0.35); }
+    .vendor-header { padding:14px 14px 10px; cursor:pointer; display:flex; align-items:flex-start; justify-content:space-between; gap:8px; }
+    .vendor-left { flex:1; }
+    .vendor-name { font-family:'Playfair Display',serif; font-size:17px; color:var(--cream); line-height:1.2; margin-bottom:3px; }
+    .vendor-tagline { font-size:10px; color:var(--muted); line-height:1.4; }
+    .vendor-right { display:flex; flex-direction:column; align-items:flex-end; gap:4px; flex-shrink:0; }
+    .vendor-cert { font-size:7px; letter-spacing:0.12em; padding:2px 7px; color:var(--green-light); border:1px solid rgba(74,138,66,0.3); background:rgba(45,90,39,0.1); }
+    .vendor-chevron { font-size:10px; color:#444; margin-top:4px; transition:transform 0.2s; }
+    .vendor-chevron.open { transform:rotate(180deg); }
+    .vendor-body { display:none; padding:0 14px 14px; }
+    .vendor-body.open { display:block; }
+    .vendor-story { font-size:11px; color:#ccc; line-height:1.7; margin-bottom:12px; padding-bottom:12px; border-bottom:1px solid var(--border); }
+    .products-label { font-size:7px; letter-spacing:0.2em; color:var(--muted); margin-bottom:8px; }
+    .product-list { display:flex; flex-wrap:wrap; gap:5px; margin-bottom:12px; }
+    .product-tag { font-size:9px; letter-spacing:0.06em; color:#aaa; border:1px solid var(--border-mid); padding:3px 8px; }
+    .product-tag.seasonal { color:#8a7a00; border-color:rgba(138,122,0,0.3); }
+    .vendor-meta { font-size:9px; color:var(--muted); line-height:1.8; }
+    .vendor-meta strong { color:#888; font-weight:400; }
+    .vendor-days { display:flex; gap:5px; margin-top:10px; }
+    .day-pill { font-size:7px; letter-spacing:0.12em; padding:3px 8px; }
+    .day-pill.active { color:var(--green-light); border:1px solid rgba(74,138,66,0.3); background:rgba(45,90,39,0.1); }
+    .day-pill.inactive { color:#333; border:1px solid #1a1a1a; }
+    .season-grid { display:grid; grid-template-columns:1fr 1fr; gap:8px; }
+    .season-card { padding:10px 12px; border:1px solid var(--border); }
+    .season-month { font-size:7px; letter-spacing:0.15em; color:var(--green-light); margin-bottom:5px; }
+    .season-items { font-size:10px; color:#aaa; line-height:1.6; }
+    .about-text { font-size:11px; color:#bbb; line-height:1.8; }
+    .about-text + .about-text { margin-top:12px; }
+    footer { padding:20px; border-top:1px solid var(--border); display:flex; align-items:center; justify-content:space-between; }
+    .footer-logo { font-size:9px; letter-spacing:0.18em; color:#2a2a2a; }
+    .footer-logo span { color:var(--red); }
+    .footer-link { font-size:9px; color:#333; text-decoration:none; }
+  </style>
+</head>
+<body>
+
+  <header>
+    <div class="logo-group">
+      <span class="logo-traced">TRACED</span>
+      <span class="logo-divider">/</span>
+      <span class="logo-local">Local</span>
+    </div>
+    <a href="https://traced-local.vercel.app" class="back-link">← ALL MARKETS</a>
+  </header>
+
+  <section class="market-hero">
+    <div class="market-eyebrow">↑ SAN FRANCISCO · NORTH BEACH</div>
+    <h1 class="market-name">North Beach<br>Farmers Market</h1>
+    <div class="market-operator">Volunteer-organized · Est. 2018 · Seasonal (May–November)</div>
+    <div class="market-hours-grid">
+      <div class="hours-card">
+        <div class="hours-day">SATURDAY</div>
+        <div class="hours-time">9 AM – 1 PM</div>
+        <div class="hours-note">Seasonal · May–November</div>
+      </div>
+      <div class="hours-card">
+        <div class="hours-day">LOCATION</div>
+        <div class="hours-time">659 Columbus Ave</div>
+        <div class="hours-note">Near Coit Tower · Joe DiMaggio Playground</div>
+      </div>
+    </div>
+    <div class="market-tags">
+      <span class="mtag yellow">SEASONAL: MAY–NOV</span>
+      <span class="mtag green">CALFRESH / EBT</span>
+      <span class="mtag">VOLUNTEER-ORGANIZED</span>
+      <span class="mtag">NEAR COIT TOWER</span>
+      <span class="mtag">CALIFORNIA CERTIFIED</span>
+    </div>
+    <a href="https://maps.google.com/?q=659+Columbus+Ave+San+Francisco+CA" target="_blank" class="map-btn">
+      ↗ OPEN IN MAPS · 659 Columbus Ave, San Francisco
+    </a>
+  </section>
+
+  <section class="section">
+    <div class="section-label">FEATURED VENDORS · <span>SEASONAL SATURDAY MARKET</span></div>
+
+    <div class="vendor-card featured">
+      <div class="vendor-header" onclick="toggle(this)">
+        <div class="vendor-left">
+          <div class="vendor-name">Saltwater Bakeshop</div>
+          <div class="vendor-tagline">Artisan sourdough & pastries · San Francisco, CA</div>
+        </div>
+        <div class="vendor-right">
+          <span class="vendor-chevron">▼</span>
+        </div>
+      </div>
+      <div class="vendor-body">
+        <div class="vendor-story">
+          Saltwater Bakeshop is a North Beach-based artisan bakery that has become a defining vendor at this market — one of the few bakeries with genuine SF neighborhood roots that sells at multiple SF markets including Clement Street and North Beach. Their sourdough uses a long-fermentation natural starter, and the pastry work reflects French training. The combination of location (half a block from the market), local ownership, and quality sets them apart from the large-operation bakeries that dominate most Bay Area markets.
+        </div>
+        <div class="products-label">WHAT THEY BRING</div>
+        <div class="product-list">
+          <span class="product-tag">Country sourdough</span>
+          <span class="product-tag">Seeded loaves</span>
+          <span class="product-tag">Croissants</span>
+          <span class="product-tag seasonal">☀ Seasonal fruit tarts</span>
+          <span class="product-tag">Kouign-amann</span>
+          <span class="product-tag">Focaccia</span>
+        </div>
+        <div class="vendor-meta">
+          <strong>Location:</strong> North Beach, San Francisco<br>
+          <strong>Also at:</strong> Clement Street Sunday
+        </div>
+        <div class="vendor-days">
+          <span class="day-pill active">SAT</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="vendor-card">
+      <div class="vendor-header" onclick="toggle(this)">
+        <div class="vendor-left">
+          <div class="vendor-name">Obour Foods</div>
+          <div class="vendor-tagline">Hot curry hummus & Middle Eastern specialties · Bay Area</div>
+        </div>
+        <div class="vendor-right">
+          <span class="vendor-chevron">▼</span>
+        </div>
+      </div>
+      <div class="vendor-body">
+        <div class="vendor-story">
+          Obour Foods is a specialty prepared foods vendor known for their signature hot curry hummus — a cross-cultural combination that has found a loyal following at North Beach and other SF markets. The product is house-made in small batches. Their range of dips and spreads draws on Middle Eastern and South Asian cooking traditions. Chef Martin Yan and Tony Gemignani were at the ribbon-cutting for North Beach's expanded market location in 2021.
+        </div>
+        <div class="products-label">WHAT THEY BRING</div>
+        <div class="product-list">
+          <span class="product-tag">Hot curry hummus</span>
+          <span class="product-tag">Classic hummus</span>
+          <span class="product-tag">Toum (garlic sauce)</span>
+          <span class="product-tag">Specialty dips</span>
+        </div>
+        <div class="vendor-meta">
+          <strong>Specialty:</strong> Curry-spiced hummus — house recipe
+        </div>
+        <div class="vendor-days">
+          <span class="day-pill active">SAT</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="vendor-card">
+      <div class="vendor-header" onclick="toggle(this)">
+        <div class="vendor-left">
+          <div class="vendor-name">Seasonal Produce Farms</div>
+          <div class="vendor-tagline">Rotating farms · Bay Area and Central Coast</div>
+        </div>
+        <div class="vendor-right">
+          <span class="vendor-chevron">▼</span>
+        </div>
+      </div>
+      <div class="vendor-body">
+        <div class="vendor-story">
+          North Beach carries a rotating selection of 8–12 produce farms during its May–November season. The market was established in 2018 and expanded its footprint significantly in 2021. Because the season runs through the peak of California's agricultural calendar — from spring strawberries through summer stone fruit and into fall squash and citrus — the produce selection is consistently strong despite the market's smaller size. Vendor rosters vary week to week.
+        </div>
+        <div class="products-label">SEASONAL PRODUCE BY MONTH</div>
+        <div class="product-list">
+          <span class="product-tag seasonal">☀ Strawberries (May–Jun)</span>
+          <span class="product-tag seasonal">☀ Stone fruit (Jun–Sep)</span>
+          <span class="product-tag seasonal">☀ Corn & tomatoes (Jul–Oct)</span>
+          <span class="product-tag seasonal">🍂 Winter squash (Sep–Nov)</span>
+          <span class="product-tag seasonal">🍂 Apples & pears (Sep–Nov)</span>
+        </div>
+        <div class="vendor-meta">
+          <strong>Note:</strong> Vendor lineup varies week to week; market is volunteer-organized
+        </div>
+        <div class="vendor-days">
+          <span class="day-pill active">SAT</span>
+        </div>
+      </div>
+    </div>
+
+  </section>
+
+  <section class="section">
+    <div class="section-label">WHAT'S IN SEASON WHEN MARKET IS OPEN · <span>MAY–NOVEMBER</span></div>
+    <div class="season-grid">
+      <div class="season-card">
+        <div class="season-month">OPENING MONTHS (MAY–JUN)</div>
+        <div class="season-items">Strawberries · Cherries · Favas · Spring onions · Asparagus · Artichokes · Lettuce · Brassicas</div>
+      </div>
+      <div class="season-card">
+        <div class="season-month">PEAK SEASON (JUL–OCT)</div>
+        <div class="season-items">Peaches · Tomatoes · Corn · Peppers · Melons · Figs · Apples · Pears · Winter squash · Pomegranates</div>
+      </div>
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="section-label">ABOUT THIS MARKET</div>
+    <p class="about-text">
+      The North Beach Farmers Market opened in 2018 — one of SF's newest markets. It runs every Saturday from May through November on Columbus Avenue near the Joe DiMaggio Playground and Coit Tower, in the heart of one of SF's most historically dense neighborhoods. It is volunteer-organized, which gives it an independently community character uncommon among SF's market landscape. The market expanded to a new, larger location in 2021, nearly doubling its footprint.
+    </p>
+    <p class="about-text">
+      Unlike year-round markets, North Beach's seasonal nature means it operates during the most abundant months of California's growing calendar — the period when tomatoes are at peak, stone fruit is in season, and the weather makes outdoor shopping appealing. Closed in winter.
+    </p>
+  </section>
+
+  <footer>
+    <div class="footer-logo"><span>TRACED</span> / LOCAL</div>
+    <a href="https://traced-local.vercel.app" class="footer-link">← all markets</a>
+  </footer>
+
+  <script>
+    function toggle(header) {
+      const body = header.nextElementSibling;
+      const chevron = header.querySelector('.vendor-chevron');
+      const isOpen = body.classList.contains('open');
+      body.classList.toggle('open', !isOpen);
+      chevron.classList.toggle('open', !isOpen);
+    }
+  </script>
+</body>
+</html>

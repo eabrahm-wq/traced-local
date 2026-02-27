@@ -1,0 +1,309 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Butchers — Traced Local</title>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=IBM+Plex+Mono:wght@300;400;500&display=swap" rel="stylesheet">
+  <style>
+    :root { --black:#080806; --cream:#f0ede4; --red:#c8392b; --green:#2d5a27; --green-light:#4a8a42; --muted:#8a8678; --border:#1e1e1a; --border-mid:#222; }
+    * { margin:0; padding:0; box-sizing:border-box; }
+    body { background:var(--black); color:var(--cream); font-family:'IBM Plex Mono',monospace; min-height:100vh; }
+
+    header { display:flex; align-items:center; justify-content:space-between; padding:20px 24px; border-bottom:1px solid var(--border); position:sticky; top:0; background:var(--black); z-index:100; }
+    .logo-group { display:flex; align-items:baseline; gap:10px; }
+    .logo-traced { font-size:13px; letter-spacing:0.25em; color:var(--red); font-weight:500; }
+    .logo-divider { color:var(--border); }
+    .logo-local { font-family:'Playfair Display',serif; font-size:18px; color:var(--cream); }
+    .back-link { font-size:9px; letter-spacing:0.18em; color:var(--muted); text-decoration:none; border:1px solid var(--border); padding:6px 12px; }
+    .back-link:hover { color:var(--cream); border-color:#444; }
+
+    .hero { padding:48px 24px 36px; border-bottom:1px solid var(--border); position:relative; overflow:hidden; }
+    .hero::before { content:''; position:absolute; top:-40px; right:-60px; width:280px; height:280px; background:radial-gradient(circle,rgba(200,57,43,0.07) 0%,transparent 70%); pointer-events:none; }
+    .hero-eyebrow { font-size:7px; letter-spacing:0.25em; color:var(--green-light); margin-bottom:14px; }
+    .hero-title { font-family:'Playfair Display',serif; font-size:clamp(28px,7vw,44px); line-height:1.1; color:var(--cream); margin-bottom:16px; }
+    .hero-sub { font-size:11px; color:var(--muted); line-height:1.75; max-width:400px; margin-bottom:24px; }
+    .hero-sub strong { color:var(--cream); font-weight:400; }
+
+    .editorial { padding:28px 24px; border-bottom:1px solid var(--border); background:#0a0a08; }
+    .editorial-label { font-size:7px; letter-spacing:0.22em; color:var(--red); margin-bottom:10px; }
+    .editorial-text { font-family:'Playfair Display',serif; font-size:14px; line-height:1.75; color:#bbb; max-width:440px; }
+    .editorial-text strong { color:var(--cream); font-style:italic; }
+
+    .listings-section { padding:28px 24px; border-bottom:1px solid var(--border); }
+    .section-eyebrow { font-size:7px; letter-spacing:0.22em; color:var(--muted); margin-bottom:18px; }
+    .section-eyebrow span { color:var(--green-light); }
+
+    .vendor-card { border:1px solid var(--border-mid); margin-bottom:12px; overflow:hidden; }
+    .vendor-card.featured { border-color:rgba(74,138,66,0.35); }
+    .vendor-header { padding:16px 16px 12px; cursor:pointer; display:flex; align-items:flex-start; justify-content:space-between; gap:8px; }
+    .vendor-header:hover { background:rgba(255,255,255,0.01); }
+    .vendor-left { flex:1; }
+    .vendor-name { font-family:'Playfair Display',serif; font-size:17px; color:var(--cream); line-height:1.2; margin-bottom:3px; }
+    .vendor-tagline { font-size:10px; color:var(--muted); line-height:1.4; }
+    .vendor-right { display:flex; flex-direction:column; align-items:flex-end; gap:4px; flex-shrink:0; }
+    .vendor-badge { font-size:7px; letter-spacing:0.12em; padding:2px 7px; color:var(--green-light); border:1px solid rgba(74,138,66,0.3); background:rgba(45,90,39,0.1); }
+    .vendor-chevron { font-size:10px; color:#444; margin-top:4px; transition:transform 0.2s; }
+    .vendor-chevron.open { transform:rotate(180deg); }
+    .vendor-body { display:none; padding:0 16px 16px; }
+    .vendor-body.open { display:block; }
+    .vendor-story { font-size:11px; color:#ccc; line-height:1.7; margin-bottom:12px; padding-bottom:12px; border-bottom:1px solid var(--border); }
+    .detail-label { font-size:7px; letter-spacing:0.2em; color:var(--muted); margin-bottom:7px; }
+    .product-list { display:flex; flex-wrap:wrap; gap:5px; margin-bottom:12px; }
+    .ptag { font-size:9px; color:#aaa; border:1px solid var(--border-mid); padding:3px 8px; }
+    .vendor-meta { font-size:9px; color:var(--muted); line-height:1.8; }
+    .vendor-meta strong { color:#888; font-weight:400; }
+
+    .what-to-ask { padding:24px; border-bottom:1px solid var(--border); }
+    .ask-grid { display:grid; grid-template-columns:1fr 1fr; gap:8px; margin-top:14px; }
+    .ask-card { padding:12px; border:1px solid var(--border-mid); }
+    .ask-q { font-size:10px; color:var(--cream); margin-bottom:5px; line-height:1.3; }
+    .ask-note { font-size:9px; color:var(--muted); line-height:1.5; }
+
+    .horizon-section { padding:24px; background:#0a0a08; border-bottom:1px solid var(--border); }
+    .horizon-text { font-family:'Playfair Display',serif; font-size:14px; line-height:1.7; color:#bbb; max-width:420px; }
+    .horizon-text strong { color:var(--cream); font-style:italic; }
+
+    footer { padding:22px 24px; border-top:1px solid var(--border); display:flex; align-items:center; justify-content:space-between; }
+    .footer-logo { font-size:9px; letter-spacing:0.2em; color:#333; }
+    .footer-logo span { color:var(--red); }
+    .footer-link { font-size:9px; color:#444; text-decoration:none; }
+    .footer-link:hover { color:var(--muted); }
+  </style>
+</head>
+<body>
+
+  <header>
+    <div class="logo-group">
+      <span class="logo-traced">TRACED</span>
+      <span class="logo-divider">/</span>
+      <span class="logo-local">Local</span>
+    </div>
+    <a href="index.html" class="back-link">← ALL CATEGORIES</a>
+  </header>
+
+  <section class="hero">
+    <div class="hero-eyebrow">↑ TRACED LOCAL · SAN FRANCISCO</div>
+    <h1 class="hero-title">Butchers</h1>
+    <p class="hero-sub">
+      Independent butchers who buy whole animals directly from local ranchers. They break them down themselves, tell you what ranch the beef came from, and know the difference between a hanging tender and a hanger steak.<br><br>
+      <strong>Not a grocery counter. A butcher.</strong>
+    </p>
+  </section>
+
+  <section class="editorial">
+    <div class="editorial-label">WHY IT MATTERS</div>
+    <p class="editorial-text">
+      Most meat sold in the US passes through four companies. It is slaughtered in industrial facilities, portioned into vacuum-sealed primals, and shipped to grocery distribution centers. The animal has no name. The ranch has no address. The grocery store employee who slices it didn't choose it.<br><br>
+      A real butcher <strong>bought a whole animal from a named ranch</strong>, hung it for three weeks, broke it down by hand, and can tell you exactly what cut is in front of you and why it matters.
+    </p>
+  </section>
+
+  <section class="listings-section">
+    <div class="section-eyebrow">SF BUTCHERS · <span>PROFILED</span></div>
+
+    <div class="vendor-card featured">
+      <div class="vendor-header" onclick="toggle(this)">
+        <div class="vendor-left">
+          <div class="vendor-name">Drewes Bros. Meats</div>
+          <div class="vendor-tagline">California's oldest operating butcher · Est. 1889 · Noe Valley</div>
+        </div>
+        <div class="vendor-right">
+          <span class="vendor-badge">EST. 1889</span>
+          <span class="vendor-chevron">▼</span>
+        </div>
+      </div>
+      <div class="vendor-body">
+        <div class="vendor-story">
+          Drewes Brothers has been operating continuously on Church Street in Noe Valley since 1889 — through the 1906 earthquake, Prohibition, the Depression, two world wars, and the complete transformation of the American food system around them. It is California's oldest operating butcher shop. The current operation sources from Northern California ranches, ages beef in-house, and maintains a full custom-cut service. Drewes also appears at the Noe Valley Farmers Market three blocks away, bringing weekend cuts to the neighborhood market.
+        </div>
+        <div class="detail-label">WHAT THEY CARRY</div>
+        <div class="product-list">
+          <span class="ptag">Dry-aged beef</span>
+          <span class="ptag">Pastured pork</span>
+          <span class="ptag">Lamb</span>
+          <span class="ptag">Housemade sausages</span>
+          <span class="ptag">Custom cuts</span>
+          <span class="ptag">Charcuterie</span>
+          <span class="ptag">Stocks & bones</span>
+        </div>
+        <div class="vendor-meta">
+          <strong>Address:</strong> 1706 Church St, Noe Valley<br>
+          <strong>Hours:</strong> Mon–Sat 9 AM–6 PM, Sun 10 AM–5 PM<br>
+          <strong>Also at:</strong> Noe Valley Farmers Market (Sat)
+        </div>
+      </div>
+    </div>
+
+    <div class="vendor-card featured">
+      <div class="vendor-header" onclick="toggle(this)">
+        <div class="vendor-left">
+          <div class="vendor-name">4505 Meats</div>
+          <div class="vendor-tagline">Whole-animal butchery & chicharrones · Mission / Ferry Plaza</div>
+        </div>
+        <div class="vendor-right">
+          <span class="vendor-badge">LOCAL SOURCING</span>
+          <span class="vendor-chevron">▼</span>
+        </div>
+      </div>
+      <div class="vendor-body">
+        <div class="vendor-story">
+          Ryan Farr founded 4505 Meats out of a commitment to whole-animal butchery and direct farm relationships. The operation is best known for its chicharrones — made from heritage-breed pork — which have become a cult product at Ferry Plaza's Saturday market. The Mission retail shop offers full butchery service with named-ranch sourcing and staff who understand the cuts. 4505 is one of the few SF butchers that has built a brand around transparency: the animal's farm is always disclosed.
+        </div>
+        <div class="detail-label">WHAT THEY CARRY</div>
+        <div class="product-list">
+          <span class="ptag">Heritage-breed pork</span>
+          <span class="ptag">Grass-fed beef</span>
+          <span class="ptag">Chicharrones</span>
+          <span class="ptag">Housemade hot dogs</span>
+          <span class="ptag">Charcuterie</span>
+          <span class="ptag">Sausage</span>
+        </div>
+        <div class="vendor-meta">
+          <strong>Address:</strong> 705 Mariposa St, Mission<br>
+          <strong>Also at:</strong> Ferry Plaza Farmers Market (Sat)
+        </div>
+      </div>
+    </div>
+
+    <div class="vendor-card">
+      <div class="vendor-header" onclick="toggle(this)">
+        <div class="vendor-left">
+          <div class="vendor-name">Avedano's Holly Park Market</div>
+          <div class="vendor-tagline">Neighborhood butcher & deli · Bernal Heights</div>
+        </div>
+        <div class="vendor-right">
+          <span class="vendor-chevron">▼</span>
+        </div>
+      </div>
+      <div class="vendor-body">
+        <div class="vendor-story">
+          Avedano's occupies a historic butcher shop space in Bernal Heights and operates as both a full-service butcher and a neighborhood deli. They source from local farms and ranches, with a particular strength in pork and lamb. The shop is connected to the Alemany market ecosystem — Bernal Heights residents who shop Alemany on Saturday often stop at Avedano's for cuts the market doesn't carry.
+        </div>
+        <div class="detail-label">WHAT THEY CARRY</div>
+        <div class="product-list">
+          <span class="ptag">Grass-fed beef</span>
+          <span class="ptag">Pastured pork</span>
+          <span class="ptag">Lamb</span>
+          <span class="ptag">House-cured meats</span>
+          <span class="ptag">Prepared foods</span>
+          <span class="ptag">Sandwiches</span>
+        </div>
+        <div class="vendor-meta">
+          <strong>Address:</strong> 235 Cortland Ave, Bernal Heights<br>
+          <strong>Note:</strong> Verify current hours before visiting
+        </div>
+      </div>
+    </div>
+
+    <div class="vendor-card">
+      <div class="vendor-header" onclick="toggle(this)">
+        <div class="vendor-left">
+          <div class="vendor-name">Marina Meats</div>
+          <div class="vendor-tagline">Old-school neighborhood butcher · Marina District</div>
+        </div>
+        <div class="vendor-right">
+          <span class="vendor-chevron">▼</span>
+        </div>
+      </div>
+      <div class="vendor-body">
+        <div class="vendor-story">
+          Marina Meats is a full-service neighborhood butcher that has served the Marina District for decades. It operates in the classic mode — you tell them what you need, they cut it to spec. Custom orders, marinating, dry-aging on request. The Marina is directly adjacent to Fort Mason's Sunday market, making a Fort Mason shop + Marina Meats stop a natural Saturday or Sunday food circuit.
+        </div>
+        <div class="detail-label">WHAT THEY CARRY</div>
+        <div class="product-list">
+          <span class="ptag">Beef (custom cut)</span>
+          <span class="ptag">Pork</span>
+          <span class="ptag">Poultry</span>
+          <span class="ptag">Lamb</span>
+          <span class="ptag">Veal</span>
+          <span class="ptag">Housemade sausage</span>
+          <span class="ptag">Marinated meats</span>
+        </div>
+        <div class="vendor-meta">
+          <strong>Address:</strong> 2257 Chestnut St, Marina<br>
+          <strong>Near:</strong> Fort Mason Farmers Market (Sun)
+        </div>
+      </div>
+    </div>
+
+    <div class="vendor-card">
+      <div class="vendor-header" onclick="toggle(this)">
+        <div class="vendor-left">
+          <div class="vendor-name">Marin Sun Farms Butcher Shop</div>
+          <div class="vendor-tagline">100% grass-fed & pasture-raised · Ferry Building</div>
+        </div>
+        <div class="vendor-right">
+          <span class="vendor-badge">100% GRASS-FED</span>
+          <span class="vendor-chevron">▼</span>
+        </div>
+      </div>
+      <div class="vendor-body">
+        <div class="vendor-story">
+          Marin Sun Farms operates a retail butcher shop inside the Ferry Building, sourcing exclusively from their own Point Reyes-area ranches. Every animal is raised on pasture, 100% grass-fed, and processed at their own USDA-inspected facility in Point Reyes Station. This is the shortest chain possible: ranch → Ferry Building butcher counter. The staff can answer exactly which ranch and which animal any cut came from.
+        </div>
+        <div class="detail-label">WHAT THEY CARRY</div>
+        <div class="product-list">
+          <span class="ptag">100% grass-fed beef</span>
+          <span class="ptag">Pastured pork</span>
+          <span class="ptag">Lamb</span>
+          <span class="ptag">Pastured poultry</span>
+          <span class="ptag">Veal</span>
+          <span class="ptag">Rabbit</span>
+          <span class="ptag">Charcuterie</span>
+        </div>
+        <div class="vendor-meta">
+          <strong>Address:</strong> Ferry Building, Shop 33, Embarcadero<br>
+          <strong>Ranch:</strong> Point Reyes, Marin County<br>
+          <strong>Also at:</strong> Ferry Plaza Farmers Market (Sat)
+        </div>
+      </div>
+    </div>
+
+  </section>
+
+  <!-- WHAT TO ASK -->
+  <section class="what-to-ask">
+    <div class="section-eyebrow">HOW TO SHOP · <span>WHAT TO ASK YOUR BUTCHER</span></div>
+    <div class="ask-grid">
+      <div class="ask-card">
+        <div class="ask-q">"What ranch did this come from?"</div>
+        <div class="ask-note">A real butcher knows. If they don't, that's information.</div>
+      </div>
+      <div class="ask-card">
+        <div class="ask-q">"Is this dry-aged or wet-aged?"</div>
+        <div class="ask-note">Dry-aged loses moisture and concentrates flavor. Wet-aged (plastic bag) is cheaper and more common.</div>
+      </div>
+      <div class="ask-card">
+        <div class="ask-q">"Do you have any secondary cuts?"</div>
+        <div class="ask-note">Whole-animal butchers have bavette, spider steak, teres major — things supermarkets never carry.</div>
+      </div>
+      <div class="ask-card">
+        <div class="ask-q">"Can I get the bones?"</div>
+        <div class="ask-note">Any butcher who buys whole animals has bones. Often free or very cheap. The best stock you'll ever make.</div>
+      </div>
+    </div>
+  </section>
+
+  <section class="horizon-section">
+    <div class="section-eyebrow">TRACED LOCAL · <span>EXPANDING</span></div>
+    <p class="horizon-text">
+      The SF butcher guide is the first chapter. <strong>Oakland, Berkeley, Marin, and Los Angeles</strong> are next — with the same depth of sourcing information, ranch relationships, and cut-by-cut guides. The goal is a directory that makes the provenance of every piece of meat in California findable.
+    </p>
+  </section>
+
+  <footer>
+    <div class="footer-logo"><span>TRACED</span> / LOCAL</div>
+    <a href="index.html" class="footer-link">← all categories</a>
+  </footer>
+
+  <script>
+    function toggle(header) {
+      const body = header.nextElementSibling;
+      const chevron = header.querySelector('.vendor-chevron');
+      body.classList.toggle('open');
+      chevron.classList.toggle('open');
+    }
+  </script>
+</body>
+</html>

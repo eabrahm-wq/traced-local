@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Dragonspunk Farmers Market — Traced Local</title>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=IBM+Plex+Mono:wght@300;400;500&display=swap" rel="stylesheet">
+  <style>
+    :root { --black:#080806; --cream:#f0ede4; --red:#c8392b; --green:#2d5a27; --green-light:#4a8a42; --muted:#8a8678; --border:#1a1a16; --border-mid:#222; }
+    * { margin:0; padding:0; box-sizing:border-box; }
+    body { background:var(--black); color:var(--cream); font-family:'IBM Plex Mono',monospace; min-height:100vh; }
+    header { display:flex; align-items:center; justify-content:space-between; padding:18px 20px; border-bottom:1px solid var(--border); position:sticky; top:0; background:var(--black); z-index:100; }
+    .logo-group { display:flex; align-items:baseline; gap:8px; }
+    .logo-traced { font-size:12px; letter-spacing:0.25em; color:var(--red); font-weight:500; }
+    .logo-divider { color:#222; }
+    .logo-local { font-family:'Playfair Display',serif; font-size:17px; color:var(--cream); }
+    .back-link { font-size:9px; letter-spacing:0.15em; color:var(--muted); text-decoration:none; border:1px solid var(--border); padding:5px 10px; }
+    .market-hero { padding:32px 20px 24px; border-bottom:1px solid var(--border); background:linear-gradient(180deg,rgba(45,90,39,0.05) 0%,transparent 100%); }
+    .market-eyebrow { font-size:7px; letter-spacing:0.25em; color:var(--green-light); margin-bottom:10px; }
+    .market-name { font-family:'Playfair Display',serif; font-size:clamp(24px,6vw,36px); line-height:1.1; color:var(--cream); margin-bottom:6px; }
+    .market-operator { font-size:9px; letter-spacing:0.12em; color:var(--muted); margin-bottom:18px; }
+    .market-hours-grid { display:grid; grid-template-columns:1fr 1fr; gap:8px; margin-bottom:16px; }
+    .hours-card { padding:10px 12px; border:1px solid var(--border-mid); background:rgba(255,255,255,0.02); }
+    .hours-day { font-size:8px; letter-spacing:0.2em; color:var(--green-light); margin-bottom:3px; }
+    .hours-time { font-size:12px; color:var(--cream); }
+    .hours-note { font-size:8px; color:var(--muted); margin-top:2px; }
+    .market-tags { display:flex; flex-wrap:wrap; gap:5px; margin-bottom:16px; }
+    .mtag { font-size:7px; letter-spacing:0.12em; color:var(--muted); border:1px solid var(--border-mid); padding:3px 8px; }
+    .mtag.green { color:var(--green-light); border-color:rgba(74,138,66,0.3); }
+    .mtag.yellow { color:#8a7a00; border-color:rgba(138,122,0,0.3); }
+    .map-btn { display:inline-flex; align-items:center; gap:6px; font-size:9px; letter-spacing:0.15em; color:var(--green-light); text-decoration:none; border:1px solid rgba(74,138,66,0.4); background:rgba(45,90,39,0.1); padding:8px 14px; }
+    .section { padding:24px 20px; border-bottom:1px solid var(--border); }
+    .section-label { font-size:7px; letter-spacing:0.22em; color:var(--muted); margin-bottom:16px; }
+    .about-text { font-size:11px; color:#bbb; line-height:1.8; }
+    .about-text + .about-text { margin-top:12px; }
+    footer { padding:20px; border-top:1px solid var(--border); display:flex; align-items:center; justify-content:space-between; }
+    .footer-logo { font-size:9px; letter-spacing:0.18em; color:#2a2a2a; }
+    .footer-logo span { color:var(--red); }
+    .footer-link { font-size:9px; color:#333; text-decoration:none; }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="logo-group">
+      <span class="logo-traced">TRACED</span>
+      <span class="logo-divider">/</span>
+      <span class="logo-local">Local</span>
+    </div>
+    <a href="https://traced-local.vercel.app" class="back-link">← ALL MARKETS</a>
+  </header>
+
+  <section class="market-hero">
+    <div class="market-eyebrow">↑ SAN FRANCISCO · BAYVIEW / DOGPATCH</div>
+    <h1 class="market-name">Dragonspunk<br>Farmers Market</h1>
+    <div class="market-operator">Community market · Bayview-Hunters Point</div>
+    <div class="market-hours-grid">
+      <div class="hours-card">
+        <div class="hours-day">THURSDAY</div>
+        <div class="hours-time">3 PM – 7:30 PM</div>
+        <div class="hours-note">1550 Evans Ave · Bayview</div>
+      </div>
+      <div class="hours-card">
+        <div class="hours-day">NEIGHBORHOOD</div>
+        <div class="hours-time">Bayview–Hunters Point</div>
+        <div class="hours-note">Southeast SF · food access focus</div>
+      </div>
+    </div>
+    <div class="market-tags">
+      <span class="mtag green">CALFRESH / EBT</span>
+      <span class="mtag">BAYVIEW</span>
+      <span class="mtag">FOOD JUSTICE</span>
+      <span class="mtag">COMMUNITY MARKET</span>
+      <span class="mtag">CALIFORNIA CERTIFIED</span>
+    </div>
+    <a href="https://maps.google.com/?q=1550+Evans+Ave+San+Francisco+CA" target="_blank" class="map-btn">
+      ↗ OPEN IN MAPS · 1550 Evans Ave, San Francisco
+    </a>
+  </section>
+
+  <section class="section">
+    <div class="section-label">ABOUT THIS MARKET</div>
+    <p class="about-text">
+      The Dragonspunk Farmers Market operates Thursday evenings in the Bayview-Hunters Point neighborhood at 1550 Evans Avenue — one of SF's most underserved communities for fresh food access. Bayview-Hunters Point has historically been a food desert: a densely populated neighborhood with very few grocery stores selling fresh produce at accessible prices, high rates of diet-related illness, and a predominantly Black and working-class population that has been systematically excluded from SF's food system investments.
+    </p>
+    <p class="about-text">
+      Dragonspunk is a community-embedded market that operates with food justice as a core value rather than a tagline. The Thursday 3–7:30pm window serves residents who work and can't make weekend or early-morning markets. CalFresh EBT is accepted. For current vendor information and community events, verify directly via the market's local organizers.
+    </p>
+  </section>
+
+  <footer>
+    <div class="footer-logo"><span>TRACED</span> / LOCAL</div>
+    <a href="https://traced-local.vercel.app" class="footer-link">← all markets</a>
+  </footer>
+</body>
+</html>

@@ -1,0 +1,437 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Alemany Farmers Market — Traced Local</title>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=IBM+Plex+Mono:wght@300;400;500&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --black: #080806;
+      --cream: #f0ede4;
+      --red: #c8392b;
+      --green: #2d5a27;
+      --green-light: #4a8a42;
+      --green-dim: rgba(45,90,39,0.08);
+      --muted: #8a8678;
+      --border: #1a1a16;
+      --border-mid: #222;
+    }
+    * { margin:0; padding:0; box-sizing:border-box; }
+    body { background: var(--black); color: var(--cream); font-family: 'IBM Plex Mono', monospace; min-height: 100vh; }
+    header { display:flex; align-items:center; justify-content:space-between; padding:18px 20px; border-bottom:1px solid var(--border); position:sticky; top:0; background:var(--black); z-index:100; }
+    .logo-group { display:flex; align-items:baseline; gap:8px; }
+    .logo-traced { font-size:12px; letter-spacing:0.25em; color:var(--red); font-weight:500; }
+    .logo-divider { color:#222; }
+    .logo-local { font-family:'Playfair Display',serif; font-size:17px; color:var(--cream); }
+    .back-link { font-size:9px; letter-spacing:0.15em; color:var(--muted); text-decoration:none; border:1px solid var(--border); padding:5px 10px; }
+    .market-hero { padding:32px 20px 24px; border-bottom:1px solid var(--border); background:linear-gradient(180deg,rgba(45,90,39,0.05) 0%,transparent 100%); }
+    .market-eyebrow { font-size:7px; letter-spacing:0.25em; color:var(--green-light); margin-bottom:10px; }
+    .market-name { font-family:'Playfair Display',serif; font-size:clamp(24px,6vw,36px); line-height:1.1; color:var(--cream); margin-bottom:6px; }
+    .market-operator { font-size:9px; letter-spacing:0.12em; color:var(--muted); margin-bottom:18px; }
+    .market-hours-grid { display:grid; grid-template-columns:1fr 1fr; gap:8px; margin-bottom:16px; }
+    .hours-card { padding:10px 12px; border:1px solid var(--border-mid); background:rgba(255,255,255,0.02); }
+    .hours-day { font-size:8px; letter-spacing:0.2em; color:var(--green-light); margin-bottom:3px; }
+    .hours-time { font-size:12px; color:var(--cream); }
+    .hours-note { font-size:8px; color:var(--muted); margin-top:2px; }
+    .market-tags { display:flex; flex-wrap:wrap; gap:5px; margin-bottom:16px; }
+    .mtag { font-size:7px; letter-spacing:0.12em; color:var(--muted); border:1px solid var(--border-mid); padding:3px 8px; }
+    .mtag.green { color:var(--green-light); border-color:rgba(74,138,66,0.3); }
+    .map-btn { display:inline-flex; align-items:center; gap:6px; font-size:9px; letter-spacing:0.15em; color:var(--green-light); text-decoration:none; border:1px solid rgba(74,138,66,0.4); background:rgba(45,90,39,0.1); padding:8px 14px; }
+    .section { padding:24px 20px; border-bottom:1px solid var(--border); }
+    .section-label { font-size:7px; letter-spacing:0.22em; color:var(--muted); margin-bottom:16px; }
+    .section-label span { color:var(--green-light); }
+    .vendor-card { border:1px solid var(--border-mid); margin-bottom:12px; overflow:hidden; }
+    .vendor-card.featured { border-color:rgba(74,138,66,0.35); }
+    .vendor-header { padding:14px 14px 10px; cursor:pointer; display:flex; align-items:flex-start; justify-content:space-between; gap:8px; }
+    .vendor-left { flex:1; }
+    .vendor-name { font-family:'Playfair Display',serif; font-size:17px; color:var(--cream); line-height:1.2; margin-bottom:3px; }
+    .vendor-tagline { font-size:10px; color:var(--muted); line-height:1.4; }
+    .vendor-right { display:flex; flex-direction:column; align-items:flex-end; gap:4px; flex-shrink:0; }
+    .vendor-cert { font-size:7px; letter-spacing:0.12em; padding:2px 7px; color:var(--green-light); border:1px solid rgba(74,138,66,0.3); background:rgba(45,90,39,0.1); }
+    .vendor-chevron { font-size:10px; color:#444; margin-top:4px; transition:transform 0.2s; }
+    .vendor-chevron.open { transform:rotate(180deg); }
+    .vendor-body { display:none; padding:0 14px 14px; }
+    .vendor-body.open { display:block; }
+    .vendor-story { font-size:11px; color:#ccc; line-height:1.7; margin-bottom:12px; padding-bottom:12px; border-bottom:1px solid var(--border); }
+    .products-label { font-size:7px; letter-spacing:0.2em; color:var(--muted); margin-bottom:8px; }
+    .product-list { display:flex; flex-wrap:wrap; gap:5px; margin-bottom:12px; }
+    .product-tag { font-size:9px; letter-spacing:0.06em; color:#aaa; border:1px solid var(--border-mid); padding:3px 8px; }
+    .product-tag.seasonal { color:#8a7a00; border-color:rgba(138,122,0,0.3); }
+    .vendor-meta { font-size:9px; color:var(--muted); line-height:1.8; }
+    .vendor-meta strong { color:#888; font-weight:400; }
+    .vendor-days { display:flex; gap:5px; margin-top:10px; }
+    .day-pill { font-size:7px; letter-spacing:0.12em; padding:3px 8px; }
+    .day-pill.active { color:var(--green-light); border:1px solid rgba(74,138,66,0.3); background:rgba(45,90,39,0.1); }
+    .day-pill.inactive { color:#333; border:1px solid #1a1a1a; }
+    .season-grid { display:grid; grid-template-columns:1fr 1fr; gap:8px; }
+    .season-card { padding:10px 12px; border:1px solid var(--border); }
+    .season-month { font-size:7px; letter-spacing:0.15em; color:var(--green-light); margin-bottom:5px; }
+    .season-items { font-size:10px; color:#aaa; line-height:1.6; }
+    .about-text { font-size:11px; color:#bbb; line-height:1.8; }
+    .about-text + .about-text { margin-top:12px; }
+    footer { padding:20px; border-top:1px solid var(--border); display:flex; align-items:center; justify-content:space-between; }
+    .footer-logo { font-size:9px; letter-spacing:0.18em; color:#2a2a2a; }
+    .footer-logo span { color:var(--red); }
+    .footer-link { font-size:9px; color:#333; text-decoration:none; }
+  </style>
+</head>
+<body>
+
+  <header>
+    <div class="logo-group">
+      <span class="logo-traced">TRACED</span>
+      <span class="logo-divider">/</span>
+      <span class="logo-local">Local</span>
+    </div>
+    <a href="https://traced-local.vercel.app" class="back-link">← ALL MARKETS</a>
+  </header>
+
+  <section class="market-hero">
+    <div class="market-eyebrow">↑ SAN FRANCISCO · BERNAL HEIGHTS</div>
+    <h1 class="market-name">Alemany<br>Farmers Market</h1>
+    <div class="market-operator">Operated by Foodwise (formerly SF Real Estate Division) · Est. 1943</div>
+    <div class="market-hours-grid">
+      <div class="hours-card">
+        <div class="hours-day">SATURDAY</div>
+        <div class="hours-time">6 AM – 3 PM</div>
+        <div class="hours-note">75–90 vendors · year-round</div>
+      </div>
+      <div class="hours-card">
+        <div class="hours-day">PARKING</div>
+        <div class="hours-time">Free on-site</div>
+        <div class="hours-note">Large lot · easy access from 101/280</div>
+      </div>
+    </div>
+    <div class="market-tags">
+      <span class="mtag green">YEAR-ROUND</span>
+      <span class="mtag green">CALFRESH / EBT</span>
+      <span class="mtag green">MARKET MATCH</span>
+      <span class="mtag green">WIC ACCEPTED</span>
+      <span class="mtag">CALIFORNIA CERTIFIED</span>
+      <span class="mtag">FREE PARKING</span>
+      <span class="mtag">OLDEST MARKET IN CA</span>
+    </div>
+    <a href="https://maps.google.com/?q=100+Alemany+Blvd+San+Francisco+CA" target="_blank" class="map-btn">
+      ↗ OPEN IN MAPS · 100 Alemany Blvd, San Francisco
+    </a>
+  </section>
+
+  <section class="section">
+    <div class="section-label">FEATURED VENDORS · <span>SATURDAY MARKET</span></div>
+
+    <!-- TOMATERO ORGANIC FARM -->
+    <div class="vendor-card featured">
+      <div class="vendor-header" onclick="toggle(this)">
+        <div class="vendor-left">
+          <div class="vendor-name">Tomatero Organic Farm</div>
+          <div class="vendor-tagline">Dry-farmed tomatoes & organic produce · Watsonville, CA</div>
+        </div>
+        <div class="vendor-right">
+          <span class="vendor-cert">CERTIFIED ORGANIC</span>
+          <span class="vendor-chevron">▼</span>
+        </div>
+      </div>
+      <div class="vendor-body">
+        <div class="vendor-story">
+          Tomatero is stationed near the market entrance and is one of the first stops serious shoppers make. They are best known for dry-farmed Early Girl tomatoes — the same technique as Dirty Girl Produce — where irrigation is cut off to stress the plant and concentrate flavor. The result is a smaller, denser, more intensely flavored tomato that no commercial grocery can stock because it won't survive the supply chain. Organic strawberries, blackberries, and crisp greens are year-round anchors. Tomatero has been coming to Alemany long enough that regulars plan their Saturdays around what's in season there.
+        </div>
+        <div class="products-label">WHAT THEY BRING</div>
+        <div class="product-list">
+          <span class="product-tag seasonal">☀ Dry-farmed Early Girls (Aug–Oct)</span>
+          <span class="product-tag seasonal">☀ Strawberries (Apr–Nov)</span>
+          <span class="product-tag seasonal">☀ Blackberries (Jun–Sep)</span>
+          <span class="product-tag seasonal">🍂 Winter squash (Oct–Jan)</span>
+          <span class="product-tag">Organic greens</span>
+          <span class="product-tag">Heirloom tomatoes</span>
+          <span class="product-tag">Peppers</span>
+        </div>
+        <div class="vendor-meta">
+          <strong>Location:</strong> Watsonville, Santa Cruz County<br>
+          <strong>Certifications:</strong> Certified Organic<br>
+          <strong>Also at:</strong> Noe Valley Saturday market
+        </div>
+        <div class="vendor-days">
+          <span class="day-pill active">SAT</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- TWIN GIRLS FARM -->
+    <div class="vendor-card featured">
+      <div class="vendor-header" onclick="toggle(this)">
+        <div class="vendor-left">
+          <div class="vendor-name">Twin Girls Farm</div>
+          <div class="vendor-tagline">Stone fruit & citrus · San Joaquin Valley</div>
+        </div>
+        <div class="vendor-right">
+          <span class="vendor-chevron">▼</span>
+        </div>
+      </div>
+      <div class="vendor-body">
+        <div class="vendor-story">
+          Robert and his team have been at Alemany long enough to be considered fixtures. They set up about a third of the way down the market and sell seasonal fruit with a focus on stone fruit in summer and citrus and persimmons through fall and winter. The farm operates across microclimates in the San Joaquin Valley, which lets them extend their stone fruit season longer than most single-location farms. Regulars know to arrive early for peaches and pluots in summer — they move fast at Alemany's prices.
+        </div>
+        <div class="products-label">WHAT THEY BRING</div>
+        <div class="product-list">
+          <span class="product-tag seasonal">☀ Peaches (Jun–Sep)</span>
+          <span class="product-tag seasonal">☀ Pluots & Plums (Jul–Sep)</span>
+          <span class="product-tag seasonal">🍂 Persimmons (Oct–Dec)</span>
+          <span class="product-tag seasonal">🍊 Citrus (Dec–Apr)</span>
+          <span class="product-tag seasonal">🍂 Pomegranates (Oct–Nov)</span>
+        </div>
+        <div class="vendor-meta">
+          <strong>Location:</strong> San Joaquin Valley, CA<br>
+          <strong>Known for:</strong> Exceptional summer peaches and fall persimmons
+        </div>
+        <div class="vendor-days">
+          <span class="day-pill active">SAT</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- FAR WEST FUNGI -->
+    <div class="vendor-card">
+      <div class="vendor-header" onclick="toggle(this)">
+        <div class="vendor-left">
+          <div class="vendor-name">Far West Fungi</div>
+          <div class="vendor-tagline">Gourmet & medicinal mushrooms · Moss Landing, CA</div>
+        </div>
+        <div class="vendor-right">
+          <span class="vendor-chevron">▼</span>
+        </div>
+      </div>
+      <div class="vendor-body">
+        <div class="vendor-story">
+          The Garrone family has been cultivating specialty mushrooms in Moss Landing since the late 1980s, making Far West one of the longest-running gourmet mushroom operations on the West Coast. At Alemany, they bring a rotating selection of cultivated and foraged varieties — from everyday cremini to lion's mane, maitake, king trumpet, and reishi. The mushrooms are grown in controlled conditions without pesticides. The stall also stocks dried mushroom products and mushroom growing kits. Far West is one of the market vendors with a presence across multiple SF markets and a retail shop in the Ferry Building.
+        </div>
+        <div class="products-label">WHAT THEY BRING</div>
+        <div class="product-list">
+          <span class="product-tag">Shiitake</span>
+          <span class="product-tag">Lion's Mane</span>
+          <span class="product-tag">Maitake</span>
+          <span class="product-tag">King Trumpet</span>
+          <span class="product-tag">Oyster mushrooms</span>
+          <span class="product-tag">Reishi</span>
+          <span class="product-tag">Dried mushrooms</span>
+          <span class="product-tag">Growing kits</span>
+        </div>
+        <div class="vendor-meta">
+          <strong>Location:</strong> Moss Landing, Monterey County<br>
+          <strong>Family:</strong> Garrone family operation<br>
+          <strong>Also at:</strong> Ferry Plaza Sat/Tue/Thu, Alemany, Ferry Building retail shop
+        </div>
+        <div class="vendor-days">
+          <span class="day-pill active">SAT</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- CITY FISH COMPANY -->
+    <div class="vendor-card">
+      <div class="vendor-header" onclick="toggle(this)">
+        <div class="vendor-left">
+          <div class="vendor-name">City Fish Company</div>
+          <div class="vendor-tagline">Direct-sourced seafood · Bay Area</div>
+        </div>
+        <div class="vendor-right">
+          <span class="vendor-chevron">▼</span>
+        </div>
+      </div>
+      <div class="vendor-body">
+        <div class="vendor-story">
+          Allan, a retired fisherman, and his cousin Sean run this seafood stall at the far end of the market. They source directly from the fishing community, which means they can price below comparable markets while still selling quality fish. They are one of the only seafood vendors at Alemany. Dungeness crab in winter is the draw that brings people from across the city. Black cod and halibut run year-round. The fish arrive fresh and sell out early — this is not a stall for 1pm shoppers.
+        </div>
+        <div class="products-label">WHAT THEY BRING</div>
+        <div class="product-list">
+          <span class="product-tag seasonal">🦀 Dungeness Crab (Nov–May)</span>
+          <span class="product-tag">Black Cod (year-round)</span>
+          <span class="product-tag seasonal">☀ Halibut (Apr–Oct)</span>
+          <span class="product-tag">Rock Cod</span>
+          <span class="product-tag">Fish Heads for stock</span>
+        </div>
+        <div class="vendor-meta">
+          <strong>Notes:</strong> Arrive early — sellout likely by 11am on busy weekends<br>
+          <strong>Pricing:</strong> Competitive, below Ferry Plaza equivalents
+        </div>
+        <div class="vendor-days">
+          <span class="day-pill active">SAT</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- PANORAMA BAKING COMPANY -->
+    <div class="vendor-card">
+      <div class="vendor-header" onclick="toggle(this)">
+        <div class="vendor-left">
+          <div class="vendor-name">Panorama Baking Company</div>
+          <div class="vendor-tagline">Artisan breads & pastries · Bay Area</div>
+        </div>
+        <div class="vendor-right">
+          <span class="vendor-chevron">▼</span>
+        </div>
+      </div>
+      <div class="vendor-body">
+        <div class="vendor-story">
+          Panorama operates the main baked goods stall near the Alemany Boulevard end of the market. They bring a wide range of sourdough and sandwich loaves, focaccia, croissants, scones, and seasonal pastries. The baking is done fresh overnight for the Saturday market. At Alemany's price points, this is one of the best-value artisan bread stalls in the city.
+        </div>
+        <div class="products-label">WHAT THEY BRING</div>
+        <div class="product-list">
+          <span class="product-tag">Sourdough loaves</span>
+          <span class="product-tag">Sandwich bread</span>
+          <span class="product-tag">Focaccia</span>
+          <span class="product-tag">Croissants</span>
+          <span class="product-tag">Scones</span>
+          <span class="product-tag">Seasonal pastries</span>
+        </div>
+        <div class="vendor-meta">
+          <strong>Web:</strong> panoramabaking.com
+        </div>
+        <div class="vendor-days">
+          <span class="day-pill active">SAT</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- YERENA FARMS -->
+    <div class="vendor-card">
+      <div class="vendor-header" onclick="toggle(this)">
+        <div class="vendor-left">
+          <div class="vendor-name">Yerena Farms</div>
+          <div class="vendor-tagline">Organic strawberries & berries · Watsonville, CA</div>
+        </div>
+        <div class="vendor-right">
+          <span class="vendor-cert">CERTIFIED ORGANIC</span>
+          <span class="vendor-chevron">▼</span>
+        </div>
+      </div>
+      <div class="vendor-body">
+        <div class="vendor-story">
+          The Yerena family has been growing organic strawberries and berries in Watsonville for over 40 years, and they have been selling at the Alemany market for roughly as long. Watsonville sits at the northern edge of the Pajaro Valley, one of the best strawberry-growing microclimates in the world — coastal fog keeps temperatures cool, and the sandy loam soils drain well. Yerena's certified organic berries are one of the most anticipated seasonal offerings at the market. Their presence at Alemany is one of the longest-standing vendor relationships at any SF market.
+        </div>
+        <div class="products-label">WHAT THEY BRING</div>
+        <div class="product-list">
+          <span class="product-tag seasonal">☀ Strawberries (Mar–Nov)</span>
+          <span class="product-tag seasonal">☀ Raspberries (Jun–Sep)</span>
+          <span class="product-tag seasonal">☀ Blackberries (Jun–Sep)</span>
+        </div>
+        <div class="vendor-meta">
+          <strong>Location:</strong> Watsonville, Santa Cruz County<br>
+          <strong>Certifications:</strong> Certified Organic<br>
+          <strong>History:</strong> At Alemany for ~40 years
+        </div>
+        <div class="vendor-days">
+          <span class="day-pill active">SAT</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- FERRARI FARMS -->
+    <div class="vendor-card">
+      <div class="vendor-header" onclick="toggle(this)">
+        <div class="vendor-left">
+          <div class="vendor-name">Ferrari Farms</div>
+          <div class="vendor-tagline">Organic apples, stone fruit & nuts · Central Valley</div>
+        </div>
+        <div class="vendor-right">
+          <span class="vendor-cert">CERTIFIED ORGANIC</span>
+          <span class="vendor-chevron">▼</span>
+        </div>
+      </div>
+      <div class="vendor-body">
+        <div class="vendor-story">
+          Ferrari Farms is a reliable year-round anchor at Alemany, best known for organic apples that span the entire apple season from early summer through winter. In summer they bring stone fruit — peaches, plums, cherries — plus almonds and walnuts in fall. Their position near the market entrance makes them an early stop for produce shoppers doing a complete weekly shop.
+        </div>
+        <div class="products-label">WHAT THEY BRING</div>
+        <div class="product-list">
+          <span class="product-tag seasonal">☀ Peaches & Plums (Jun–Sep)</span>
+          <span class="product-tag seasonal">☀ Cherries (May–Jun)</span>
+          <span class="product-tag seasonal">🍎 Apples (Jul–Feb)</span>
+          <span class="product-tag seasonal">🍂 Almonds & Walnuts (Sep–Nov)</span>
+        </div>
+        <div class="vendor-meta">
+          <strong>Certifications:</strong> Certified Organic<br>
+          <strong>Web:</strong> ferrarifarms.com
+        </div>
+        <div class="vendor-days">
+          <span class="day-pill active">SAT</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- EL HUARACHE LOCO -->
+    <div class="vendor-card">
+      <div class="vendor-header" onclick="toggle(this)">
+        <div class="vendor-left">
+          <div class="vendor-name">El Huarache Loco</div>
+          <div class="vendor-tagline">Traditional Mexican street food · SF-based</div>
+        </div>
+        <div class="vendor-right">
+          <span class="vendor-chevron">▼</span>
+        </div>
+      </div>
+      <div class="vendor-body">
+        <div class="vendor-story">
+          Lorena Topete has operated El Huarache Loco at Alemany and the Ferry Plaza for years, serving traditional Oaxacan and Central Mexican street food. Huaraches are oval masa sandals topped with beans, salsa, and various proteins — a Mexico City street food that is difficult to find well-executed in the Bay Area. The line at El Huarache Loco on Saturday mornings is a reliable indicator of quality. Lorena won the CUESA Farmer-Chef Connection award and has been cited by SF Chronicle food writers as one of the best prepared food vendors at any SF farmers market.
+        </div>
+        <div class="products-label">WHAT THEY SERVE</div>
+        <div class="product-list">
+          <span class="product-tag">Huaraches</span>
+          <span class="product-tag">Tlayudas</span>
+          <span class="product-tag">Tamales</span>
+          <span class="product-tag">Memelas</span>
+          <span class="product-tag">Quesadillas</span>
+          <span class="product-tag">Aguas frescas</span>
+        </div>
+        <div class="vendor-meta">
+          <strong>Web:</strong> huaracheloco.com<br>
+          <strong>Also at:</strong> Ferry Plaza Saturday
+        </div>
+        <div class="vendor-days">
+          <span class="day-pill active">SAT</span>
+        </div>
+      </div>
+    </div>
+
+  </section>
+
+  <section class="section">
+    <div class="section-label">WHAT'S IN SEASON · <span>BAY AREA · FEBRUARY–MARCH</span></div>
+    <div class="season-grid">
+      <div class="season-card">
+        <div class="season-month">NOW</div>
+        <div class="season-items">Citrus · Blood oranges · Meyer lemons · Navel oranges · Kale & chard · Root vegetables · Leeks · Winter squash · Cabbage</div>
+      </div>
+      <div class="season-card">
+        <div class="season-month">COMING SOON</div>
+        <div class="season-items">Strawberries (Mar–Apr) · Asparagus (Mar–May) · Fava beans (Mar–Apr) · English peas · Artichokes · Spring onions</div>
+      </div>
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="section-label">ABOUT THIS MARKET</div>
+    <p class="about-text">
+      The Alemany Farmers Market opened on August 12, 1943 — during World War II — when the Victory Garden Council and regional farmers started it as a way to sell surplus produce that federal wartime restrictions would otherwise have wasted. It is the oldest continuously operating farmers market in California and the first of its kind in the state. It began at Duboce Avenue and Market Street and moved to its current Bernal Heights location in 1947.
+    </p>
+    <p class="about-text">
+      Known affectionately as "The People's Market," Alemany draws up to 90 farms and food vendors and more than 3,000 shoppers every Saturday. Unlike the Ferry Plaza, the emphasis here is affordability and diversity — Asian vegetables like bitter melon, luffa squash, and Chinese mustard greens sit alongside heirloom tomatoes, boysenberries, and pomegranates. The market has historically been operated by the City and County of San Francisco; as of February 2026, Foodwise (which also runs the Ferry Plaza) took over operations. CalFresh EBT, Market Match, and WIC are all accepted.
+    </p>
+  </section>
+
+  <footer>
+    <div class="footer-logo"><span>TRACED</span> / LOCAL</div>
+    <a href="https://traced-local.vercel.app" class="footer-link">← all markets</a>
+  </footer>
+
+  <script>
+    function toggle(header) {
+      const body = header.nextElementSibling;
+      const chevron = header.querySelector('.vendor-chevron');
+      const isOpen = body.classList.contains('open');
+      body.classList.toggle('open', !isOpen);
+      chevron.classList.toggle('open', !isOpen);
+    }
+  </script>
+</body>
+</html>

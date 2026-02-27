@@ -1,0 +1,327 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Seafood Markets — Traced Local</title>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=IBM+Plex+Mono:wght@300;400;500&display=swap" rel="stylesheet">
+  <style>
+    :root { --black:#080806; --cream:#f0ede4; --red:#c8392b; --green:#2d5a27; --green-light:#4a8a42; --muted:#8a8678; --border:#1e1e1a; --border-mid:#222; --blue:#1a3a5c; --blue-light:#3a7ab8; }
+    * { margin:0; padding:0; box-sizing:border-box; }
+    body { background:var(--black); color:var(--cream); font-family:'IBM Plex Mono',monospace; min-height:100vh; }
+
+    header { display:flex; align-items:center; justify-content:space-between; padding:20px 24px; border-bottom:1px solid var(--border); position:sticky; top:0; background:var(--black); z-index:100; }
+    .logo-group { display:flex; align-items:baseline; gap:10px; }
+    .logo-traced { font-size:13px; letter-spacing:0.25em; color:var(--red); font-weight:500; }
+    .logo-divider { color:var(--border); }
+    .logo-local { font-family:'Playfair Display',serif; font-size:18px; color:var(--cream); }
+    .back-link { font-size:9px; letter-spacing:0.18em; color:var(--muted); text-decoration:none; border:1px solid var(--border); padding:6px 12px; }
+    .back-link:hover { color:var(--cream); border-color:#444; }
+
+    .hero { padding:48px 24px 36px; border-bottom:1px solid var(--border); position:relative; overflow:hidden; }
+    .hero::before { content:''; position:absolute; top:-40px; right:-60px; width:280px; height:280px; background:radial-gradient(circle,rgba(26,58,92,0.15) 0%,transparent 70%); pointer-events:none; }
+    .hero-eyebrow { font-size:7px; letter-spacing:0.25em; color:var(--green-light); margin-bottom:14px; }
+    .hero-title { font-family:'Playfair Display',serif; font-size:clamp(28px,7vw,44px); line-height:1.1; color:var(--cream); margin-bottom:16px; }
+    .hero-sub { font-size:11px; color:var(--muted); line-height:1.75; max-width:400px; margin-bottom:24px; }
+    .hero-sub strong { color:var(--cream); font-weight:400; }
+
+    .editorial { padding:28px 24px; border-bottom:1px solid var(--border); background:#0a0a08; }
+    .editorial-label { font-size:7px; letter-spacing:0.22em; color:var(--red); margin-bottom:10px; }
+    .editorial-text { font-family:'Playfair Display',serif; font-size:14px; line-height:1.75; color:#bbb; max-width:440px; }
+    .editorial-text strong { color:var(--cream); font-style:italic; }
+
+    .season-alert { padding:14px 24px; border-bottom:1px solid var(--border); background:rgba(26,58,92,0.12); border-left:none; display:flex; align-items:center; gap:12px; }
+    .alert-icon { font-size:16px; flex-shrink:0; }
+    .alert-text { font-size:10px; color:#aac4e0; line-height:1.5; }
+    .alert-text strong { color:var(--cream); font-weight:400; }
+
+    .listings-section { padding:28px 24px; border-bottom:1px solid var(--border); }
+    .section-eyebrow { font-size:7px; letter-spacing:0.22em; color:var(--muted); margin-bottom:18px; }
+    .section-eyebrow span { color:var(--green-light); }
+
+    .vendor-card { border:1px solid var(--border-mid); margin-bottom:12px; overflow:hidden; }
+    .vendor-card.featured { border-color:rgba(74,138,66,0.35); }
+    .vendor-header { padding:16px 16px 12px; cursor:pointer; display:flex; align-items:flex-start; justify-content:space-between; gap:8px; }
+    .vendor-left { flex:1; }
+    .vendor-name { font-family:'Playfair Display',serif; font-size:17px; color:var(--cream); line-height:1.2; margin-bottom:3px; }
+    .vendor-tagline { font-size:10px; color:var(--muted); line-height:1.4; }
+    .vendor-right { display:flex; flex-direction:column; align-items:flex-end; gap:4px; flex-shrink:0; }
+    .vendor-badge { font-size:7px; letter-spacing:0.12em; padding:2px 7px; color:var(--green-light); border:1px solid rgba(74,138,66,0.3); background:rgba(45,90,39,0.1); }
+    .vendor-chevron { font-size:10px; color:#444; margin-top:4px; transition:transform 0.2s; }
+    .vendor-chevron.open { transform:rotate(180deg); }
+    .vendor-body { display:none; padding:0 16px 16px; }
+    .vendor-body.open { display:block; }
+    .vendor-story { font-size:11px; color:#ccc; line-height:1.7; margin-bottom:12px; padding-bottom:12px; border-bottom:1px solid var(--border); }
+    .detail-label { font-size:7px; letter-spacing:0.2em; color:var(--muted); margin-bottom:7px; }
+    .product-list { display:flex; flex-wrap:wrap; gap:5px; margin-bottom:12px; }
+    .ptag { font-size:9px; color:#aaa; border:1px solid var(--border-mid); padding:3px 8px; }
+    .ptag.seasonal { color:#8a7a00; border-color:rgba(138,122,0,0.3); }
+    .vendor-meta { font-size:9px; color:var(--muted); line-height:1.8; }
+    .vendor-meta strong { color:#888; font-weight:400; }
+
+    .species-section { padding:24px; border-bottom:1px solid var(--border); }
+    .species-grid { display:grid; grid-template-columns:1fr 1fr; gap:8px; margin-top:14px; }
+    .species-card { padding:12px; border:1px solid var(--border-mid); }
+    .species-name { font-size:11px; color:var(--cream); margin-bottom:3px; }
+    .species-note { font-size:9px; color:var(--muted); line-height:1.5; }
+    .species-season { font-size:7px; letter-spacing:0.1em; color:#8a7a00; margin-top:5px; }
+
+    .horizon-section { padding:24px; background:#0a0a08; border-bottom:1px solid var(--border); }
+    .horizon-text { font-family:'Playfair Display',serif; font-size:14px; line-height:1.7; color:#bbb; max-width:420px; }
+    .horizon-text strong { color:var(--cream); font-style:italic; }
+
+    footer { padding:22px 24px; border-top:1px solid var(--border); display:flex; align-items:center; justify-content:space-between; }
+    .footer-logo { font-size:9px; letter-spacing:0.2em; color:#333; }
+    .footer-logo span { color:var(--red); }
+    .footer-link { font-size:9px; color:#444; text-decoration:none; }
+    .footer-link:hover { color:var(--muted); }
+  </style>
+</head>
+<body>
+
+  <header>
+    <div class="logo-group">
+      <span class="logo-traced">TRACED</span>
+      <span class="logo-divider">/</span>
+      <span class="logo-local">Local</span>
+    </div>
+    <a href="index.html" class="back-link">← ALL CATEGORIES</a>
+  </header>
+
+  <section class="hero">
+    <div class="hero-eyebrow">↑ TRACED LOCAL · SAN FRANCISCO</div>
+    <h1 class="hero-title">Seafood<br>Markets</h1>
+    <p class="hero-sub">
+      Day-boat catch, wild Bay Area species, and fishmongers who know the difference between line-caught and trawled. San Francisco sits on one of the most productive fishing coastlines in the world.<br><br>
+      <strong>The fish at a real fishmonger was probably in the water yesterday.</strong>
+    </p>
+  </section>
+
+  <section class="editorial">
+    <div class="editorial-label">WHY IT MATTERS</div>
+    <p class="editorial-text">
+      Most seafood sold in American grocery stores has been frozen, shipped internationally for processing, re-frozen, and shipped back. The label says "Product of USA" because it was caught here — but it left and came back.<br><br>
+      San Francisco has <strong>Dungeness crab in the bay, salmon off the Marin coast, halibut at Half Moon Bay, and rockfish year-round</strong>. A real fishmonger bought it off a boat this morning.
+    </p>
+  </section>
+
+  <div class="season-alert">
+    <div class="alert-icon">🦀</div>
+    <div class="alert-text"><strong>Dungeness crab season</strong> is open now through spring. This is the best time of year to buy from local boats at the Wharf and at market fish stalls. Ask for SF Bay crab specifically.</div>
+  </div>
+
+  <section class="listings-section">
+    <div class="section-eyebrow">SF SEAFOOD SOURCES · <span>PROFILED</span></div>
+
+    <div class="vendor-card featured">
+      <div class="vendor-header" onclick="toggle(this)">
+        <div class="vendor-left">
+          <div class="vendor-name">H&H Fresh Fish</div>
+          <div class="vendor-tagline">Day-boat catch · Clement Street Market & Richmond</div>
+        </div>
+        <div class="vendor-right">
+          <span class="vendor-badge">DAY-BOAT</span>
+          <span class="vendor-chevron">▼</span>
+        </div>
+      </div>
+      <div class="vendor-body">
+        <div class="vendor-story">
+          H&H Fresh Fish is an anchor vendor at the Clement Street Farmers Market and a Richmond District institution. They source from boats out of Pillar Point Harbor (Half Moon Bay) and Bodega Bay — two of the most productive small-boat fishing ports on the Northern California coast. The selection changes weekly based on what's running: Dungeness crab in winter, salmon in summer, halibut in spring and fall, with rockfish year-round. This is the closest most SF residents will get to boat-to-table fish without driving to the harbor themselves.
+        </div>
+        <div class="detail-label">WHAT THEY CARRY</div>
+        <div class="product-list">
+          <span class="ptag seasonal">🦀 Dungeness crab (Nov–May)</span>
+          <span class="ptag seasonal">☀ King salmon (May–Oct)</span>
+          <span class="ptag seasonal">☀ Halibut (spring & fall)</span>
+          <span class="ptag">Rockfish (year-round)</span>
+          <span class="ptag">Lingcod</span>
+          <span class="ptag">Sand dabs</span>
+          <span class="ptag">Live shellfish (seasonal)</span>
+        </div>
+        <div class="vendor-meta">
+          <strong>At:</strong> Clement Street Farmers Market (Sun 9 AM–2 PM)<br>
+          <strong>Source ports:</strong> Pillar Point / Bodega Bay
+        </div>
+      </div>
+    </div>
+
+    <div class="vendor-card featured">
+      <div class="vendor-header" onclick="toggle(this)">
+        <div class="vendor-left">
+          <div class="vendor-name">City Fish Company</div>
+          <div class="vendor-tagline">Market fishmonger · Alemany Farmers Market</div>
+        </div>
+        <div class="vendor-right">
+          <span class="vendor-badge">MARKET VENDOR</span>
+          <span class="vendor-chevron">▼</span>
+        </div>
+      </div>
+      <div class="vendor-body">
+        <div class="vendor-story">
+          City Fish Company has been a fixture at Alemany's Saturday market for years, serving the Bernal Heights and working-class SF customer base that Alemany draws. Their pricing reflects the market's ethos — affordable, not aspirational. They bring the same Northern California catch that you'd find at premium fishmongers, without the premium markup. For anyone who shops Alemany, City Fish is one of the essential stalls.
+        </div>
+        <div class="detail-label">WHAT THEY CARRY</div>
+        <div class="product-list">
+          <span class="ptag seasonal">🦀 Dungeness crab (in season)</span>
+          <span class="ptag">Salmon (in season)</span>
+          <span class="ptag">Rockfish</span>
+          <span class="ptag">Seasonal market catch</span>
+          <span class="ptag">Shrimp</span>
+        </div>
+        <div class="vendor-meta">
+          <strong>At:</strong> Alemany Farmers Market (Sat 6 AM–3 PM)<br>
+          <strong>100 Alemany Blvd, Bernal Heights</strong>
+        </div>
+      </div>
+    </div>
+
+    <div class="vendor-card">
+      <div class="vendor-header" onclick="toggle(this)">
+        <div class="vendor-left">
+          <div class="vendor-name">Fisherman's Wharf — Direct from Boats</div>
+          <div class="vendor-tagline">Pier 45 & Pier 47 · SF waterfront</div>
+        </div>
+        <div class="vendor-right">
+          <span class="vendor-badge">DIRECT PURCHASE</span>
+          <span class="vendor-chevron">▼</span>
+        </div>
+      </div>
+      <div class="vendor-body">
+        <div class="vendor-story">
+          During Dungeness crab season, it is possible to buy directly from fishing boats docked at Pier 45 and Pier 47. This is the most direct transaction in SF's food system — money directly to the fisherman, fish that may have been caught that morning. The experience requires knowing when boats are in (typically early morning on weekends through the season) and being willing to buy whole crab. The Wharf has become heavily tourist-oriented, but the actual working boats are still there, and buying direct from them remains possible.
+        </div>
+        <div class="detail-label">WHAT TO BUY</div>
+        <div class="product-list">
+          <span class="ptag seasonal">🦀 Live Dungeness crab (Nov–May)</span>
+          <span class="ptag seasonal">🦀 Cooked Dungeness crab</span>
+          <span class="ptag">Seasonal boat catch</span>
+        </div>
+        <div class="vendor-meta">
+          <strong>Location:</strong> Pier 45 & 47, Fisherman's Wharf<br>
+          <strong>Best time:</strong> Early morning, weekends, during Dungeness season<br>
+          <strong>Note:</strong> Volume varies by day and season
+        </div>
+      </div>
+    </div>
+
+    <div class="vendor-card">
+      <div class="vendor-header" onclick="toggle(this)">
+        <div class="vendor-left">
+          <div class="vendor-name">Swan Oyster Depot</div>
+          <div class="vendor-tagline">Counter fishmonger & raw bar · Est. 1912 · Polk Gulch</div>
+        </div>
+        <div class="vendor-right">
+          <span class="vendor-badge">EST. 1912</span>
+          <span class="vendor-chevron">▼</span>
+        </div>
+      </div>
+      <div class="vendor-body">
+        <div class="vendor-story">
+          Swan Oyster Depot has been operating on Polk Street since 1912, with five to six members of the Sancimino family working the counter on any given day. It functions as both a fishmonger and a raw bar — you can buy fish to take home, or sit at the 18-stool counter and eat oysters, crab cocktail, and chowder. The fish they sell reflects the Northern California catch directly. This is one of the most legitimate old-school seafood operations in the country, not just SF. Arrive early — lines form before it opens.
+        </div>
+        <div class="detail-label">WHAT THEY CARRY</div>
+        <div class="product-list">
+          <span class="ptag">West Coast oysters (raw bar)</span>
+          <span class="ptag seasonal">🦀 Dungeness crab (in season)</span>
+          <span class="ptag">Smoked salmon</span>
+          <span class="ptag">Clam chowder</span>
+          <span class="ptag">Fresh fish (daily)</span>
+          <span class="ptag">Shrimp</span>
+        </div>
+        <div class="vendor-meta">
+          <strong>Address:</strong> 1517 Polk St, Polk Gulch<br>
+          <strong>Hours:</strong> Tue–Sat 8 AM–5:30 PM (arrive early, closes when sold out)<br>
+          <strong>Note:</strong> Cash only · No reservations
+        </div>
+      </div>
+    </div>
+
+    <div class="vendor-card">
+      <div class="vendor-header" onclick="toggle(this)">
+        <div class="vendor-left">
+          <div class="vendor-name">Anchor Oyster Bar</div>
+          <div class="vendor-tagline">Castro fishmonger & raw bar · Castro</div>
+        </div>
+        <div class="vendor-right">
+          <span class="vendor-chevron">▼</span>
+        </div>
+      </div>
+      <div class="vendor-body">
+        <div class="vendor-story">
+          Anchor Oyster Bar on Castro Street serves as both a retail fish counter and a sit-down raw bar. For Castro neighborhood residents who want fresh fish without going to the Wharf, it is the neighborhood option. They carry a range of West Coast oyster varieties and daily fish, and the retail counter allows buying to take home.
+        </div>
+        <div class="detail-label">WHAT THEY CARRY</div>
+        <div class="product-list">
+          <span class="ptag">West Coast oysters</span>
+          <span class="ptag">Daily fish selection</span>
+          <span class="ptag seasonal">🦀 Crab (seasonal)</span>
+          <span class="ptag">Clams & mussels</span>
+        </div>
+        <div class="vendor-meta">
+          <strong>Address:</strong> 579 Castro St, Castro<br>
+          <strong>Note:</strong> Primarily a restaurant, retail counter available
+        </div>
+      </div>
+    </div>
+
+  </section>
+
+  <!-- LOCAL SPECIES GUIDE -->
+  <section class="species-section">
+    <div class="section-eyebrow">LOCAL SPECIES · <span>NORTHERN CALIFORNIA WATERS</span></div>
+    <div class="species-grid">
+      <div class="species-card">
+        <div class="species-name">Dungeness Crab</div>
+        <div class="species-note">SF Bay's signature catch. Meaty, sweet, sustainably managed. Buy live when possible.</div>
+        <div class="species-season">SEASON: NOV – MAY</div>
+      </div>
+      <div class="species-card">
+        <div class="species-name">King (Chinook) Salmon</div>
+        <div class="species-note">Wild Pacific salmon from the SF Bay watershed. One of the great fish of the world when fresh.</div>
+        <div class="species-season">SEASON: MAY – OCT</div>
+      </div>
+      <div class="species-card">
+        <div class="species-name">Pacific Halibut</div>
+        <div class="species-note">Flatfish from Northern California. Clean, mild, firm. Excellent grilled or pan-roasted.</div>
+        <div class="species-season">SEASON: SPRING & FALL</div>
+      </div>
+      <div class="species-card">
+        <div class="species-name">Rockfish (Various)</div>
+        <div class="species-note">Year-round staple of the NorCal coast. Many species; all good eating. Often the freshest option.</div>
+        <div class="species-season">YEAR-ROUND</div>
+      </div>
+      <div class="species-card">
+        <div class="species-name">Pacific Sand Dabs</div>
+        <div class="species-note">Small, local flatfish. Underrated. Lightly floured and pan-fried is the classic preparation.</div>
+        <div class="species-season">YEAR-ROUND</div>
+      </div>
+      <div class="species-card">
+        <div class="species-name">Oysters — Tomales Bay</div>
+        <div class="species-note">Drakes Bay Oyster (until 2014) left a legacy. Hog Island and others farm Tomales Bay today.</div>
+        <div class="species-season">YEAR-ROUND · BEST IN FALL/WINTER</div>
+      </div>
+    </div>
+  </section>
+
+  <section class="horizon-section">
+    <div class="section-eyebrow">TRACED LOCAL · <span>EXPANDING</span></div>
+    <p class="horizon-text">
+      SF's seafood guide covers Dungeness country. The same guide is being built for <strong>LA's Santa Monica fish market, San Diego's tuna boats, Monterey's sardine legacy, and the Dungeness fleet up through Eureka</strong>. California has one of the longest coastlines in the US — and most people who live here eat frozen imported fish.
+    </p>
+  </section>
+
+  <footer>
+    <div class="footer-logo"><span>TRACED</span> / LOCAL</div>
+    <a href="index.html" class="footer-link">← all categories</a>
+  </footer>
+
+  <script>
+    function toggle(header) {
+      const body = header.nextElementSibling;
+      const chevron = header.querySelector('.vendor-chevron');
+      body.classList.toggle('open');
+      chevron.classList.toggle('open');
+    }
+  </script>
+</body>
+</html>

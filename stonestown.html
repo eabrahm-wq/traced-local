@@ -1,0 +1,274 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Stonestown Farmers Market — Traced Local</title>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=IBM+Plex+Mono:wght@300;400;500&display=swap" rel="stylesheet">
+  <style>
+    :root { --black:#080806; --cream:#f0ede4; --red:#c8392b; --green:#2d5a27; --green-light:#4a8a42; --muted:#8a8678; --border:#1a1a16; --border-mid:#222; }
+    * { margin:0; padding:0; box-sizing:border-box; }
+    body { background:var(--black); color:var(--cream); font-family:'IBM Plex Mono',monospace; min-height:100vh; }
+    header { display:flex; align-items:center; justify-content:space-between; padding:18px 20px; border-bottom:1px solid var(--border); position:sticky; top:0; background:var(--black); z-index:100; }
+    .logo-group { display:flex; align-items:baseline; gap:8px; }
+    .logo-traced { font-size:12px; letter-spacing:0.25em; color:var(--red); font-weight:500; }
+    .logo-divider { color:#222; }
+    .logo-local { font-family:'Playfair Display',serif; font-size:17px; color:var(--cream); }
+    .back-link { font-size:9px; letter-spacing:0.15em; color:var(--muted); text-decoration:none; border:1px solid var(--border); padding:5px 10px; }
+    .market-hero { padding:32px 20px 24px; border-bottom:1px solid var(--border); background:linear-gradient(180deg,rgba(45,90,39,0.05) 0%,transparent 100%); }
+    .market-eyebrow { font-size:7px; letter-spacing:0.25em; color:var(--green-light); margin-bottom:10px; }
+    .market-name { font-family:'Playfair Display',serif; font-size:clamp(24px,6vw,36px); line-height:1.1; color:var(--cream); margin-bottom:6px; }
+    .market-operator { font-size:9px; letter-spacing:0.12em; color:var(--muted); margin-bottom:18px; }
+    .market-hours-grid { display:grid; grid-template-columns:1fr 1fr; gap:8px; margin-bottom:16px; }
+    .hours-card { padding:10px 12px; border:1px solid var(--border-mid); background:rgba(255,255,255,0.02); }
+    .hours-day { font-size:8px; letter-spacing:0.2em; color:var(--green-light); margin-bottom:3px; }
+    .hours-time { font-size:12px; color:var(--cream); }
+    .hours-note { font-size:8px; color:var(--muted); margin-top:2px; }
+    .market-tags { display:flex; flex-wrap:wrap; gap:5px; margin-bottom:16px; }
+    .mtag { font-size:7px; letter-spacing:0.12em; color:var(--muted); border:1px solid var(--border-mid); padding:3px 8px; }
+    .mtag.green { color:var(--green-light); border-color:rgba(74,138,66,0.3); }
+    .map-btn { display:inline-flex; align-items:center; gap:6px; font-size:9px; letter-spacing:0.15em; color:var(--green-light); text-decoration:none; border:1px solid rgba(74,138,66,0.4); background:rgba(45,90,39,0.1); padding:8px 14px; }
+    .section { padding:24px 20px; border-bottom:1px solid var(--border); }
+    .section-label { font-size:7px; letter-spacing:0.22em; color:var(--muted); margin-bottom:16px; }
+    .section-label span { color:var(--green-light); }
+    .vendor-card { border:1px solid var(--border-mid); margin-bottom:12px; overflow:hidden; }
+    .vendor-card.featured { border-color:rgba(74,138,66,0.35); }
+    .vendor-header { padding:14px 14px 10px; cursor:pointer; display:flex; align-items:flex-start; justify-content:space-between; gap:8px; }
+    .vendor-left { flex:1; }
+    .vendor-name { font-family:'Playfair Display',serif; font-size:17px; color:var(--cream); line-height:1.2; margin-bottom:3px; }
+    .vendor-tagline { font-size:10px; color:var(--muted); line-height:1.4; }
+    .vendor-right { display:flex; flex-direction:column; align-items:flex-end; gap:4px; flex-shrink:0; }
+    .vendor-cert { font-size:7px; letter-spacing:0.12em; padding:2px 7px; color:var(--green-light); border:1px solid rgba(74,138,66,0.3); background:rgba(45,90,39,0.1); }
+    .vendor-chevron { font-size:10px; color:#444; margin-top:4px; transition:transform 0.2s; }
+    .vendor-chevron.open { transform:rotate(180deg); }
+    .vendor-body { display:none; padding:0 14px 14px; }
+    .vendor-body.open { display:block; }
+    .vendor-story { font-size:11px; color:#ccc; line-height:1.7; margin-bottom:12px; padding-bottom:12px; border-bottom:1px solid var(--border); }
+    .products-label { font-size:7px; letter-spacing:0.2em; color:var(--muted); margin-bottom:8px; }
+    .product-list { display:flex; flex-wrap:wrap; gap:5px; margin-bottom:12px; }
+    .product-tag { font-size:9px; letter-spacing:0.06em; color:#aaa; border:1px solid var(--border-mid); padding:3px 8px; }
+    .product-tag.seasonal { color:#8a7a00; border-color:rgba(138,122,0,0.3); }
+    .vendor-meta { font-size:9px; color:var(--muted); line-height:1.8; }
+    .vendor-meta strong { color:#888; font-weight:400; }
+    .vendor-days { display:flex; gap:5px; margin-top:10px; }
+    .day-pill { font-size:7px; letter-spacing:0.12em; padding:3px 8px; }
+    .day-pill.active { color:var(--green-light); border:1px solid rgba(74,138,66,0.3); background:rgba(45,90,39,0.1); }
+    .day-pill.inactive { color:#333; border:1px solid #1a1a1a; }
+    .season-grid { display:grid; grid-template-columns:1fr 1fr; gap:8px; }
+    .season-card { padding:10px 12px; border:1px solid var(--border); }
+    .season-month { font-size:7px; letter-spacing:0.15em; color:var(--green-light); margin-bottom:5px; }
+    .season-items { font-size:10px; color:#aaa; line-height:1.6; }
+    .about-text { font-size:11px; color:#bbb; line-height:1.8; }
+    .about-text + .about-text { margin-top:12px; }
+    footer { padding:20px; border-top:1px solid var(--border); display:flex; align-items:center; justify-content:space-between; }
+    .footer-logo { font-size:9px; letter-spacing:0.18em; color:#2a2a2a; }
+    .footer-logo span { color:var(--red); }
+    .footer-link { font-size:9px; color:#333; text-decoration:none; }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="logo-group">
+      <span class="logo-traced">TRACED</span>
+      <span class="logo-divider">/</span>
+      <span class="logo-local">Local</span>
+    </div>
+    <a href="https://traced-local.vercel.app" class="back-link">← ALL MARKETS</a>
+  </header>
+
+  <section class="market-hero">
+    <div class="market-eyebrow">↑ SAN FRANCISCO · LAKE MERCED / WEST SF</div>
+    <h1 class="market-name">Stonestown<br>Farmers Market</h1>
+    <div class="market-operator">Operated by Agricultural Institute of Marin (AIM) · Year-round</div>
+    <div class="market-hours-grid">
+      <div class="hours-card">
+        <div class="hours-day">SUNDAY</div>
+        <div class="hours-time">9 AM – 1 PM</div>
+        <div class="hours-note">Year-round · rain or shine</div>
+      </div>
+      <div class="hours-card">
+        <div class="hours-day">LOCATION</div>
+        <div class="hours-time">Stonestown Galleria</div>
+        <div class="hours-note">NW corner of mall · Winston Dr entrance</div>
+      </div>
+    </div>
+    <div class="market-tags">
+      <span class="mtag green">YEAR-ROUND</span>
+      <span class="mtag green">CALFRESH / EBT</span>
+      <span class="mtag green">MARKET MATCH</span>
+      <span class="mtag green">WIC ACCEPTED</span>
+      <span class="mtag">FREE PARKING</span>
+      <span class="mtag">FAMILY-FRIENDLY</span>
+      <span class="mtag">CALIFORNIA CERTIFIED</span>
+      <span class="mtag">SF WEEKLY BEST FAMILY MARKET</span>
+    </div>
+    <a href="https://maps.google.com/?q=501+Buckingham+Way+San+Francisco+CA" target="_blank" class="map-btn">
+      ↗ OPEN IN MAPS · 501 Buckingham Way (Stonestown Galleria), San Francisco
+    </a>
+  </section>
+
+  <section class="section">
+    <div class="section-label">FEATURED VENDORS · <span>SUNDAY MARKET</span></div>
+
+    <div class="vendor-card featured">
+      <div class="vendor-header" onclick="toggle(this)">
+        <div class="vendor-left">
+          <div class="vendor-name">Williamson Farms</div>
+          <div class="vendor-tagline">Organic strawberries & row crops · Watsonville, CA</div>
+        </div>
+        <div class="vendor-right">
+          <span class="vendor-cert">CERTIFIED ORGANIC</span>
+          <span class="vendor-chevron">▼</span>
+        </div>
+      </div>
+      <div class="vendor-body">
+        <div class="vendor-story">
+          Williamson Farms grows certified organic strawberries and row crops in the Watsonville-Salinas corridor, one of the most productive agricultural belts in California. Their strawberries are a consistent seasonal highlight at Stonestown — the Pajaro Valley microclimate produces berries with high sugar content and good structure. AIM markets across the Bay Area frequently feature Williamson as a standout spring and summer vendor.
+        </div>
+        <div class="products-label">WHAT THEY BRING</div>
+        <div class="product-list">
+          <span class="product-tag seasonal">☀ Organic strawberries (Mar–Jul)</span>
+          <span class="product-tag seasonal">☀ Seasonal vegetables (spring–fall)</span>
+          <span class="product-tag">Salad greens</span>
+          <span class="product-tag">Herbs</span>
+        </div>
+        <div class="vendor-meta">
+          <strong>Location:</strong> Watsonville / Salinas Valley<br>
+          <strong>Certifications:</strong> Certified Organic
+        </div>
+        <div class="vendor-days">
+          <span class="day-pill active">SUN</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="vendor-card featured">
+      <div class="vendor-header" onclick="toggle(this)">
+        <div class="vendor-left">
+          <div class="vendor-name">Kay Lee Farm</div>
+          <div class="vendor-tagline">Summer squash & seasonal vegetables · Central Valley</div>
+        </div>
+        <div class="vendor-right">
+          <span class="vendor-chevron">▼</span>
+        </div>
+      </div>
+      <div class="vendor-body">
+        <div class="vendor-story">
+          Kay Lee Farm is a Central Valley grower that has been cited by AIM as a standout summer vegetable vendor at Stonestown. They specialize in summer squash — yellow crookneck, pattypan, zucchini — along with broader seasonal vegetable production. Squash grown in the warm Central Valley develops better flavor than coastal-grown equivalents, and Kay Lee's summer presence at Stonestown fills a produce gap that colder-microclimate farms can't match.
+        </div>
+        <div class="products-label">WHAT THEY BRING</div>
+        <div class="product-list">
+          <span class="product-tag seasonal">☀ Summer squash (Jun–Sep)</span>
+          <span class="product-tag seasonal">☀ Zucchini (Jun–Sep)</span>
+          <span class="product-tag seasonal">☀ Pattypan squash (Jun–Sep)</span>
+          <span class="product-tag">Seasonal vegetables</span>
+          <span class="product-tag seasonal">🍂 Winter squash (Sep–Dec)</span>
+        </div>
+        <div class="vendor-meta">
+          <strong>Location:</strong> Central Valley, CA
+        </div>
+        <div class="vendor-days">
+          <span class="day-pill active">SUN</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="vendor-card">
+      <div class="vendor-header" onclick="toggle(this)">
+        <div class="vendor-left">
+          <div class="vendor-name">Vacos</div>
+          <div class="vendor-tagline">Vegan tacos & Mexican street food · Bay Area</div>
+        </div>
+        <div class="vendor-right">
+          <span class="vendor-chevron">▼</span>
+        </div>
+      </div>
+      <div class="vendor-body">
+        <div class="vendor-story">
+          Vacos is a vegan Mexican food vendor that appears at Stonestown and other AIM markets. They bring plant-based takes on classic taco fillings — jackfruit, mushroom, and legume-based proteins — with housemade salsas and corn tortillas. At a family-oriented market like Stonestown, having a prepared hot food option that works for diverse dietary needs is particularly valued.
+        </div>
+        <div class="products-label">WHAT THEY SERVE</div>
+        <div class="product-list">
+          <span class="product-tag">Vegan tacos</span>
+          <span class="product-tag">Jackfruit fillings</span>
+          <span class="product-tag">Mushroom fillings</span>
+          <span class="product-tag">Housemade salsas</span>
+          <span class="product-tag">Corn tortillas</span>
+        </div>
+        <div class="vendor-meta">
+          <strong>Also at:</strong> Multiple AIM markets
+        </div>
+        <div class="vendor-days">
+          <span class="day-pill active">SUN</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="vendor-card">
+      <div class="vendor-header" onclick="toggle(this)">
+        <div class="vendor-left">
+          <div class="vendor-name">Sowl Bowls</div>
+          <div class="vendor-tagline">Housemade wontons & Asian-inspired bowls · Bay Area</div>
+        </div>
+        <div class="vendor-right">
+          <span class="vendor-chevron">▼</span>
+        </div>
+      </div>
+      <div class="vendor-body">
+        <div class="vendor-story">
+          Sowl Bowls makes fresh wontons and Asian-inspired grain bowls at Stonestown and other AIM markets. Their wontons are made to order and use locally sourced ingredients where possible. The prepared foods offering at Stonestown's AIM market leans into the neighborhood's diverse culinary preferences — the Lake Merced and West Portal communities draw a mix of Asian American, Latin, and multi-generational SF families.
+        </div>
+        <div class="products-label">WHAT THEY SERVE</div>
+        <div class="product-list">
+          <span class="product-tag">Fresh wontons</span>
+          <span class="product-tag">Asian-style grain bowls</span>
+          <span class="product-tag">Seasonal broths</span>
+        </div>
+        <div class="vendor-days">
+          <span class="day-pill active">SUN</span>
+        </div>
+      </div>
+    </div>
+
+  </section>
+
+  <section class="section">
+    <div class="section-label">WHAT'S IN SEASON · <span>BAY AREA · FEBRUARY–MARCH</span></div>
+    <div class="season-grid">
+      <div class="season-card">
+        <div class="season-month">NOW</div>
+        <div class="season-items">Citrus · Blood oranges · Meyer lemons · Kale & chard · Root vegetables · Brassicas · Leeks · Mushrooms</div>
+      </div>
+      <div class="season-card">
+        <div class="season-month">COMING SOON</div>
+        <div class="season-items">Strawberries (Mar) · Asparagus · Artichokes · Spring onions · Fava beans · English peas</div>
+      </div>
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="section-label">ABOUT THIS MARKET</div>
+    <p class="about-text">
+      The Stonestown Farmers Market runs every Sunday year-round in the northwest corner of Stonestown Galleria's parking area, with the easiest entry via Winston Drive. It is operated by the Agricultural Institute of Marin (AIM), and features many of the same certified farms that appear at AIM's other Bay Area markets, including Marin Civic Center and Clement Street. SF Weekly named it the Best Family-Oriented Farmers Market in San Francisco — the combination of free parking, adjacent mall, and a vendor mix calibrated to a neighborhood of families and long-term residents gives it a distinctive character.
+    </p>
+    <p class="about-text">
+      West SF — the zip codes around Lake Merced, West Portal, and Forest Hills — has historically been underserved by farmers markets compared to the northeast quadrant of the city. Stonestown is the primary weekly fresh-food market for the entire western side of SF. AIM accepts CalFresh EBT, Market Match, and WIC at all its markets including this one.
+    </p>
+  </section>
+
+  <footer>
+    <div class="footer-logo"><span>TRACED</span> / LOCAL</div>
+    <a href="https://traced-local.vercel.app" class="footer-link">← all markets</a>
+  </footer>
+
+  <script>
+    function toggle(header) {
+      const body = header.nextElementSibling;
+      const chevron = header.querySelector('.vendor-chevron');
+      const isOpen = body.classList.contains('open');
+      body.classList.toggle('open', !isOpen);
+      chevron.classList.toggle('open', !isOpen);
+    }
+  </script>
+</body>
+</html>

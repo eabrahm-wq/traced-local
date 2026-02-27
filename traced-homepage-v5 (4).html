@@ -1,0 +1,2647 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>TRACED — Know Who Owns Your Food</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;0,800;0,900;1,700;1,800&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,700;1,9..40,300;1,9..40,400&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+/* ═══════════════════════════════════════════
+   TOKENS
+═══════════════════════════════════════════ */
+:root{
+  --bg:      #fbfbf8;
+  --bg2:     #f5f2eb;
+  --card:    #ffffff;
+  --border:  #e7e3da;
+  --ink:     #14120f;
+  --muted:   #6f6a62;
+  --dim:     #9a948b;
+  --accent:  #1f7a6a;
+  --accent-dk:#145c4e;
+  --gold:    #b07a00;
+  --gold-lt: rgba(202,162,75,.12);
+  --teal-lt: rgba(31,122,106,.08);
+  --red:     #c83d2a;
+  --red-lt:  rgba(200,61,42,.07);
+  --shadow:  0 16px 40px rgba(20,18,15,.09);
+  --shadow-s:0 4px 14px rgba(20,18,15,.06);
+}
+
+/* ═══════════════════════════════════════════
+   RESET
+═══════════════════════════════════════════ */
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{
+  font-family:'DM Sans',system-ui,sans-serif;
+  background:var(--bg);color:var(--ink);
+  font-size:16px;line-height:1.65;
+  -webkit-font-smoothing:antialiased;
+}
+a{color:inherit;text-decoration:none}
+button{font-family:inherit;cursor:pointer;border:none;background:none}
+img{display:block;max-width:100%}
+.W{max-width:1160px;margin:0 auto;padding:0 28px}
+
+/* ═══════════════════════════════════════════
+   TYPE HELPERS
+═══════════════════════════════════════════ */
+.serif{font-family:'Playfair Display',Georgia,serif}
+.mono {font-family:'DM Mono',ui-monospace,monospace}
+.kicker{
+  font-family:'DM Mono',ui-monospace,monospace;
+  font-size:10px;letter-spacing:.18em;
+  text-transform:uppercase;font-weight:500;
+  color:var(--accent);
+}
+.kicker.gold{color:var(--gold)}
+.kicker.dim {color:var(--dim)}
+.kicker.red {color:var(--red)}
+
+/* ═══════════════════════════════════════════
+   NAV
+═══════════════════════════════════════════ */
+.nav{
+  position:sticky;top:0;z-index:200;
+  background:rgba(251,251,248,.93);
+  backdrop-filter:blur(14px);
+  border-bottom:1px solid var(--border);
+}
+.nav-i{
+  display:flex;align-items:center;
+  justify-content:space-between;height:68px;gap:12px;
+}
+.nav-logo{
+  display:flex;align-items:center;gap:8px;
+  font-family:'DM Mono',monospace;
+  font-size:12px;letter-spacing:.22em;
+  text-transform:uppercase;color:var(--accent);
+  white-space:nowrap;font-weight:500;
+}
+.nav-logo-sep{color:var(--border);margin:0 2px}
+.nav-logo-sub{color:var(--dim);letter-spacing:.08em;font-size:10px;text-transform:none}
+.nav-links{display:flex;align-items:center;gap:2px}
+.nav-links a{
+  font-size:13px;color:var(--muted);
+  padding:8px 11px;border-radius:999px;
+  transition:color .15s,background .15s;
+}
+.nav-links a:hover{color:var(--ink);background:var(--bg2)}
+.nav-cta{
+  padding:9px 16px;border-radius:999px;
+  background:var(--accent);color:#fff !important;
+  font-size:11px;font-family:'DM Mono',monospace;
+  letter-spacing:.12em;text-transform:uppercase;
+  font-weight:500;transition:background .15s;
+  white-space:nowrap;
+}
+.nav-cta:hover{background:var(--accent-dk) !important}
+.nav-search{
+  padding:8px 14px;border-radius:10px;
+  border:1px solid var(--border);
+  background:var(--card);
+  font-size:13px;width:190px;font-family:inherit;
+  color:var(--ink);transition:border-color .15s;
+}
+.nav-search:focus{outline:none;border-color:var(--accent)}
+
+/* ═══════════════════════════════════════════
+   HERO  — single, unified entry point
+═══════════════════════════════════════════ */
+.hero{
+  padding:72px 0 58px;
+  position:relative;overflow:hidden;
+}
+.hero::before{
+  content:'';position:absolute;inset:0;pointer-events:none;
+  background:
+    radial-gradient(ellipse 55% 55% at 72% 18%, rgba(31,122,106,.07),transparent),
+    radial-gradient(ellipse 45% 50% at 20% 85%, rgba(202,162,75,.09),transparent);
+}
+.hero-grid{
+  display:grid;
+  grid-template-columns:1fr 420px;
+  gap:52px;align-items:center;
+  position:relative;
+}
+.hero-eyebrow{
+  display:flex;align-items:center;gap:10px;
+  margin-bottom:22px;
+}
+.hero-dot{
+  width:6px;height:6px;border-radius:50%;
+  background:var(--accent);flex-shrink:0;
+}
+.hero-h1{
+  font-family:'Playfair Display',Georgia,serif;
+  font-size:clamp(50px,5.8vw,80px);
+  font-weight:700;
+  letter-spacing:-.028em;
+  line-height:.97;
+  margin-bottom:22px;
+}
+.hero-h1 em{font-style:italic;color:var(--accent)}
+.hero-sub{
+  font-size:17px;color:var(--muted);
+  max-width:48ch;margin-bottom:30px;line-height:1.6;
+}
+/* search */
+.hero-search-wrap{position:relative;max-width:520px;z-index:400}
+.hero-search{
+  width:100%;padding:17px 20px 17px 50px;
+  border-radius:16px;
+  border:1.5px solid var(--border);
+  background:var(--card);
+  font-size:15px;font-family:inherit;color:var(--ink);
+  box-shadow:var(--shadow-s);
+  transition:border-color .2s,box-shadow .2s;
+}
+.hero-search:focus{
+  outline:none;border-color:var(--accent);
+  box-shadow:0 0 0 3px rgba(31,122,106,.11);
+}
+.hero-search-ico{
+  position:absolute;left:18px;top:50%;
+  transform:translateY(-50%);
+  color:var(--dim);font-size:16px;pointer-events:none;
+}
+.hero-dd{
+  position:absolute;top:calc(100% + 8px);left:0;right:0;
+  background:var(--card);border:1px solid var(--border);
+  border-radius:14px;box-shadow:var(--shadow);
+  overflow:hidden;display:none;z-index:300;
+}
+.hero-dd.open{display:block}
+.dd-label{
+  font-family:'DM Mono',monospace;
+  font-size:9px;letter-spacing:.14em;
+  text-transform:uppercase;color:var(--dim);
+  padding:10px 14px 6px;
+  border-bottom:1px solid rgba(20,18,15,.06);
+}
+.dd-item{
+  display:flex;align-items:center;
+  justify-content:space-between;
+  padding:11px 14px;gap:10px;
+  font-size:14px;color:var(--ink);
+  cursor:pointer;transition:background .12s;
+}
+.dd-item:hover{background:var(--teal-lt)}
+.dd-type{
+  font-family:'DM Mono',monospace;
+  font-size:9px;letter-spacing:.10em;
+  text-transform:uppercase;color:var(--dim);
+  background:var(--bg2);padding:4px 8px;
+  border-radius:999px;white-space:nowrap;
+}
+/* quick pills under search */
+.hero-pills{
+  display:flex;gap:8px;flex-wrap:wrap;
+  margin-top:18px;
+  position:relative;z-index:1;
+}
+.hero-pill{
+  font-size:12px;padding:7px 12px;
+  border-radius:999px;border:1px solid var(--border);
+  background:var(--card);color:var(--muted);
+  cursor:pointer;transition:all .15s;
+}
+.hero-pill:hover{
+  border-color:var(--accent);
+  color:var(--accent);background:var(--teal-lt);
+}
+
+/* ─── Hero right: ownership web card ─── */
+.hero-web{
+  background:var(--card);
+  border:1px solid var(--border);
+  border-radius:22px;padding:22px;
+  box-shadow:var(--shadow);
+  position:relative;overflow:hidden;
+}
+.hero-web::after{
+  content:'';position:absolute;
+  top:-50px;right:-50px;
+  width:180px;height:180px;
+  background:radial-gradient(circle,rgba(31,122,106,.08),transparent 70%);
+  pointer-events:none;
+}
+.hero-web-lbl{
+  font-family:'DM Mono',monospace;
+  font-size:9px;letter-spacing:.16em;
+  text-transform:uppercase;color:var(--dim);
+  margin-bottom:14px;
+}
+.hero-web svg{width:100%;height:auto;display:block}
+.hero-web-note{
+  margin-top:14px;padding-top:14px;
+  border-top:1px solid rgba(20,18,15,.07);
+  font-size:12px;color:var(--muted);line-height:1.5;
+}
+.hero-web-note strong{color:var(--ink)}
+
+/* ═══════════════════════════════════════════
+   SECTION WRAPPER
+═══════════════════════════════════════════ */
+.section{padding:68px 0}
+.section+.section{border-top:1px solid var(--border)}
+.sec-head{
+  display:flex;align-items:flex-end;
+  justify-content:space-between;gap:16px;
+  margin-bottom:34px;flex-wrap:wrap;
+}
+.sec-title{
+  font-family:'Playfair Display',Georgia,serif;
+  font-size:clamp(26px,2.8vw,36px);
+  font-weight:700;letter-spacing:-.01em;
+  line-height:1.1;margin-top:7px;
+}
+.sec-sub{
+  font-size:14px;color:var(--muted);
+  max-width:58ch;margin-top:7px;line-height:1.6;
+}
+.sec-link{
+  font-size:13px;color:var(--accent);
+  font-weight:700;white-space:nowrap;
+}
+.sec-link:hover{text-decoration:underline}
+
+/* ═══════════════════════════════════════════
+   OWNERSHIP SECTION
+═══════════════════════════════════════════ */
+.own-grid{
+  display:grid;
+  grid-template-columns:repeat(4,1fr);
+  gap:14px;
+}
+.own-card{
+  background:var(--card);
+  border:1.5px solid var(--border);
+  border-radius:18px;padding:20px;
+  box-shadow:var(--shadow-s);
+  transition:border-color .2s,transform .2s,box-shadow .2s;
+  display:block;cursor:pointer;
+  position:relative;
+}
+.own-card:hover{
+  border-color:var(--accent);
+  transform:translateY(-3px);
+  box-shadow:var(--shadow);
+}
+.own-card:hover .own-cta{
+  opacity:1;
+}
+.own-cta{
+  display:flex;align-items:center;gap:6px;
+  margin-top:16px;padding-top:14px;
+  border-top:1px solid var(--border);
+  font-family:'DM Mono',monospace;
+  font-size:10px;letter-spacing:.12em;
+  text-transform:uppercase;
+  color:var(--accent);font-weight:500;
+  opacity:.6;
+  transition:opacity .2s;
+}
+.own-cta-arrow{
+  font-size:13px;transition:transform .2s;
+}
+.own-card:hover .own-cta-arrow{transform:translateX(3px);}
+.own-name{
+  font-family:'Playfair Display',Georgia,serif;
+  font-size:19px;font-weight:700;
+  margin:7px 0 12px;letter-spacing:-.01em;
+}
+.own-brands{display:flex;flex-direction:column;gap:7px}
+.own-brand{
+  display:flex;align-items:center;gap:8px;
+  font-size:13px;color:var(--muted);
+}
+.own-brand::before{
+  content:'→';color:var(--dim);
+  font-size:11px;flex-shrink:0;
+}
+.own-brand.hi{color:var(--ink);font-weight:700}
+.own-brand.hi::before{color:var(--accent)}
+
+.own-stats{
+  display:grid;grid-template-columns:repeat(3,1fr);
+  gap:12px;margin-top:28px;
+}
+.own-stat{
+  background:var(--card);
+  border:1px solid var(--border);
+  border-radius:16px;padding:22px;
+  text-align:center;
+}
+.own-stat-n{
+  font-family:'Playfair Display',Georgia,serif;
+  font-size:44px;font-weight:800;
+  color:var(--accent);line-height:1;margin-bottom:6px;
+}
+.own-stat-l{font-size:13px;color:var(--muted);line-height:1.4}
+
+/* ═══════════════════════════════════════════
+   BRIDGE — the pivot moment
+═══════════════════════════════════════════ */
+.bridge{
+  background:linear-gradient(135deg,rgba(31,122,106,.10),rgba(202,162,75,.09));
+  border:1px solid rgba(31,122,106,.20);
+  border-radius:22px;
+  padding:38px 44px;
+  display:flex;align-items:center;
+  justify-content:space-between;gap:28px;
+  flex-wrap:wrap;
+}
+.bridge-h{
+  font-family:'Playfair Display',Georgia,serif;
+  font-size:26px;font-weight:700;
+  letter-spacing:-.01em;margin-bottom:8px;
+}
+.bridge-sub{
+  font-size:15px;color:var(--muted);
+  max-width:52ch;line-height:1.55;
+}
+.bridge-btns{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+.btn{
+  display:inline-flex;align-items:center;gap:8px;
+  padding:13px 22px;border-radius:12px;
+  font-family:'DM Mono',monospace;
+  font-size:11px;letter-spacing:.12em;
+  text-transform:uppercase;font-weight:500;
+  transition:all .15s;cursor:pointer;border:none;
+}
+.btn-p{
+  background:var(--accent-dk);color:#fff;
+  box-shadow:0 8px 22px rgba(15,92,78,.25);
+}
+.btn-p:hover{background:var(--accent)}
+.btn-s{
+  background:var(--card);color:var(--ink);
+  border:1px solid var(--border);
+  box-shadow:var(--shadow-s);
+}
+.btn-s:hover{border-color:var(--accent);color:var(--accent)}
+
+/* ═══════════════════════════════════════════
+   LOCAL DISCOVERY SECTION
+═══════════════════════════════════════════ */
+.local-bg{
+  background:var(--bg2);
+  border-top:1px solid var(--border);
+  border-bottom:1px solid var(--border);
+}
+.local-controls{
+  background:var(--card);
+  border:1px solid var(--border);
+  border-radius:16px;padding:18px;
+  box-shadow:var(--shadow-s);
+  margin-bottom:20px;
+}
+.local-row{
+  display:flex;gap:10px;align-items:center;
+  flex-wrap:wrap;margin-bottom:14px;
+}
+.local-zip{
+  padding:10px 14px;border-radius:10px;
+  border:1.5px solid var(--border);
+  background:var(--bg);font-size:13px;
+  font-family:'DM Mono',monospace;
+  width:130px;color:var(--ink);
+  transition:border-color .15s;
+}
+.local-zip:focus{outline:none;border-color:var(--accent)}
+.city-pill{
+  padding:9px 14px;border-radius:999px;
+  border:1px solid var(--border);
+  font-size:12px;font-weight:700;
+  background:var(--card);color:var(--muted);
+  cursor:pointer;transition:all .15s;
+}
+.city-pill.on{
+  background:var(--teal-lt);
+  border-color:rgba(31,122,106,.28);
+  color:var(--accent);
+}
+.f-chips{display:flex;gap:8px;flex-wrap:wrap}
+.f-chip{
+  padding:8px 12px;border-radius:999px;
+  border:1px solid var(--border);
+  font-size:12px;background:var(--card);
+  color:var(--muted);cursor:pointer;transition:all .15s;
+}
+.f-chip.on{
+  background:var(--teal-lt);
+  border-color:rgba(31,122,106,.28);
+  color:var(--accent);
+}
+/* layout: results + side panel */
+.local-layout{
+  display:grid;
+  grid-template-columns:1fr 340px;
+  gap:22px;align-items:start;
+}
+/* vendor result cards */
+.v-grid{display:grid;gap:14px}
+.v-card{
+  background:var(--card);
+  border:1.5px solid var(--border);
+  border-radius:18px;padding:20px;
+  box-shadow:var(--shadow-s);
+  transition:border-color .2s,transform .15s,box-shadow .2s;
+  cursor:pointer;display:block;
+  opacity:1;
+}
+.v-card:hover{
+  border-color:var(--accent);
+  transform:translateY(-2px);
+  box-shadow:var(--shadow);
+}
+.v-card.hidden{display:none}
+.v-top{
+  display:flex;justify-content:space-between;
+  align-items:flex-start;gap:10px;margin-bottom:7px;
+}
+.v-name{
+  font-family:'Playfair Display',Georgia,serif;
+  font-size:18px;font-weight:700;line-height:1.15;
+}
+.v-dist{
+  font-family:'DM Mono',monospace;
+  font-size:10px;color:var(--dim);white-space:nowrap;
+  padding-top:4px;
+}
+.v-meta{
+  font-size:13px;color:var(--muted);
+  margin-bottom:10px;line-height:1.4;
+}
+.v-why{
+  font-size:12.5px;
+  background:var(--teal-lt);
+  border-left:2.5px solid var(--accent);
+  padding:9px 11px;border-radius:0 8px 8px 0;
+  color:var(--ink);line-height:1.55;
+  margin-bottom:12px;
+}
+.v-why strong{font-weight:700;color:var(--accent-dk)}
+.v-badges{display:flex;gap:6px;flex-wrap:wrap}
+.badge{
+  font-family:'DM Mono',monospace;
+  font-size:9px;letter-spacing:.10em;
+  text-transform:uppercase;
+  padding:5px 9px;border-radius:999px;
+  border:1px solid rgba(20,18,15,.12);
+  background:var(--bg2);color:var(--muted);
+}
+.badge.g{background:var(--teal-lt);border-color:rgba(31,122,106,.22);color:var(--accent)}
+.badge.a{background:var(--gold-lt);border-color:rgba(202,162,75,.28);color:var(--gold)}
+.v-actions{
+  display:flex;gap:8px;flex-wrap:wrap;
+  margin-top:12px;padding-top:12px;
+  border-top:1px solid rgba(20,18,15,.06);
+}
+.v-btn{
+  padding:8px 12px;border-radius:10px;
+  border:1px solid var(--border);
+  background:var(--bg);
+  font-size:12px;color:var(--ink);
+  cursor:pointer;transition:all .14s;font-family:inherit;
+}
+.v-btn:hover{border-color:var(--accent);color:var(--accent)}
+/* details expand */
+.v-details{
+  margin-top:10px;padding-top:10px;
+  border-top:1px solid rgba(20,18,15,.08);
+}
+.v-details summary{
+  cursor:pointer;
+  font-family:'DM Mono',monospace;
+  font-size:10px;letter-spacing:.12em;
+  text-transform:uppercase;color:var(--accent);
+}
+.v-detail-body{
+  color:var(--muted);font-size:13px;
+  line-height:1.6;margin-top:10px;
+  display:grid;gap:6px;
+}
+
+/* neighborhood panel */
+.nbhd{
+  background:var(--card);
+  border:1px solid var(--border);
+  border-radius:18px;padding:18px;
+  box-shadow:var(--shadow-s);
+  position:sticky;top:84px;
+}
+.nbhd-map{
+  height:190px;
+  background:
+    radial-gradient(circle at 28% 36%, rgba(31,122,106,.16),transparent 38%),
+    radial-gradient(circle at 68% 64%, rgba(202,162,75,.13),transparent 38%),
+    linear-gradient(155deg,#f6f4ef,#ede9df);
+  border-radius:12px;
+  border:1px solid var(--border);
+  position:relative;overflow:hidden;
+  margin-bottom:14px;
+}
+.mpin{
+  position:absolute;
+  width:38px;height:38px;
+  background:var(--card);
+  border:1.5px solid var(--border);
+  border-radius:50%;
+  display:flex;align-items:center;justify-content:center;
+  box-shadow:var(--shadow-s);
+  font-family:'DM Mono',monospace;
+  font-size:9px;color:var(--ink);font-weight:500;
+}
+.mpin.hi{
+  background:var(--accent);
+  color:#fff;border-color:var(--accent-dk);
+}
+.nbhd-list{display:grid;gap:8px;margin-top:14px}
+.nbhd-row{
+  display:flex;align-items:center;
+  justify-content:space-between;
+  padding:9px 11px;
+  background:var(--bg2);border-radius:10px;
+  font-size:13px;cursor:pointer;transition:background .14s;
+}
+.nbhd-row:hover{background:var(--teal-lt)}
+.nbhd-row-n{font-weight:700}
+.nbhd-row-d{
+  font-family:'DM Mono',monospace;
+  font-size:10px;color:var(--dim);
+}
+
+/* empty state */
+.v-empty{
+  padding:48px 24px;text-align:center;
+  color:var(--muted);font-size:14px;
+  background:var(--card);border:1px solid var(--border);
+  border-radius:18px;display:none;
+}
+
+/* ═══════════════════════════════════════════
+   STORIES CAROUSEL
+═══════════════════════════════════════════ */
+.stories-scroll{
+  display:flex;gap:16px;
+  overflow-x:auto;padding-bottom:8px;
+  scrollbar-width:none;-ms-overflow-style:none;
+}
+.stories-scroll::-webkit-scrollbar{display:none}
+.s-card{
+  min-width:300px;max-width:300px;
+  background:var(--card);
+  border:1.5px solid var(--border);
+  border-radius:18px;padding:22px;
+  box-shadow:var(--shadow-s);
+  flex-shrink:0;
+  transition:transform .2s,box-shadow .2s,border-color .2s;
+  display:block;
+}
+.s-card:hover{
+  transform:translateY(-4px);
+  box-shadow:var(--shadow);
+  border-color:var(--accent);
+}
+.s-card.feat{
+  min-width:340px;max-width:340px;
+  background:linear-gradient(160deg,rgba(31,122,106,.06),rgba(202,162,75,.06));
+  border-color:rgba(31,122,106,.22);
+}
+.s-title{
+  font-family:'Playfair Display',Georgia,serif;
+  font-size:22px;font-weight:700;
+  letter-spacing:-.01em;line-height:1.1;
+  margin:8px 0 8px;
+}
+.s-desc{
+  font-size:13px;color:var(--muted);
+  line-height:1.55;margin-bottom:14px;
+}
+.s-tags{display:flex;gap:6px;flex-wrap:wrap}
+.s-tag{
+  font-size:11px;padding:5px 10px;
+  border-radius:999px;
+  border:1px solid rgba(20,18,15,.10);
+  background:var(--bg2);color:var(--muted);
+}
+
+/* ═══════════════════════════════════════════
+   INDEXES GRID
+═══════════════════════════════════════════ */
+.idx-grid{
+  display:grid;
+  grid-template-columns:repeat(auto-fill,minmax(260px,1fr));
+  gap:14px;
+}
+.idx-card{
+  background:var(--card);
+  border:1.5px solid var(--border);
+  border-radius:18px;padding:22px;
+  box-shadow:var(--shadow-s);
+  transition:all .2s;display:block;
+}
+.idx-card:hover{
+  border-color:var(--accent);
+  transform:translateY(-2px);
+  box-shadow:var(--shadow);
+}
+.idx-card.coming{opacity:.58;cursor:default}
+.idx-card.coming:hover{transform:none;border-color:var(--border)}
+.idx-title{
+  font-family:'Playfair Display',Georgia,serif;
+  font-size:20px;font-weight:700;
+  margin:8px 0 7px;
+}
+.idx-desc{font-size:13px;color:var(--muted);line-height:1.5;margin-bottom:14px}
+.idx-foot{
+  display:flex;justify-content:space-between;
+  align-items:center;font-size:12px;color:var(--dim);
+}
+.idx-count{
+  font-family:'DM Mono',monospace;
+  color:var(--accent);font-size:11px;
+}
+
+/* ═══════════════════════════════════════════
+   VENDOR CTA — dark section, marketplace side
+═══════════════════════════════════════════ */
+.vendor-cta-section{
+  background:var(--ink);
+  position:relative;overflow:hidden;
+}
+.vendor-cta-section::before{
+  content:'';position:absolute;inset:0;pointer-events:none;
+  background:
+    radial-gradient(ellipse 50% 65% at 78% 50%,rgba(31,122,106,.24),transparent),
+    radial-gradient(ellipse 40% 55% at 22% 35%,rgba(202,162,75,.14),transparent);
+}
+.vendor-inner{
+  display:grid;
+  grid-template-columns:1fr auto;
+  gap:40px;align-items:center;
+  position:relative;z-index:1;
+  padding:64px 0;
+}
+.vendor-kicker{
+  font-family:'DM Mono',monospace;
+  font-size:10px;letter-spacing:.18em;
+  text-transform:uppercase;color:var(--accent);
+  margin-bottom:14px;
+}
+.vendor-h{
+  font-family:'Playfair Display',Georgia,serif;
+  font-size:clamp(26px,3vw,40px);
+  font-weight:700;color:#fff;
+  letter-spacing:-.02em;line-height:1.05;
+  margin-bottom:14px;
+}
+.vendor-h em{font-style:italic;color:rgba(202,162,75,.85)}
+.vendor-sub{
+  font-size:15px;color:rgba(255,255,255,.58);
+  max-width:52ch;line-height:1.6;
+}
+.vendor-perks{display:flex;flex-direction:column;gap:12px;margin-top:24px}
+.vperk{
+  display:flex;align-items:flex-start;gap:12px;
+  font-size:14px;color:rgba(255,255,255,.72);
+}
+.vperk-dot{
+  width:22px;height:22px;border-radius:50%;
+  background:rgba(31,122,106,.28);
+  border:1px solid rgba(31,122,106,.48);
+  display:flex;align-items:center;justify-content:center;
+  flex-shrink:0;margin-top:2px;
+  font-size:10px;color:var(--accent);
+}
+.vperk strong{color:#fff}
+.vendor-form{
+  background:rgba(255,255,255,.06);
+  border:1px solid rgba(255,255,255,.12);
+  border-radius:18px;padding:26px;
+  min-width:290px;
+}
+.vform-title{
+  font-family:'DM Mono',monospace;
+  font-size:10px;letter-spacing:.16em;
+  text-transform:uppercase;
+  color:rgba(255,255,255,.55);margin-bottom:18px;
+}
+.vform-label{
+  display:block;
+  font-family:'DM Mono',monospace;
+  font-size:9px;letter-spacing:.14em;
+  text-transform:uppercase;color:rgba(255,255,255,.42);
+  margin-bottom:6px;
+}
+.vform-input{
+  width:100%;padding:11px 13px;
+  border-radius:10px;
+  border:1px solid rgba(255,255,255,.13);
+  background:rgba(255,255,255,.07);
+  font-size:14px;color:#fff;font-family:inherit;
+  margin-bottom:12px;
+  transition:border-color .15s;
+}
+.vform-input::placeholder{color:rgba(255,255,255,.28)}
+.vform-input:focus{outline:none;border-color:var(--accent)}
+.vform-btn{
+  width:100%;padding:14px;
+  background:var(--accent);color:#fff;
+  border-radius:10px;font-weight:700;
+  font-family:'DM Mono',monospace;
+  font-size:11px;letter-spacing:.12em;
+  text-transform:uppercase;border:none;
+  cursor:pointer;transition:background .15s;
+}
+.vform-btn:hover{background:var(--accent-dk)}
+.vform-note{
+  font-size:11px;color:rgba(255,255,255,.30);
+  text-align:center;margin-top:9px;line-height:1.5;
+}
+
+/* ═══════════════════════════════════════════
+   FOOTER
+═══════════════════════════════════════════ */
+.footer{border-top:1px solid var(--border);padding:44px 0 30px}
+.footer-grid{
+  display:grid;
+  grid-template-columns:1.6fr 1fr 1fr 1fr;
+  gap:32px;
+}
+.footer-brand-name{
+  font-family:'DM Mono',monospace;
+  font-size:11px;letter-spacing:.22em;
+  text-transform:uppercase;color:var(--accent);margin-bottom:9px;
+}
+.footer-brand-desc{font-size:13px;color:var(--muted);line-height:1.6;max-width:28ch}
+.footer-principle{
+  font-size:11px;color:var(--dim);
+  margin-top:14px;line-height:1.5;font-style:italic;
+}
+.f-col-head{
+  font-family:'DM Mono',monospace;
+  font-size:9px;letter-spacing:.16em;
+  text-transform:uppercase;color:var(--dim);margin-bottom:12px;
+}
+.f-col-links{display:flex;flex-direction:column;gap:9px}
+.f-col-links a{font-size:13px;color:var(--muted);transition:color .14s}
+.f-col-links a:hover{color:var(--accent)}
+.footer-bot{
+  margin-top:36px;padding-top:20px;
+  border-top:1px solid var(--border);
+  display:flex;justify-content:space-between;
+  align-items:center;flex-wrap:wrap;gap:12px;
+}
+.footer-copy{font-size:12px;color:var(--dim)}
+.footer-tag{
+  font-family:'DM Mono',monospace;
+  font-size:10px;color:var(--dim);letter-spacing:.10em;
+}
+
+/* ═══════════════════════════════════════════
+   RESPONSIVE
+═══════════════════════════════════════════ */
+@media(max-width:1020px){
+  .hero-grid{grid-template-columns:1fr;gap:34px}
+  .hero-web{max-width:480px}
+  .own-grid{grid-template-columns:1fr 1fr}
+  .local-layout{grid-template-columns:1fr}
+  .nbhd{position:relative;top:auto}
+  .vendor-inner{grid-template-columns:1fr}
+  .vendor-form{min-width:auto}
+  .footer-grid{grid-template-columns:1fr 1fr;gap:24px}
+}
+@media(max-width:640px){
+  .own-grid{grid-template-columns:1fr}
+  .own-stats{grid-template-columns:1fr}
+  .bridge{padding:26px}
+  .s-card,.s-card.feat{min-width:260px;max-width:260px}
+  .nav-links a:not(.nav-cta){display:none}
+  .footer-grid{grid-template-columns:1fr}
+  .vendor-inner{padding:44px 0}
+}
+
+/* ═══════════════════════════════════════════
+   LOAD ANIMATION
+═══════════════════════════════════════════ */
+@keyframes up{
+  from{opacity:0;transform:translateY(20px)}
+  to  {opacity:1;transform:translateY(0)}
+}
+.hero-h1      {animation:up .65s ease both}
+.hero-sub     {animation:up .65s ease .12s both}
+.hero-search-wrap{animation:up .65s ease .22s both}
+.hero-pills   {animation:up .65s ease .30s both}
+.hero-web     {animation:up .70s ease .16s both}
+
+/* ═══════════════════════════════════════════
+   PRIVATE EQUITY SECTION
+═══════════════════════════════════════════ */
+.pe-explainer{
+  background:var(--bg2);
+  border:1px solid var(--border);
+  border-radius:20px;
+  padding:32px;
+  margin-bottom:28px;
+}
+.pe-explainer-inner{
+  display:grid;
+  grid-template-columns:repeat(3,1fr);
+  gap:28px;
+}
+.pe-exp-block{}
+.pe-exp-num{
+  font-family:'DM Mono',monospace;
+  font-size:10px;letter-spacing:.16em;
+  color:var(--dim);margin-bottom:6px;
+}
+.pe-exp-label{
+  font-family:'Playfair Display',Georgia,serif;
+  font-size:15px;font-weight:700;
+  margin-bottom:8px;
+}
+.pe-exp-text{
+  font-size:13px;color:var(--muted);line-height:1.65;
+}
+.pe-grid{
+  display:grid;
+  grid-template-columns:repeat(2,1fr);
+  gap:16px;
+  margin-bottom:20px;
+}
+.pe-card{
+  background:var(--card);
+  border:1.5px solid var(--border);
+  border-radius:18px;
+  overflow:hidden;
+  box-shadow:var(--shadow-s);
+  transition:box-shadow .2s,transform .2s;
+}
+.pe-card:hover{
+  box-shadow:var(--shadow);
+  transform:translateY(-2px);
+}
+.pe-card-header{
+  background:var(--ink);
+  padding:20px 22px;
+}
+.pe-firm-type{
+  font-family:'DM Mono',monospace;
+  font-size:9px;letter-spacing:.16em;
+  text-transform:uppercase;
+  color:rgba(255,255,255,.4);
+  margin-bottom:6px;
+}
+.pe-firm-name{
+  font-family:'Playfair Display',Georgia,serif;
+  font-size:22px;font-weight:700;
+  color:#fff;line-height:1;
+  margin-bottom:6px;
+}
+.pe-firm-aum{
+  font-family:'DM Mono',monospace;
+  font-size:10px;color:rgba(255,255,255,.5);
+}
+.pe-card-body{padding:20px 22px;}
+.pe-brands-label{
+  font-family:'DM Mono',monospace;
+  font-size:9px;letter-spacing:.14em;
+  text-transform:uppercase;color:var(--dim);
+  margin-bottom:14px;
+}
+.pe-brands-list{
+  display:flex;flex-direction:column;
+  gap:8px;margin-bottom:18px;
+}
+.pe-brand-row{
+  display:flex;align-items:flex-start;
+  gap:8px;font-size:13px;color:var(--ink);
+  font-weight:600;line-height:1.4;
+}
+.pe-dot{
+  width:7px;height:7px;border-radius:50%;
+  flex-shrink:0;margin-top:4px;
+}
+.pe-dot.green{background:#2d7a5c}
+.pe-dot.amber{background:#b5872a}
+.pe-dot.red{background:#8b2020}
+.pe-note{
+  font-weight:400;color:var(--muted);
+  font-size:12px;display:block;
+}
+.pe-card-insight{
+  background:var(--bg2);
+  border-left:3px solid var(--border-md);
+  border-radius:0 10px 10px 0;
+  padding:12px 14px;
+  font-size:12.5px;color:var(--muted);
+  line-height:1.65;
+}
+.pe-insight-label{
+  display:block;
+  font-family:'DM Mono',monospace;
+  font-size:9px;letter-spacing:.14em;
+  text-transform:uppercase;
+  color:var(--dim);margin-bottom:5px;
+}
+.pe-footer-note{
+  text-align:center;
+  font-size:12px;color:var(--dim);
+  font-style:italic;line-height:1.6;
+  max-width:64ch;margin:0 auto;
+  padding:16px 0 0;
+}
+@media(max-width:900px){
+  .pe-explainer-inner{grid-template-columns:1fr;}
+  .pe-grid{grid-template-columns:1fr;}
+}
+
+
+/* ── FEATURED INVESTIGATION BLOCK ── */
+.feat-invest{
+  display:flex;gap:40px;
+  background:linear-gradient(135deg, rgba(26,22,18,.96), rgba(26,22,18,.99));
+  border:1.5px solid rgba(255,255,255,.08);
+  border-radius:22px;
+  padding:40px 44px;
+  margin-bottom:28px;
+  color:#fff;
+  cursor:pointer;
+  transition:border-color .2s, transform .2s, box-shadow .2s;
+  box-shadow:0 12px 40px rgba(26,22,18,.22);
+  text-decoration:none;
+  position:relative;
+  overflow:hidden;
+}
+.feat-invest::before{
+  content:'';
+  position:absolute;inset:0;
+  background:repeating-linear-gradient(
+    -55deg,
+    transparent, transparent 28px,
+    rgba(255,255,255,.012) 28px, rgba(255,255,255,.012) 29px
+  );
+  pointer-events:none;
+}
+.feat-invest:hover{
+  border-color:rgba(31,122,106,.5);
+  transform:translateY(-2px);
+  box-shadow:0 18px 50px rgba(26,22,18,.28);
+}
+.fi-left{ flex:1; position:relative; z-index:1; }
+.fi-eyebrow{
+  display:flex;align-items:center;gap:10px;
+  margin-bottom:14px;
+}
+.fi-badge{
+  background:var(--accent);
+  color:#fff;
+  font-family:var(--mono);
+  font-size:9px;letter-spacing:.16em;text-transform:uppercase;
+  padding:4px 10px;border-radius:6px;font-weight:500;
+}
+.fi-category{
+  font-family:var(--mono);
+  font-size:9px;letter-spacing:.14em;text-transform:uppercase;
+  color:rgba(255,255,255,.35);
+}
+.fi-title{
+  font-family:var(--serif);
+  font-style:italic;font-weight:700;
+  font-size:clamp(22px,2.4vw,34px);
+  line-height:1.1;letter-spacing:-.02em;
+  color:#fff;margin-bottom:14px;
+}
+.fi-desc{
+  font-size:14px;color:rgba(255,255,255,.6);
+  line-height:1.7;max-width:58ch;margin-bottom:20px;
+}
+.fi-tags{ display:flex;flex-wrap:wrap;gap:7px; }
+.fi-tag{
+  font-family:var(--mono);
+  font-size:9px;letter-spacing:.1em;text-transform:uppercase;
+  background:rgba(255,255,255,.07);
+  border:1px solid rgba(255,255,255,.1);
+  color:rgba(255,255,255,.5);
+  padding:4px 10px;border-radius:6px;
+}
+.fi-right{
+  display:flex;flex-direction:column;
+  justify-content:space-between;
+  min-width:190px;flex-shrink:0;
+  position:relative;z-index:1;
+  border-left:1px solid rgba(255,255,255,.08);
+  padding-left:36px;
+}
+.fi-stat-col{ display:flex;flex-direction:column;gap:20px; }
+.fi-stat-n{
+  font-family:var(--serif);
+  font-size:34px;font-weight:800;
+  color:rgba(255,255,255,.9);line-height:1;
+  margin-bottom:4px;
+}
+.fi-stat-l{
+  font-family:var(--mono);
+  font-size:9px;letter-spacing:.1em;text-transform:uppercase;
+  color:rgba(255,255,255,.3);line-height:1.4;max-width:16ch;
+}
+.fi-cta{
+  font-family:var(--mono);
+  font-size:10px;letter-spacing:.14em;text-transform:uppercase;
+  color:var(--accent);font-weight:500;
+  margin-top:24px;
+  transition:color .15s;
+}
+.feat-invest:hover .fi-cta{ color:#4ec9b0; }
+@media(max-width:720px){
+  .feat-invest{flex-direction:column;padding:28px 24px;}
+  .fi-right{border-left:none;border-top:1px solid rgba(255,255,255,.08);
+    padding-left:0;padding-top:24px;}
+}
+</style>
+</head>
+<body>
+
+<!-- ╔══════════════════════════════════════════╗
+     ║  NAV                                      ║
+     ╚══════════════════════════════════════════╝ -->
+<nav class="nav">
+  <div class="W nav-i">
+    <a href="/" class="nav-logo">
+      <strong>TRACED</strong>
+      <span class="nav-logo-sep">/</span>
+      <span class="nav-logo-sub">food transparency</span>
+    </a>
+    <div class="nav-links">
+      <a href="#stories">Stories</a>
+      <a href="#ownership">Ownership</a>
+      <a href="#local">Local</a>
+      <a href="#indexes">Indexes</a>
+      <a href="#vendors" class="nav-cta">List Your Shop</a>
+    </div>
+  </div>
+</nav>
+
+
+<!-- ╔══════════════════════════════════════════╗
+     ║  HERO — unified single entry             ║
+     ╚══════════════════════════════════════════╝ -->
+<section class="hero">
+  <div class="W">
+    <div class="hero-grid">
+
+      <!-- Left: thesis + search -->
+      <div>
+        <div class="hero-eyebrow">
+          <span class="hero-dot"></span>
+          <span class="kicker">Food Transparency Research</span>
+        </div>
+        <h1 class="hero-h1">
+          Find out what's<br>
+          <em>actually</em> in your food —<br>
+          and where to get<br>
+          the real thing.
+        </h1>
+        <p class="hero-sub">
+          Most shoppers don't realize how few companies control what's on the shelf —
+          or how those companies' incentives quietly shape what ends up in the packaging.
+          Traced investigates the brands in your cupboard, exposes who really
+          owns them, and connects you to verified local vendors worth switching to.
+        </p>
+        <div class="hero-search-wrap">
+          <span class="hero-search-ico">⌕</span>
+          <input
+            class="hero-search" id="heroSearch"
+            placeholder="Search a brand, ingredient, or company…"
+            autocomplete="off"
+          >
+          <div class="hero-dd" id="heroDD"></div>
+        </div>
+        <div class="hero-pills">
+          <a class="hero-pill" href="traced-annies.html">🔥 Annie's → General Mills</a>
+          <a class="hero-pill" href="#local">📍 Shop local instead</a>
+          <a class="hero-pill" href="traced-protein-supplements.html">💪 Protein powder index</a>
+          <a class="hero-pill" href="#ownership">🕸 Who owns what</a>
+        </div>
+      </div>
+
+      <!-- Right: ownership web illustration -->
+      <div class="hero-web">
+        <div class="hero-web-lbl">Traced in one glance</div>
+        <svg viewBox="0 0 400 230" role="img" aria-label="Ownership web: three consumer brands connect up to one parent company">
+          <defs>
+            <marker id="arr" viewBox="0 0 6 6" refX="5" refY="3" markerWidth="5" markerHeight="5">
+              <path d="M0,0 L6,3 L0,6 Z" fill="rgba(20,18,15,.22)"/>
+            </marker>
+          </defs>
+          <!-- lines -->
+          <line x1="90"  y1="182" x2="196" y2="82" stroke="rgba(20,18,15,.14)" stroke-width="1.5" marker-end="url(#arr)"/>
+          <line x1="200" y1="192" x2="200" y2="82" stroke="rgba(20,18,15,.14)" stroke-width="1.5" marker-end="url(#arr)"/>
+          <line x1="310" y1="182" x2="204" y2="82" stroke="rgba(20,18,15,.14)" stroke-width="1.5" marker-end="url(#arr)"/>
+          <!-- parent -->
+          <rect x="130" y="28" width="140" height="58" rx="14" fill="rgba(202,162,75,.18)" stroke="rgba(202,162,75,.58)" stroke-width="1.5"/>
+          <text x="200" y="56" font-family="'DM Mono',monospace" font-size="11" font-weight="600" fill="rgba(20,18,15,.85)" text-anchor="middle">PARENT OWNER</text>
+          <text x="200" y="74" font-family="'DM Mono',monospace" font-size="9" fill="rgba(20,18,15,.48)" text-anchor="middle">controls the portfolio</text>
+          <!-- brand nodes -->
+          <rect x="18" y="152" width="144" height="50" rx="12" fill="#fff" stroke="rgba(20,18,15,.16)" stroke-width="1.5"/>
+          <text x="90" y="174" font-family="'DM Mono',monospace" font-size="10" font-weight="600" fill="rgba(20,18,15,.82)" text-anchor="middle">"INDIE" BRAND</text>
+          <text x="90" y="191" font-family="'DM Mono',monospace" font-size="9" fill="rgba(31,122,106,.75)" text-anchor="middle">Acquired 2014</text>
+          <rect x="128" y="162" width="144" height="50" rx="12" fill="#fff" stroke="rgba(20,18,15,.16)" stroke-width="1.5"/>
+          <text x="200" y="184" font-family="'DM Mono',monospace" font-size="10" font-weight="600" fill="rgba(20,18,15,.82)" text-anchor="middle">"CLEAN" BRAND</text>
+          <text x="200" y="201" font-family="'DM Mono',monospace" font-size="9" fill="rgba(31,122,106,.75)" text-anchor="middle">Same parent</text>
+          <rect x="238" y="152" width="144" height="50" rx="12" fill="#fff" stroke="rgba(20,18,15,.16)" stroke-width="1.5"/>
+          <text x="310" y="174" font-family="'DM Mono',monospace" font-size="10" font-weight="600" fill="rgba(20,18,15,.82)" text-anchor="middle">"PREMIUM" BRAND</text>
+          <text x="310" y="191" font-family="'DM Mono',monospace" font-size="9" fill="rgba(31,122,106,.75)" text-anchor="middle">Same parent</text>
+          <text x="200" y="224" font-family="'DM Mono',monospace" font-size="9" fill="rgba(20,18,15,.35)" text-anchor="middle">Traced makes this visible in 20 seconds.</text>
+        </svg>
+        <div class="hero-web-note">
+          <strong>Annie's, Lärabar, Cascadian Farm</strong> — three different shelves, different aesthetics.
+          One owner: <strong>General Mills</strong>.
+        </div>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+
+<!-- ╔══════════════════════════════════════════╗
+     ║  OWNERSHIP SHOCK                         ║
+     ╚══════════════════════════════════════════╝ -->
+<section class="section" id="ownership">
+  <div class="W">
+    <div class="sec-head">
+      <div>
+        <div class="kicker">The Consolidation Problem</div>
+        <h2 class="sec-title">20 companies. Most of your grocery store.</h2>
+        <p class="sec-sub">Whole Foods. "Clean" snacks. "Independent" chocolate brands. The labels change — the ownership doesn't. A handful of conglomerates control most of what you see, and they're all incentivized to cut costs quietly. Click any card to trace the full web.</p>
+      </div>
+    </div>
+
+    <div class="own-grid">
+      <a class="own-card" href="owner-general-mills.html">
+        <div class="kicker">Owner</div>
+        <div class="own-name">General Mills</div>
+        <div class="own-brands">
+          <div class="own-brand hi">Annie's Homegrown</div>
+          <div class="own-brand hi">Lärabar</div>
+          <div class="own-brand">Cheerios · Lucky Charms</div>
+          <div class="own-brand">Haagen-Dazs · Yoplait</div>
+          <div class="own-brand">Cascadian Farm (organic)</div>
+        </div>
+        <div class="own-cta">View full ownership web <span class="own-cta-arrow">→</span></div>
+      </a>
+      <a class="own-card" href="owner-kelloggs.html">
+        <div class="kicker">Owner</div>
+        <div class="own-name">Kellogg's</div>
+        <div class="own-brands">
+          <div class="own-brand hi">RXBar</div>
+          <div class="own-brand hi">Kashi (organic)</div>
+          <div class="own-brand">Special K · Frosted Flakes</div>
+          <div class="own-brand">Pringles · Pop-Tarts</div>
+          <div class="own-brand">MorningStar Farms</div>
+        </div>
+        <div class="own-cta">View full ownership web <span class="own-cta-arrow">→</span></div>
+      </a>
+      <a class="own-card" href="owner-nestle.html">
+        <div class="kicker">Owner</div>
+        <div class="own-name">Nestlé</div>
+        <div class="own-brands">
+          <div class="own-brand hi">Sweet Earth (plant-based)</div>
+          <div class="own-brand hi">Vital Proteins</div>
+          <div class="own-brand">KitKat · Crunch</div>
+          <div class="own-brand">Gerber · Purina</div>
+          <div class="own-brand">Nespresso · Nescafé</div>
+        </div>
+        <div class="own-cta">View full ownership web <span class="own-cta-arrow">→</span></div>
+      </a>
+      <a class="own-card" href="owner-jab.html">
+        <div class="kicker">Owner</div>
+        <div class="own-name">JAB Holding</div>
+        <div class="own-brands">
+          <div class="own-brand hi">Peet's Coffee</div>
+          <div class="own-brand hi">Caribou Coffee</div>
+          <div class="own-brand">Keurig · Dr Pepper</div>
+          <div class="own-brand">Einstein Bros. Bagels</div>
+          <div class="own-brand">Panera Bread</div>
+        </div>
+        <div class="own-cta">View full ownership web <span class="own-cta-arrow">→</span></div>
+      </a>
+    </div>
+
+    <div class="own-stats">
+      <div class="own-stat">
+        <div class="own-stat-n">10</div>
+        <div class="own-stat-l">companies own roughly 80% of US grocery brand revenue</div>
+      </div>
+      <div class="own-stat">
+        <div class="own-stat-n">$820M</div>
+        <div class="own-stat-l">General Mills paid for Annie's in 2014 — brand kept its "homegrown" identity</div>
+      </div>
+      <div class="own-stat">
+        <div class="own-stat-n">47</div>
+        <div class="own-stat-l">brands traced so far across Traced's investigation database</div>
+      </div>
+    </div>
+  </div>
+  <div style="text-align:center;margin-top:24px;padding-bottom:8px;">
+    <a href="#stories" style="font-family:'DM Mono',monospace;font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:var(--accent);font-weight:500;">See full brand investigations →</a>
+  </div>
+</section>
+
+
+
+  <!-- ╔══════════════════════════════════════════╗
+       ║  PRIVATE EQUITY SECTION                  ║
+       ╚══════════════════════════════════════════╝ -->
+  <div class="W" style="padding:0 0 72px">
+
+    <div class="sec-head" style="margin-bottom:24px">
+      <div>
+        <div class="kicker">Ownership Intelligence</div>
+        <h2 class="sec-title">Private Equity in Your Grocery Aisle</h2>
+        <p class="sec-sub" style="margin-top:8px">
+          Unlike Kellogg's or Nestlé, these firms don't make food — they invest in brands, 
+          scale them, and exit. The brand stays. The ownership changes. Most consumers 
+          never know it happened.
+        </p>
+      </div>
+    </div>
+
+    <!-- PE explainer callout -->
+    <div class="pe-explainer">
+      <div class="pe-explainer-inner">
+        <div class="pe-exp-block">
+          <div class="pe-exp-num">01</div>
+          <div class="pe-exp-label">The Playbook</div>
+          <p class="pe-exp-text">A founder builds a brand with genuine values. PE firm invests at growth stage — providing capital for distribution and marketing. The brand scales rapidly. Then either: (a) the PE firm sells to a conglomerate, or (b) holds and quietly optimizes margins.</p>
+        </div>
+        <div class="pe-exp-block">
+          <div class="pe-exp-num">02</div>
+          <div class="pe-exp-label">The Warning Signs</div>
+          <p class="pe-exp-text">PE investment is not inherently bad — but it's a leading indicator. Watch for: rapid SKU expansion, reduced ingredient quality, "family of brands" language appearing on packaging, sudden distribution into mass-market chains.</p>
+        </div>
+        <div class="pe-exp-block">
+          <div class="pe-exp-num">03</div>
+          <div class="pe-exp-label">What You Won't See</div>
+          <p class="pe-exp-text">PE ownership is rarely disclosed on packaging. The brand's website still features the founder's story. The Instagram still posts farmer photos. The ingredient list may not change — yet. The financial relationship already has.</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- PE firm cards -->
+    <div class="pe-grid">
+
+      <!-- Butterfly Equity -->
+      <div class="pe-card">
+        <div class="pe-card-header">
+          <div class="pe-firm-type">Food-Specialist PE · Los Angeles</div>
+          <div class="pe-firm-name">Butterfly Equity</div>
+          <div class="pe-firm-aum">$4B+ AUM · Founded 2016</div>
+        </div>
+        <div class="pe-card-body">
+          <div class="pe-brands-label">Brands you've seen at Whole Foods, Target, Sprouts</div>
+          <div class="pe-brands-list">
+            <div class="pe-brand-row"><span class="pe-dot green"></span><span>Chosen Foods <span class="pe-note">avocado oil, mayo, dressings</span></span></div>
+            <div class="pe-brand-row"><span class="pe-dot green"></span><span>Orgain <span class="pe-note">organic protein shakes — sold majority to Nestlé Health Science</span></span></div>
+            <div class="pe-brand-row"><span class="pe-dot green"></span><span>Pete & Gerry's Organics <span class="pe-note">pasture-raised eggs</span></span></div>
+            <div class="pe-brand-row"><span class="pe-dot green"></span><span>Health-Ade Kombucha <span class="pe-note">refrigerated section staple</span></span></div>
+            <div class="pe-brand-row"><span class="pe-dot green"></span><span>Evolution Fresh <span class="pe-note">cold-pressed juices — acquired from Starbucks</span></span></div>
+            <div class="pe-brand-row"><span class="pe-dot green"></span><span>Bolthouse Farms <span class="pe-note">carrots, protein drinks, dressings</span></span></div>
+          </div>
+          <div class="pe-card-insight">
+            <span class="pe-insight-label">The pattern to watch</span>
+            Butterfly specializes in food exclusively — they know the sector deeply. But their model is acquire → scale → exit. Orgain, one of their most "authentic" organic nutrition brands, already had its majority stake sold to Nestlé Health Science. Bolthouse was split into two companies to maximize separate exit value.
+          </div>
+        </div>
+      </div>
+
+      <!-- L Catterton -->
+      <div class="pe-card">
+        <div class="pe-card-header">
+          <div class="pe-firm-type">Consumer PE · Backed by LVMH / Bernard Arnault</div>
+          <div class="pe-firm-name">L Catterton</div>
+          <div class="pe-firm-aum">$37B AUM · Founded 1989</div>
+        </div>
+        <div class="pe-card-body">
+          <div class="pe-brands-label">Brands positioned as independent or "better-for-you"</div>
+          <div class="pe-brands-list">
+            <div class="pe-brand-row"><span class="pe-dot amber"></span><span>Kodiak Cakes <span class="pe-note">protein pancake mix, whole grain — Shark Tank origin story</span></span></div>
+            <div class="pe-brand-row"><span class="pe-dot amber"></span><span>Good Culture <span class="pe-note">clean-label cottage cheese — $500M+ deal Jan 2026</span></span></div>
+            <div class="pe-brand-row"><span class="pe-dot amber"></span><span>Kettle Brand Chips <span class="pe-note">"natural" kettle chips — previously also owned by Campbell's</span></span></div>
+            <div class="pe-brand-row"><span class="pe-dot amber"></span><span>Cholula Hot Sauce <span class="pe-note">later sold to McCormick & Co. for $800M</span></span></div>
+            <div class="pe-brand-row"><span class="pe-dot amber"></span><span>Thorne Research <span class="pe-note">premium supplements</span></span></div>
+            <div class="pe-brand-row"><span class="pe-dot amber"></span><span>Kettle Cuisine <span class="pe-note">refrigerated soups, foodservice</span></span></div>
+          </div>
+          <div class="pe-card-insight">
+            <span class="pe-insight-label">The detail most people miss</span>
+            L Catterton is backed by LVMH and Bernard Arnault — the world's largest luxury goods conglomerate. The same capital structure behind Louis Vuitton, Moët Hennessy, and Sephora is backing Kodiak Cakes and Good Culture's "clean label" positioning. The firms operate separately, but the financial lineage is the same.
+          </div>
+        </div>
+      </div>
+
+      <!-- KKR / Upfield -->
+      <div class="pe-card">
+        <div class="pe-card-header">
+          <div class="pe-firm-type">Global PE / Alternative Assets · New York</div>
+          <div class="pe-firm-name">KKR (via Upfield)</div>
+          <div class="pe-firm-aum">$553B AUM · Founded 1976</div>
+        </div>
+        <div class="pe-card-body">
+          <div class="pe-brands-label">Brands you might not realize are PE-owned</div>
+          <div class="pe-brands-list">
+            <div class="pe-brand-row"><span class="pe-dot red"></span><span>Country Crock <span class="pe-note">plant-based butters and spreads</span></span></div>
+            <div class="pe-brand-row"><span class="pe-dot red"></span><span>I Can't Believe It's Not Butter <span class="pe-note">formerly Unilever — $8B buyout in 2017</span></span></div>
+            <div class="pe-brand-row"><span class="pe-dot red"></span><span>Flora <span class="pe-note">plant-based spreads, marketed as "heart healthy"</span></span></div>
+            <div class="pe-brand-row"><span class="pe-dot red"></span><span>Becel / Pro-Activ <span class="pe-note">cholesterol-reducing spreads, sold in 60+ countries</span></span></div>
+          </div>
+          <div class="pe-card-insight">
+            <span class="pe-insight-label">The Upfield story</span>
+            KKR bought Unilever's entire spreads division for $8 billion in 2017, rebranded it as Upfield, and positioned it as a "plant-based" company. Country Crock Plant Butter launched under this structure — marketed with sustainability and health language while owned by one of the largest leveraged buyout firms in history. KKR's food portfolio also includes Nature's Bounty vitamins and historically RJR Nabisco.
+          </div>
+        </div>
+      </div>
+
+
+      <!-- Kettle & Fire -->
+      <div class="pe-card">
+        <div class="pe-card-header" style="background:#3d2a1a;">
+          <div class="pe-firm-type">VC-Backed Brand · Austin, TX &rarr; Lancaster, PA</div>
+          <div class="pe-firm-name">Kettle &amp; Fire</div>
+          <div class="pe-firm-aum">$43M raised March 2025 &middot; Colter Ventures</div>
+        </div>
+        <div class="pe-card-body">
+          <div class="pe-brands-label">Same brand name. Very different product. Per 1 cup:</div>
+          <div class="pe-brands-list">
+            <div class="pe-brand-row"><span class="pe-dot green"></span><span>Classic Chicken Bone Broth <span class="pe-note">flagship &mdash; ~40 cal &middot; ~0g fat &middot; 0g sat fat &middot; ~9.5g protein &middot; 3 ingredients</span></span></div>
+            <div class="pe-brand-row"><span class="pe-dot red"></span><span>Coconut Curry &amp; Lime Bone Broth <span class="pe-note">new line &mdash; 190 cal &middot; 15g fat &middot; 13g sat fat (65% DV) &middot; 12g protein &middot; 521mg sodium</span></span></div>
+          </div>
+          <div style="background:rgba(139,26,26,.07);border:1px solid rgba(139,26,26,.18);border-radius:10px;padding:14px 16px;margin:14px 0 0;">
+            <div style="font-family:'DM Mono',monospace;font-size:9px;letter-spacing:.14em;text-transform:uppercase;color:#8b1a1a;margin-bottom:8px;font-weight:500;">By the numbers &middot; per cup</div>
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px 20px;font-size:12px;">
+              <div style="color:#5c5349;font-family:'DM Mono',monospace;font-size:10px;letter-spacing:.06em;padding-bottom:4px;border-bottom:1px solid rgba(0,0,0,.07);grid-column:1">Flagship</div>
+              <div style="color:#8b1a1a;font-family:'DM Mono',monospace;font-size:10px;letter-spacing:.06em;padding-bottom:4px;border-bottom:1px solid rgba(0,0,0,.07);grid-column:2">Coconut Curry Lime</div>
+              <div style="color:#1a1612;">Calories: <strong>~40</strong></div><div style="color:#8b1a1a;">Calories: <strong>190</strong> <span style="font-size:11px;opacity:.7;">(4.75&times;)</span></div>
+              <div style="color:#1a1612;">Total Fat: <strong>~0g</strong></div><div style="color:#8b1a1a;">Total Fat: <strong>15g</strong></div>
+              <div style="color:#1a1612;">Sat. Fat: <strong>0g</strong></div><div style="color:#8b1a1a;">Sat. Fat: <strong>13g &mdash; 65% DV</strong></div>
+              <div style="color:#1a1612;">Protein: <strong>~9.5g</strong></div><div style="color:#1a1612;">Protein: <strong>12g</strong></div>
+              <div style="color:#1a1612;">Sodium: <strong>~310mg</strong></div><div style="color:#8b1a1a;">Sodium: <strong>521mg</strong></div>
+            </div>
+          </div>
+          <div class="pe-card-insight" style="margin-top:14px;">
+            <span class="pe-insight-label">What to watch here</span>
+            The original bone broth is genuinely well-sourced and nutritionally clean. The new Coconut Curry &amp; Lime line carries identical branding but is a fundamentally different product &mdash; 69% of calories from fat, 65% of the daily saturated fat limit in a single cup. Kettle &amp; Fire markets it as &ldquo;the only bone broth in the world that contains fat.&rdquo; The $43M Colter Ventures round (March 2025) bought out early investors, installed a new CEO, and is explicitly funding line expansion. The flagship is fine. Read the label on each SKU individually.
+          </div>
+        </div>
+      </div>
+
+    </div><!-- /pe-grid -->
+
+    <div class="pe-footer-note">
+      PE ownership is legal, disclosed in SEC filings, and sometimes genuinely beneficial to brands. This section exists not to indict these firms, but because the information is almost never visible at point of purchase — and it should be.
+    </div>
+
+  </div><!-- /PE section wrapper -->
+
+
+<!-- ╔══════════════════════════════════════════╗
+     ║  FEATURED INVESTIGATION                  ║
+     ╚══════════════════════════════════════════╝ -->
+<div style="background:var(--bg2);border-top:1px solid var(--border);border-bottom:1px solid var(--border);padding:56px max(24px,5vw);">
+  <div style="max-width:1080px;margin:0 auto;">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:24px;flex-wrap:wrap;gap:12px;">
+      <div>
+        <div class="kicker">Latest Investigation</div>
+        <h2 class="sec-title" style="margin:0;">Meat &amp; Seafood</h2>
+      </div>
+      <a href="traced-meat-fish.html" style="font-family:'DM Mono',monospace;font-size:10px;letter-spacing:.12em;text-transform:uppercase;color:var(--accent);font-weight:500;">Read full investigation →</a>
+    </div>
+    <a href="traced-meat-fish.html" class="feat-invest" style="text-decoration:none;">
+      <div class="fi-left">
+        <div class="fi-eyebrow">
+          <span class="fi-badge">Featured Investigation</span>
+          <span class="fi-category">Meat &amp; Seafood · 4 chapters</span>
+        </div>
+        <h2 class="fi-title">The Counter Doesn't Know Where It Came From</h2>
+        <p class="fi-desc">Grocery store meat and fish labeling has three overlapping problems: origin claims that mean less than they sound, quality terms with no federal definition, and a supply chain so fragmented that even the retailer often can't trace it. We went through the regulatory history, the Oceana fraud data, and the USDA loopholes — chapter by chapter.</p>
+        <div class="fi-tags">
+          <span class="fi-tag">Country of origin labeling</span>
+          <span class="fi-tag">Grass-fed vs. grass-finished</span>
+          <span class="fi-tag">43% salmon mislabeling rate</span>
+          <span class="fi-tag">Supply chain opacity</span>
+          <span class="fi-tag">Local butchers &amp; fishmongers</span>
+        </div>
+      </div>
+      <div class="fi-right">
+        <div class="fi-stat-col">
+          <div class="fi-stat">
+            <div class="fi-stat-n">43%</div>
+            <div class="fi-stat-l">of salmon samples mislabeled in Oceana study</div>
+          </div>
+          <div class="fi-stat">
+            <div class="fi-stat-n">2016</div>
+            <div class="fi-stat-l">Congress repealed mandatory beef origin labeling</div>
+          </div>
+          <div class="fi-stat">
+            <div class="fi-stat-n">4</div>
+            <div class="fi-stat-l">companies process ~85% of all US beef</div>
+          </div>
+        </div>
+        <div class="fi-cta">Read the investigation →</div>
+      </div>
+    </a>
+  </div>
+</div>
+
+<!-- ╔══════════════════════════════════════════╗
+     ║  BRIDGE — the pivot moment               ║
+     ╚══════════════════════════════════════════╝ -->
+<div class="W" style="padding-bottom:68px">
+  <div class="bridge">
+    <div>
+      <div class="kicker" style="margin-bottom:9px">Now do something about it</div>
+      <div class="bridge-h">You know who owns it. Here's where to shop instead.</div>
+      <p class="bridge-sub">Every investigation on Traced ends with a clear alternative. Farmers markets, independent butchers, specialty makers — all vetted, all outside the conglomerate system, all searchable by ZIP.</p>
+    </div>
+    <div class="bridge-btns">
+      <a href="#local" class="btn btn-p">Find local alternatives ↓</a>
+      <a href="#vendors" class="btn btn-s">List your shop</a>
+    </div>
+  </div>
+</div>
+
+
+<!-- ╔══════════════════════════════════════════╗
+     ║  LOCAL DISCOVERY                         ║
+     ╚══════════════════════════════════════════╝ -->
+<section class="section local-bg" id="local">
+  <div class="W">
+    <div class="sec-head">
+      <div>
+        <div class="kicker">Where to Shop Instead</div>
+        <h2 class="sec-title">Real food. Real sourcing. Near you.</h2>
+        <p class="sec-sub">Every vendor here has been vetted by Traced — confirmed sourcing, no holding company layers. Enter your ZIP to find farmers markets, independent butchers, specialty shops, and local makers worth switching to. specific sourcing reason, not just an address.</p>
+      </div>
+    </div>
+
+    <div class="local-controls">
+      <div class="local-row">
+        <input class="local-zip" id="localZip" placeholder="ZIP code" inputmode="numeric" maxlength="5">
+        <button class="city-pill on" data-city="sf">San Francisco</button>
+        <button class="city-pill" data-city="oc">Orange County</button>
+      </div>
+      <div class="f-chips" id="fChips">
+        <button class="f-chip on" data-f="all">All</button>
+        <button class="f-chip" data-f="market">Farmers markets</button>
+        <button class="f-chip" data-f="maker">Specialty makers</button>
+        <button class="f-chip" data-f="shop">Independent shops</button>
+        <button class="f-chip" data-f="csa">CSA</button>
+        <button class="f-chip" data-f="butcher">Butchers</button>
+        <button class="f-chip" data-f="seafood">Seafood</button>
+      </div>
+    </div>
+
+    <div class="local-layout">
+      <!-- Dynamic vendor grid -->
+      <div>
+        <div class="v-grid" id="vGrid">
+          <!-- Rendered by JS below -->
+        </div>
+        <div class="v-empty" id="vEmpty" style="display:none;">
+          <p class="v-empty-msg">No verified vendors found for ZIP <strong id="emptyZip"></strong>.</p>
+          <p class="v-empty-sub">We're still building out coverage. <a href="/cdn-cgi/l/email-protection#eb838e878784ab9f998a888e8fc58884">Suggest a vendor →</a></p>
+        </div>
+      </div>
+      <div class="local-aside">
+        <div class="local-note">
+          <div class="kicker">How Traced vets vendors</div>
+          <p>We don't list every farmers market or health food store. Each vendor earns its place through confirmed sourcing practices, independence from major holding companies, and a clear <em>why-it-belongs-here</em> explanation tied to our investigations. If a brand we've flagged has a local alternative, that alternative is here.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script>
+(function(){
+
+/* ── VENDOR DATABASE ─────────────────────────────────────────────────── */
+const VENDORS = [
+
+  /* ── SF FARMERS MARKETS ─────────────────────────────────── */
+  {
+    name: "Ferry Plaza Farmers Market",
+    type: "market",
+    city: "sf",
+    url: "https://foodwise.org/markets/ferry-plaza-farmers-market",
+    address: "1 Ferry Building, SF",
+    hours: "Sat 8am–2pm · Tue & Thu 10am–2pm",
+    note: "100+ producers including certified organic farms, direct-trade cacao vendors, and independently owned cheese makers. Most of what's sold here bypasses national distribution entirely.",
+    zips: ["94111","94105","94107","94103","94158","94104","94102"]
+  },
+  {
+    name: "Heart of the City Farmers' Market",
+    type: "market",
+    city: "sf",
+    url: "https://www.heartofthecity.org/",
+    address: "United Nations Plaza, SF",
+    hours: "Wed 7am–5:30pm · Sun 7am–5pm",
+    note: "One of SF's oldest and most diverse markets. Deeply community-rooted, accepts EBT/CalFresh. Serves neighborhoods often bypassed by premium food retail.",
+    zips: ["94102","94103","94110","94114","94117","94131"]
+  },
+  {
+    name: "Alemany Farmers' Market",
+    type: "market",
+    city: "sf",
+    url: "https://sfrecpark.org/526/Alemany-Farmers-Market",
+    address: "100 Alemany Blvd, SF",
+    hours: "Sat 6am–1pm",
+    note: "SF's oldest certified farmers market (est. 1943). No vendors selling crafts or hot food — pure produce and farm goods. One of the most affordable direct-farm markets in the Bay Area.",
+    zips: ["94110","94112","94124","94134","94131","94103"]
+  },
+  {
+    name: "Outer Sunset Farmers Market & Mercantile",
+    type: "market",
+    city: "sf",
+    url: "https://outersunsetfarmersmarket.com/",
+    address: "Irving St & 44th Ave, SF",
+    hours: "Sun 9am–1pm (seasonal)",
+    note: "Neighborhood-scale market with strong local craft and produce presence. Serves a residential corridor underserved by premium food retail. Strong community ethos.",
+    zips: ["94116","94122","94121","94132"]
+  },
+  {
+    name: "Fort Mason Center Farmers' Market",
+    type: "market",
+    city: "sf",
+    url: "https://cuesa.org/markets/fort-mason-center-farmers-market",
+    address: "2 Marina Blvd, Fort Mason, SF",
+    hours: "Sun 9am–1pm",
+    note: "High concentration of specialty producers: heritage grain bakers, small-batch preserve makers, sustainable ranchers. One of the best markets in SF for finding independent artisan food businesses.",
+    zips: ["94109","94123","94133","94111","94117"]
+  },
+
+  /* ── SF ARTISAN CHOCOLATE ────────────────────────────────── */
+  {
+    name: "Dandelion Chocolate",
+    type: "maker",
+    city: "sf",
+    url: "https://www.dandelionchocolate.com",
+    address: "740 Valencia St (Mission) · 1 Ferry Building · 2115 Fillmore St",
+    hours: "Mission: Mon–Thu 7:30am–9pm · Fri–Sat 7:30am–10pm · Sun 7:30am–9pm",
+    note: "Bean-to-bar factory in the Mission making two-ingredient chocolate: cocoa beans and organic cane sugar, nothing else. Traces every bar to the farm and harvest year. Antithesis of compound chocolate.",
+    zips: ["94110","94103","94111","94115","94114","94131","94105"]
+  },
+  {
+    name: "Recchiuti Confections",
+    type: "maker",
+    city: "sf",
+    url: "https://www.recchiuti.com",
+    address: "1 Ferry Building, Shop #30, SF",
+    hours: "Mon–Thu 10am–6pm · Fri 9am–6pm · Sat 8am–5pm · Sun 10am–5pm",
+    note: "Handmaking confections in SF since 1997. Known for herb- and tea-infused ganaches — tarragon, jasmine tea, lavender vanilla — using single-origin chocolate. Everything is made to order in their SF kitchen.",
+    zips: ["94111","94105","94107","94103","94158","94104"]
+  },
+  {
+    name: "Feve Artisan Chocolatier",
+    type: "maker",
+    city: "sf",
+    url: "https://fevechocolates.com",
+    address: "2222 Palou Ave, SF (Bayview factory storefront)",
+    hours: "Mon–Fri 10am–5pm",
+    note: "SF-based since 2007, founded by a Navy admiral's chef and La Folie pastry alum. Donates 5% of net profit to micro-loans for cocoa farmers. Bold SF-originated flavors: Karl the Fog, yuzu, ube. Factory direct.",
+    zips: ["94124","94110","94112","94134"]
+  },
+  {
+    name: "Socola Chocolatier",
+    type: "maker",
+    city: "sf",
+    url: "https://www.socolachocolates.com",
+    address: "535 Folsom St, SF (SoMa)",
+    hours: "Mon–Fri 12pm–6pm",
+    note: "Vietnamese-American sisters Wendy and Susan Lieu. Uses Straus Family Creamery butter and cream in every truffle. Flavors rooted in their heritage — pho, durian, lychee. A rare example of cultural storytelling through chocolate sourcing.",
+    zips: ["94105","94103","94107","94111","94104","94158"]
+  },
+  {
+    name: "XOX Truffles",
+    type: "maker",
+    city: "sf",
+    url: "https://xoxtruffles.com",
+    address: "754 Columbus Ave, SF (North Beach)",
+    hours: "Mon–Wed & Fri–Sun 12pm–7pm",
+    note: "French-tradition truffles made by master chocolatier Jean-Marc Gorce since 1997. Hand-rolled, cocoa-dusted, 26+ flavors. One of the last pure-truffle ateliers in SF. Free truffle with any coffee order.",
+    zips: ["94133","94111","94109","94123"]
+  },
+
+  /* ── SF SEAFOOD ──────────────────────────────────────────── */
+  {
+    name: "Billingsgate Seafood",
+    type: "seafood",
+    city: "sf",
+    url: "https://www.billingsgatesf.com",
+    address: "3859 24th St, SF (Noe Valley)",
+    hours: "Mon–Sun 10am–7pm (Sat opens 9am)",
+    note: "Founded 2020 by two restaurant chefs who left kitchens to become fishmongers. Sources directly from CA coast fishermen via Four Star Seafood. Traceable, sustainably caught, chef-trusted. Oyster happy hour Tue–Fri 3–5pm.",
+    zips: ["94114","94131","94110","94107","94103"]
+  },
+  {
+    name: "Nopa Fish (Ferry Building)",
+    type: "seafood",
+    city: "sf",
+    url: "https://www.nopafish.com",
+    address: "1 Ferry Building, SF (opened June 2025)",
+    hours: "Daily — check site for current hours",
+    note: "Opened June 2025 in the Ferry Building, replacing the longtime SF Fish Company space. Hybrid market and fast-casual kitchen from Nopa Restaurant. West Coast–only sourcing, traceable to catch. Seasonal menu built around daily market fish.",
+    zips: ["94111","94105","94107","94103","94158","94104"]
+  },
+
+  /* ── SF BUTCHERS ─────────────────────────────────────────── */
+  {
+    name: "Avedano's Holly Park Market",
+    type: "butcher",
+    city: "sf",
+    url: "https://avedanos.com",
+    address: "235 Cortland Ave, SF (Bernal Heights)",
+    hours: "Mon–Thu 12pm–6pm · Fri–Sun 9am–6pm",
+    note: "Woman-owned Bernal Heights butcher practicing whole-animal butchery. Zero-waste mentality — every part of every animal is used. Connects customers directly to named farms. One of the strongest Traced-fit butchers in SF.",
+    zips: ["94110","94112","94131","94124"]
+  },
+  {
+    name: "Guerra Quality Meats",
+    type: "butcher",
+    city: "sf",
+    url: "https://www.guerrameats.com",
+    address: "490 Taraval St, SF (Outer Sunset)",
+    hours: "Mon–Fri 9am–7pm · Sat–Sun 9am–6pm",
+    note: "Family-owned since 1954 — now run by second-generation brothers Robert and John Guerra. Neighborhood institution in the Outer Sunset with Italian butcher traditions. Known for custom cuts and in-house sandwiches. Wild salmon in season.",
+    zips: ["94116","94122","94127","94132","94117"]
+  },
+  {
+    name: "Baron's Quality Meats & Seafood",
+    type: "butcher",
+    city: "sf",
+    url: "https://www.baronsmeats.com",
+    address: "1706 Church St, SF (Noe Valley)",
+    hours: "Mon–Fri 12pm–7pm · Sat–Sun 11am–7pm",
+    note: "Founded by a Niman Ranch alum. No hormones, no antibiotics, humanely raised, pasture-raised when possible, organic diet when possible. SF's oldest butcher shop location (est. 1889). Carries both meat and fresh seafood.",
+    zips: ["94131","94114","94110","94103"]
+  },
+
+  /* ── SF HIGH-QUALITY MARKETS ─────────────────────────────── */
+  {
+    name: "Rainbow Grocery Cooperative",
+    type: "shop",
+    city: "sf",
+    url: "https://rainbow.coop",
+    address: "1745 Folsom St, SF (Mission/SoMa border)",
+    hours: "Daily 9am–9pm (closed select holidays)",
+    note: "Worker-owned cooperative since 1975. No meat, fish, or fowl — but the most comprehensive selection of organic, non-GMO, and local packaged goods in SF. Bulk section is unmatched. No ads, no national distribution incentives. Genuinely independent.",
+    zips: ["94103","94110","94114","94102","94105"]
+  },
+  {
+    name: "Bi-Rite Market",
+    type: "shop",
+    city: "sf",
+    url: "https://biritemarket.com",
+    address: "3639 18th St (Mission) · 550 Divisadero St (NoPa) · 2140 Polk St (Russian Hill)",
+    hours: "Daily 8am–9pm",
+    note: "Certified B Corp with a 'peak of season' sourcing philosophy. Works directly with named farms, ranchers, and makers. Every item is covered by their 'Certified Delicious' guarantee. Three SF locations serving different neighborhoods.",
+    zips: ["94110","94114","94117","94109","94115","94103","94131","94123"]
+  },
+  {
+    name: "Gus's Community Market",
+    type: "shop",
+    city: "sf",
+    url: "https://gussmarket.com",
+    address: "5 SF locations: Haight, Mission, Noriega, Mission Bay, Canyon Market",
+    hours: "Daily 7am–9pm (Canyon Market closes 8pm)",
+    note: "Greek-immigrant family business operating since 1981. Five neighborhood markets across SF. Not a chain — each location serves its specific community. Strong produce focus, fresh meat departments, and neighborhood pricing.",
+    zips: ["94117","94110","94122","94158","94131","94103","94112","94116","94132","94127","94114"]
+  },
+
+  /* ── OC HIGH-QUALITY MARKETS ─────────────────────────────── */
+  {
+    name: "Pacific Ranch Market",
+    type: "shop",
+    city: "oc",
+    url: "https://www.pacificranchmarket.com",
+    address: "7540 E Chapman Ave, Orange, CA",
+    hours: "Daily 8am–8pm",
+    note: "Family-owned gourmet market serving Orange for 35+ years. Carries all-natural California-raised Brandt Beef, full-service butcher, first-quality produce, and a bakery that makes from-scratch cakes. The kind of neighborhood market that's disappeared everywhere else.",
+    zips: ["92869","92868","92861","92866","92865"]
+  },
+  {
+    name: "Mother's Market & Kitchen",
+    type: "shop",
+    city: "oc",
+    url: "https://www.mothersmarket.com",
+    address: "Multiple OC locations: Costa Mesa · Irvine · Huntington Beach · Lake Forest",
+    hours: "Costa Mesa: Daily 6:30am–10:30pm · Irvine: Daily 6:30am–9:30pm",
+    note: "OC's original natural and organic health food chain, independent since the 1970s. Full juice bar, hot bar, café, and supplement section. Focuses on organic, non-GMO, and locally sourced products. Not owned by a national grocer.",
+    zips: ["92627","92626","92612","92656","92648","92651","92653","92630","92868","92866","92869","92861"]
+  },
+
+  /* ── OC FARMERS MARKETS ──────────────────────────────────── */
+  {
+    name: "Irvine Farmers Market",
+    type: "market",
+    city: "oc",
+    url: "https://myoccfm.com",
+    address: "5001 Newport Coast Dr, Irvine (Sat) · 1 Irvine Park Rd, Orange (Tue)",
+    hours: "Sat 8am–12pm · Tue 9am–1pm",
+    note: "Two certified OC Farm Bureau markets. Newport Coast location draws premium farm vendors. Irvine Regional Park location offers free park entry during market hours. Certified farmers only — every producer is verified by the county ag commissioner.",
+    zips: ["92603","92612","92618","92620","92602","92869","92868","92861"]
+  },
+  {
+    name: "Laguna Beach Farmers Market",
+    type: "market",
+    city: "oc",
+    url: "https://lagunabeachfarmersmarket.com",
+    address: "521 Forest Ave, Laguna Beach (Lumberyard Parking Lot 12)",
+    hours: "Sat 8am–12pm year-round",
+    note: "40+ vendors, all certified California farmers or licensed artisans. Known for exceptional seasonal produce, organic options, and direct-from-farm relationships. OC's most scenically situated market — walking distance from the beach.",
+    zips: ["92651","92652","92653","92656","92657"]
+  },
+  {
+    name: "Orange Home Grown Farmers Market",
+    type: "market",
+    city: "oc",
+    url: "https://www.orangehomegrown.org",
+    address: "303 W Palm Ave, Orange, CA (Chapman University lot)",
+    hours: "Sat 9am–1pm year-round · rain or shine",
+    note: "501(c)(3) non-profit market since 2011. Only sources farmers with a California Certified Producer's Certificate. Accepts EBT + Market Match (free matching funds). Artisan food vendors must hold county TFF permits. One of OC's most transparency-focused markets.",
+    zips: ["92868","92869","92861","92866","92865","92867","92602"]
+  }
+
+];
+
+/* ── RENDER ENGINE ───────────────────────────────────────────────────── */
+function renderVendors(city, type, zip) {
+  const grid   = document.getElementById('vGrid');
+  const empty  = document.getElementById('vEmpty');
+  const emptyZipEl = document.getElementById('emptyZip');
+
+  let filtered = VENDORS.filter(v => v.city === city);
+
+  if (type && type !== 'all') {
+    filtered = filtered.filter(v => v.type === type);
+  }
+
+  if (zip && zip.length === 5) {
+    filtered = filtered.filter(v => v.zips.includes(zip));
+  }
+
+  grid.innerHTML = '';
+
+  if (filtered.length === 0) {
+    empty.style.display = 'block';
+    if (emptyZipEl) emptyZipEl.textContent = zip;
+    return;
+  }
+
+  empty.style.display = 'none';
+
+  filtered.forEach(v => {
+    const typeLabels = {
+      market:  'Farmers market',
+      maker:   'Artisan maker',
+      shop:    'Independent market',
+      butcher: 'Butcher',
+      seafood: 'Seafood'
+    };
+    const a = document.createElement('a');
+    a.href = v.url;
+    a.target = '_blank';
+    a.rel = 'noopener';
+    a.className = 'v-card';
+    a.dataset.city = v.city;
+    a.dataset.type = v.type;
+    a.innerHTML = `
+      <div class="v-top">
+        <div class="v-name">${v.name}</div>
+        <div class="v-badge">${typeLabels[v.type] || v.type}</div>
+      </div>
+      <div class="v-meta">${v.address} · ${v.hours}</div>
+      <div class="v-why"><strong>Traced note:</strong> ${v.note}</div>
+    `;
+    grid.appendChild(a);
+  });
+}
+
+/* ── WIRING ──────────────────────────────────────────────────────────── */
+let activeCity = 'sf';
+let activeType = 'all';
+let activeZip  = '';
+
+// Initial render
+renderVendors(activeCity, activeType, activeZip);
+
+// City pills
+document.querySelectorAll('.city-pill').forEach(btn => {
+  btn.addEventListener('click', function(){
+    document.querySelectorAll('.city-pill').forEach(b => b.classList.remove('on'));
+    this.classList.add('on');
+    activeCity = this.dataset.city;
+    activeZip = '';
+    const zipInput = document.getElementById('localZip');
+    if (zipInput) zipInput.value = '';
+    renderVendors(activeCity, activeType, activeZip);
+  });
+});
+
+// Type filter chips
+document.querySelectorAll('.f-chip').forEach(btn => {
+  btn.addEventListener('click', function(){
+    document.querySelectorAll('.f-chip').forEach(b => b.classList.remove('on'));
+    this.classList.add('on');
+    activeType = this.dataset.f;
+    renderVendors(activeCity, activeType, activeZip);
+  });
+});
+
+// ZIP input — filter on 5-digit entry, clear on empty
+const zipInput = document.getElementById('localZip');
+if (zipInput) {
+  zipInput.addEventListener('input', function(){
+    const val = this.value.trim();
+    if (val.length === 5 && /^\d{5}$/.test(val)) {
+      activeZip = val;
+      renderVendors(activeCity, activeType, activeZip);
+    } else if (val.length === 0) {
+      activeZip = '';
+      renderVendors(activeCity, activeType, activeZip);
+    }
+  });
+}
+
+})();
+</script>
+
+
+
+<!-- ╔══════════════════════════════════════════╗
+     ║  TRACED STORIES                          ║
+     ╚══════════════════════════════════════════╝ -->
+<section class="section" id="stories">
+  <div class="W">
+    <div class="sec-head">
+      <div>
+        <div class="kicker">Is It Still Worth Buying?</div>
+        <h2 class="sec-title">Investigations you can finish in 60 seconds</h2>
+        <p class="sec-sub">Reformulated ingredients. Misleading labels. Quiet ownership changes. Fast scan first — expand for receipts. Every investigation ends with local alternatives worth switching to.</p>
+      </div>
+      <a href="#indexes" class="sec-link">Browse all indexes →</a>
+    </div>
+
+
+    <div class="stories-scroll">
+      <a href="traced-annies.html" class="s-card feat">
+        <div class="kicker">Story · Featured</div>
+        <div class="s-title">Annie's</div>
+        <div class="s-desc">The organic mac & cheese icon built to rival Kraft. Acquired by General Mills in 2014 for $820M — while the bunny and "Homegrown" cues stayed intact on shelf.</div>
+        <div class="s-tags">
+          <span class="s-tag">Ownership web</span>
+          <span class="s-tag">Acquisition timeline</span>
+          <span class="s-tag">Local pasta alternatives</span>
+        </div>
+      </a>
+      <a href="traced-david.html" class="s-card">
+        <div class="kicker gold">Story</div>
+        <div class="s-title">David Protein Bar</div>
+        <div class="s-desc">Ingredient architecture, label reading methodology, and what the "clean" positioning actually signals about the brand's incentive structure.</div>
+        <div class="s-tags">
+          <span class="s-tag">Evidence cards</span>
+          <span class="s-tag">Label reading</span>
+          <span class="s-tag">Ingredient audit</span>
+        </div>
+      </a>
+      <a href="traced-reeses-hershey.html" class="s-card">
+        <div class="kicker">Story</div>
+        <div class="s-title">Reese's / Hershey</div>
+        <div class="s-desc">The supply chain behind America's best-selling candy. Hershey's cocoa sourcing record, child labor audit history, and what third-party certifications do and don't verify.</div>
+        <div class="s-tags">
+          <span class="s-tag">Supply chain</span>
+          <span class="s-tag">Labor record</span>
+          <span class="s-tag">Cocoa sourcing</span>
+        </div>
+      </a>
+      <a href="traced-halotop.html" class="s-card">
+        <div class="kicker">Story</div>
+        <div class="s-title">Halo Top</div>
+        <div class="s-desc">Diet positioning as a strategy. How "better-for-you" architecture is engineered, who owns it now, and what that ownership change meant for the product formula.</div>
+        <div class="s-tags">
+          <span class="s-tag">Formulation</span>
+          <span class="s-tag">PE acquisition</span>
+          <span class="s-tag">Incentive map</span>
+        </div>
+      </a>
+      <a href="traced-beyondmeat.html" class="s-card">
+        <div class="kicker">Story</div>
+        <div class="s-title">Beyond Meat</div>
+        <div class="s-desc">The plant-based promise, the IPO, and what public market pressure does to ingredient integrity and sourcing claims over time.</div>
+        <div class="s-tags">
+          <span class="s-tag">IPO incentives</span>
+          <span class="s-tag">Ingredient drift</span>
+          <span class="s-tag">Brand vs. product</span>
+        </div>
+      </a>
+      <a href="traced-ag1-deep-trace.html" class="s-card">
+        <div class="kicker gold">Deep Trace</div>
+        <div class="s-title">AG1</div>
+        <div class="s-desc">When a category lives on marketing and distribution, ownership and incentive mapping becomes the entire story. Full proprietary blend analysis.</div>
+        <div class="s-tags">
+          <span class="s-tag">Deep trace</span>
+          <span class="s-tag">Proprietary blend</span>
+          <span class="s-tag">Influencer economics</span>
+        </div>
+      </a>
+    </div>
+  </div>
+</section>
+
+
+<!-- ╔══════════════════════════════════════════╗
+     ║  INDEXES                                 ║
+     ╚══════════════════════════════════════════╝ -->
+<section class="section" id="indexes">
+  <div class="W">
+    <div class="sec-head">
+      <div>
+        <div class="kicker">Traced Indexes</div>
+        <h2 class="sec-title">Category transparency research</h2>
+        <p class="sec-sub">Every index scores brands across ownership, ingredient integrity, certifications, and labor record. Sortable, filterable, expandable.</p>
+      </div>
+    </div>
+    <div class="idx-grid">
+      <a href="traced-protein-supplements.html" class="idx-card">
+        <div class="kicker">Index · Live</div>
+        <div class="idx-title">Protein Supplements</div>
+        <div class="idx-desc">Ownership networks, heavy metal disclosures, influencer economics, and transparency scoring. 28 brands, 7-dimension methodology.</div>
+        <div class="idx-foot"><span class="idx-count">28 brands traced</span><span>Updated Feb 2025</span></div>
+      </a>
+      <a href="traced-protein-bars.html" class="idx-card">
+        <div class="kicker">Index · Live</div>
+        <div class="idx-title">Protein Bars</div>
+        <div class="idx-desc">Celebrity investment, private equity roll-ups, and ingredient positioning across performance snack brands. Includes the David deep trace.</div>
+        <div class="idx-foot"><span class="idx-count">12 brands traced</span><span>Updated Jan 2025</span></div>
+      </a>
+      <a href="traced-chocolate.html" class="idx-card">
+        <div class="kicker">Index · Live</div>
+        <div class="idx-title">Chocolate</div>
+        <div class="idx-desc">Ethical sourcing claims, conglomerate ownership, child labor audit records, and the bean-to-bar transparency gap.</div>
+        <div class="idx-foot"><span class="idx-count">11 brands traced</span><span>Updated Jan 2025</span></div>
+      </a>
+      <a href="traced-greens-powders.html" class="idx-card">
+        <div class="kicker">Index · Live</div>
+        <div class="idx-title">Greens Powders</div>
+        <div class="idx-desc">Proprietary blend opacity, influencer incentives, and what "clinically studied" actually means on a greens powder label.</div>
+        <div class="idx-foot"><span class="idx-count">8 brands traced</span><span>Updated Dec 2024</span></div>
+      </a>
+      <div class="idx-card coming">
+        <div class="kicker dim">Index · Coming soon</div>
+        <div class="idx-title">Olive Oil</div>
+        <div class="idx-desc">Harvest date opacity, single-estate vs. blend labeling, and why origin claims in olive oil are uniquely difficult to verify.</div>
+        <div class="idx-foot"><span style="font-size:12px;color:var(--dim)">In research</span></div>
+      </div>
+      <div class="idx-card coming">
+        <div class="kicker dim">Index · Coming soon</div>
+        <div class="idx-title">Coffee</div>
+        <div class="idx-desc">The JAB Holding empire, direct-trade claims, and the difference between Rainforest Alliance and genuine farmer transparency.</div>
+        <div class="idx-foot"><span style="font-size:12px;color:var(--dim)">In research</span></div>
+      </div>
+      <div class="idx-card coming">
+        <div class="kicker dim">Index · Coming soon</div>
+        <div class="idx-title">Dairy &amp; Eggs</div>
+        <div class="idx-desc">Supply chain traceability, pasture-raised vs. cage-free certification gaps, and who actually owns "happy farm" brands.</div>
+        <div class="idx-foot"><span style="font-size:12px;color:var(--dim)">In research</span></div>
+      </div>
+      <div class="idx-card coming">
+        <div class="kicker dim">Index · Coming soon</div>
+        <div class="idx-title">Electrolytes</div>
+        <div class="idx-desc">Hydration brands, VC backing, and whether the "clean electrolyte" category lives up to its ingredient transparency claims.</div>
+        <div class="idx-foot"><span style="font-size:12px;color:var(--dim)">In research</span></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+
+<!-- ╔══════════════════════════════════════════╗
+     ║  VENDOR CTA — the marketplace side       ║
+     ╚══════════════════════════════════════════╝ -->
+<section class="vendor-cta-section" id="vendors">
+  <div class="W">
+    <div class="vendor-inner">
+      <div>
+        <div class="vendor-kicker">For independent vendors</div>
+        <h2 class="vendor-h">Your sourcing story<br>deserves to be <em>found.</em></h2>
+        <p class="vendor-sub">Every day Traced users read about what a corporate brand isn't — then immediately want to know what's near them instead. If you're an independent maker, market, or shop with a real sourcing story, you belong in this network.</p>
+        <div class="vendor-perks">
+          <div class="vperk">
+            <div class="vperk-dot">✓</div>
+            <span>A <strong>Traced-vetted vendor profile</strong> — not a directory listing. We write the "why it belongs here" context for you, tied to specific brand investigations.</span>
+          </div>
+          <div class="vperk">
+            <div class="vperk-dot">✓</div>
+            <span>Appear in <strong>category-specific local discovery</strong> — when someone reads our chocolate investigation, they find your chocolate shop.</span>
+          </div>
+          <div class="vperk">
+            <div class="vperk-dot">✓</div>
+            <span><strong>Free during founding period.</strong> No affiliate swaps, no sponsored rankings. Independence is the product.</span>
+          </div>
+          <div class="vperk">
+            <div class="vperk-dot">✓</div>
+            <span>Your own <strong>vendor profile page</strong> on Traced — shareable, searchable, and linked from every relevant investigation.</span>
+          </div>
+        </div>
+      </div>
+      <div class="vendor-form">
+        <div class="vform-title">Get listed on Traced</div>
+        <label class="vform-label">Shop or market name</label>
+        <input class="vform-input" type="text" placeholder="e.g. Acme Specialty Foods">
+        <label class="vform-label">City + type</label>
+        <input class="vform-input" type="text" placeholder="e.g. Oakland · Specialty maker">
+        <label class="vform-label">Your sourcing claim (one line)</label>
+        <input class="vform-input" type="text" placeholder="e.g. Bean-to-bar, direct-trade cacao">
+        <label class="vform-label">Email</label>
+        <input class="vform-input" type="email" placeholder="you@yourshop.com">
+        <button class="vform-btn" onclick="this.textContent='Submitted ✓';this.style.background='#145c4e'">Request a profile →</button>
+        <div class="vform-note">We review every application. Responds within 5 business days.</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+
+<!-- ╔══════════════════════════════════════════╗
+     ║  FOOTER                                  ║
+     ╚══════════════════════════════════════════╝ -->
+<footer class="footer">
+  <div class="W">
+    <div class="footer-grid">
+      <div>
+        <div class="footer-brand-name">Traced</div>
+        <div class="footer-brand-desc">Food transparency research. Corporate ownership mapping. Independent discovery.</div>
+        <div class="footer-principle">Traced principle: map ownership + incentives. No affiliate engine. No sponsored rankings. Independence is the product.</div>
+      </div>
+      <div>
+        <div class="f-col-head">Investigations</div>
+        <div class="f-col-links">
+          <a href="traced-annies.html">Annie's → General Mills</a>
+          <a href="traced-david.html">David Protein Bar</a>
+          <a href="traced-reeses-hershey.html">Reese's / Hershey</a>
+          <a href="traced-ag1-deep-trace.html">AG1 Deep Trace</a>
+          <a href="traced-beyondmeat.html">Beyond Meat</a>
+        </div>
+      </div>
+      <div>
+        <div class="f-col-head">Indexes</div>
+        <div class="f-col-links">
+          <a href="traced-protein-supplements.html">Protein Supplements</a>
+          <a href="traced-protein-bars.html">Protein Bars</a>
+          <a href="traced-chocolate.html">Chocolate</a>
+          <a href="traced-greens-powders.html">Greens Powders</a>
+        </div>
+      </div>
+      <div>
+        <div class="f-col-head">Marketplace</div>
+        <div class="f-col-links">
+          <a href="#local">Find local alternatives</a>
+          <a href="#vendors">List your shop</a>
+          <a href="traced-archive.html">General Mills web</a>
+          <a href="traced-archive.html">Nestlé web</a>
+          <a href="traced-archive.html">Kellogg's web</a>
+        </div>
+      </div>
+    </div>
+    <div class="footer-bot">
+      <div class="footer-copy">© 2025 Traced. Built in San Francisco.</div>
+      <div class="footer-tag">ownership shock → 20-second story → independent discovery</div>
+    </div>
+  </div>
+
+<div class="traced-legal-bar" style="background:rgba(201,168,76,0.04);border-top:1px solid rgba(201,168,76,0.12);padding:20px 24px;margin-top:48px;">
+  <p style="font-family:var(--font-mono, 'DM Mono', monospace);font-size:10px;letter-spacing:0.12em;text-transform:uppercase;color:var(--text-muted, #7a7570);line-height:1.7;max-width:820px;margin:0 auto;text-align:center;">
+    <strong style="color:var(--text, #e8e4dc);">Editorial Assessment.</strong>
+    Traced scores are independent editorial assessments based on publicly available information.
+    They are not statements of product safety, legality, or consumer harm. Scores are editorial opinion.
+    Corrections: <a href="/cdn-cgi/l/email-protection#91f4f5f8e5fee3f8f0fdd1e5e3f0f2f4f5bff2fe" style="color:var(--accent, #C9A84C);"><span class="__cf_email__" data-cfemail="bbdedfd2cfd4c9d2dad7fbcfc9dad8dedf95d8d4">[email&#160;protected]</span></a>
+    &nbsp;·&nbsp;
+    <a href="traced-editorial-standards.html" style="color:var(--accent, #C9A84C);">Editorial Standards →</a>
+  </p>
+</div>
+</footer>
+
+
+<!-- ═══════════════════════════════════════════
+   SCRIPTS
+═══════════════════════════════════════════ -->
+<script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script>
+document.addEventListener("DOMContentLoaded", function(){
+
+/* ── Search dropdown ─────────────────────────── */
+  const input = document.getElementById('heroSearch');
+  const dd    = document.getElementById('heroDD');
+  if(!input || !dd) return;
+
+  const ROUTES = [
+    // ── Investigations ────────────────────────────────────────────
+    {label:"AG1 / Athletic Greens",     type:"Story",      keys:["ag1","athletic greens","greens powder","andrew huberman"],          href:"traced-ag1.html"},
+    {label:"Annie's Homegrown",         type:"Story",      keys:["annies","annie","mac","general mills","pasta","organic"],           href:"traced-annies.html"},
+    {label:"Beyond Meat",               type:"Story",      keys:["beyond meat","plant","vegan","plant based"],                        href:"traced-beyondmeat.html"},
+    {label:"Cheerios",                  type:"Story",      keys:["cheerios","general mills","oat","cholesterol","heart"],             href:"traced-cheerios.html"},
+    {label:"Chobani",                   type:"Story",      keys:["chobani","yogurt","greek yogurt","oat milk"],                       href:"traced-chobani.html"},
+    {label:"David Protein Bar",         type:"Story",      keys:["david","protein bar","david bar"],                                  href:"traced-david.html"},
+    {label:"Fairlife",                  type:"Story",      keys:["fairlife","milk","coca cola","ultra filtered","animal welfare"],     href:"traced-fairlife.html"},
+    {label:"Halo Top",                  type:"Story",      keys:["halo top","ice cream","low calorie","erythritol","diet"],           href:"traced-halotop.html"},
+    {label:"Jif Peanut Butter",         type:"Story",      keys:["jif","peanut butter","recall","salmonella","smucker"],              href:"traced-jif.html"},
+    {label:"Momentous",                 type:"Story",      keys:["momentous","protein","nsf","certified","huberman"],                 href:"traced-momentous.html"},
+    {label:"Muscle Milk",               type:"Story",      keys:["muscle milk","cytosport","hormel","protein","ftc"],                 href:"traced-muscle-milk.html"},
+    {label:"Oatly",                     type:"Story",      keys:["oatly","oat milk","blackstone","sweden"],                          href:"traced-oatly.html"},
+    {label:"Optimum Nutrition",         type:"Story",      keys:["optimum nutrition","gold standard","on protein","glanbia"],         href:"traced-optimum-nutrition.html"},
+    {label:"Reese's / Hershey",         type:"Story",      keys:["reeses","hershey","chocolate","compound coating","peanut butter"],  href:"traced-reeses-hershey.html"},
+    {label:"RXBAR",                     type:"Story",      keys:["rxbar","rx bar","clif","kellogg","dates","egg whites"],             href:"traced-rxbar.html"},
+    {label:"Salt & Straw",              type:"Story",      keys:["salt and straw","salt straw","ice cream","independent","portland"], href:"traced-saltstraw.html"},
+    {label:"Transparent Labs",          type:"Story",      keys:["transparent labs","transparentlabs","pre workout","certified"],     href:"traced-transparent-labs.html"},
+    {label:"Tropicana",                 type:"Story",      keys:["tropicana","orange juice","oj","pepsico","natural","flavor pack"],  href:"traced-tropicana.html"},
+    // ── Deep Traces ───────────────────────────────────────────────
+    {label:"AG1 — Deep Trace",          type:"Deep Trace", keys:["ag1 deep","athletic greens deep","ag1 full"],                      href:"traced-ag1-deep-trace.html"},
+    {label:"Annie's — Deep Trace",      type:"Deep Trace", keys:["annies deep","annie deep trace"],                                  href:"traced-annies-deep-trace.html"},
+    {label:"Beyond Meat — Deep Trace",  type:"Deep Trace", keys:["beyond meat deep","beyond deep trace"],                            href:"traced-beyondmeat-deep-trace.html"},
+    {label:"David — Deep Trace",        type:"Deep Trace", keys:["david deep","david bar deep"],                                     href:"traced-david-deep-trace.html"},
+    {label:"Ghost Whey — Deep Trace",   type:"Deep Trace", keys:["ghost","whey","ghost whey","ghost deep"],                          href:"traced-ghost-deep-trace.html"},
+    {label:"Halo Top — Deep Trace",     type:"Deep Trace", keys:["halo top deep","halo deep"],                                       href:"traced-halotop-deep-trace.html"},
+    {label:"MusclePharm — Deep Trace",  type:"Deep Trace", keys:["musclepharm","muscle pharm","sec","fraud","deep trace"],           href:"traced-musclepharm-deep-trace.html"},
+    {label:"Reese's — Deep Trace",      type:"Deep Trace", keys:["reeses deep","hershey deep","compound coating deep"],              href:"traced-reeses-deep-trace.html"},
+    // ── Category Indexes ──────────────────────────────────────────
+    {label:"Chocolate Index",           type:"Index",      keys:["chocolate","cocoa","cacao","dark chocolate"],                       href:"traced-chocolate.html"},
+    {label:"Electrolytes Index",        type:"Index",      keys:["electrolyte","lmnt","liquid iv","hydration","sodium"],             href:"traced-electrolytes.html"},
+    {label:"Greens Powders Index",      type:"Index",      keys:["greens powder","greens","superfood"],                              href:"traced-greens-powders.html"},
+    {label:"Protein Bars Index",        type:"Index",      keys:["protein bar","bar","rxbar","clif","kind"],                         href:"traced-protein-bars.html"},
+    {label:"Protein Supplements Index", type:"Index",      keys:["protein","supplement","whey","creatine","powder"],                 href:"traced-protein-supplements.html"},
+    // ── Site Pages ────────────────────────────────────────────────
+    {label:"All Investigations",        type:"Index",      keys:["archive","all","everything","list","browse","investigations"],      href:"traced-archive.html"},
+    {label:"How Scoring Works",         type:"Index",      keys:["methodology","scoring","how","score","rubric","dimensions"],       href:"traced-methodology.html"},
+    // ── Local ─────────────────────────────────────────────────────
+    {label:"Find local alternatives",   type:"Local",      keys:["local","near me","farmers market","independent","shop local"],     href:"#local"},
+  ];
+
+  function matches(q){
+    q = q.toLowerCase().trim();
+    if(!q) return ROUTES;
+    return ROUTES.filter(r => r.keys.some(k => k.includes(q) || q.includes(k)));
+  }
+
+  function render(q){
+    const list = (matches(q)||[]).slice(0,8);
+    if(!list.length){dd.classList.remove('open');return;}
+    const byType = {};
+    list.forEach(r=>{
+      if(!byType[r.type]) byType[r.type]=[];
+      byType[r.type].push(r);
+    });
+    let html='';
+    for(const [type,items] of Object.entries(byType)){
+      html+=`<div class="dd-label">${type}</div>`;
+      items.forEach(r=>{
+        html+=`<a href="${r.href}" class="dd-item">${r.label}<span class="dd-type">${r.type}</span></a>`;
+      });
+    }
+    dd.innerHTML = html;
+    dd.classList.add('open');
+  }
+
+  input.addEventListener('focus',  ()=>render(input.value));
+  input.addEventListener('input',  ()=>render(input.value));
+  input.addEventListener('keydown', e=>{
+    if(e.key==='Escape') dd.classList.remove('open');
+    if(e.key==='Enter'){
+      const first = matches(input.value)[0];
+      if(first) window.location.href = first.href;
+    }
+  });
+  document.addEventListener('click', e=>{
+    if(!input.contains(e.target)&&!dd.contains(e.target))
+      dd.classList.remove('open');
+  });
+
+/* ── NAV search ──────────────────────────────── */
+  // If a nav search input exists, share the same routing logic
+  const navInput = document.querySelector('.nav-search');
+  if(navInput){
+  // Simple: on Enter navigate
+  navInput.addEventListener('keydown', e=>{
+    if(e.key!=='Enter') return;
+    const q = navInput.value.toLowerCase().trim();
+    const map = [
+      ["annies","traced-annies.html"],["protein","traced-protein-supplements.html"],
+      ["chocolate","traced-chocolate.html"],["general mills","traced-archive.html"],
+      ["local","#local"],["farmers","#local"],["vendor","#vendors"],
+    ];
+    for(const [k,href] of map){
+      if(q.includes(k)){window.location.href=href;return;}
+    }
+  });
+  } // end navInput
+
+
+
+});
+</script>
+</body>
+</html
+
+        </div></div>
+      </div>
+
+      <!-- Neighborhood panel -->
+      <div class="nbhd">
+        <div class="kicker dim" style="margin-bottom:12px">Nearby (demo)</div>
+        <div class="nbhd-map">
+          <div class="mpin hi" style="left:22%;top:18%">FM</div>
+          <div class="mpin" style="left:58%;top:26%">MK</div>
+          <div class="mpin" style="left:36%;top:56%">SH</div>
+          <div class="mpin" style="left:70%;top:60%">CO</div>
+          <div class="mpin" style="left:16%;top:68%">FM</div>
+        </div>
+        <div class="kicker dim" style="margin:14px 0 8px">Highlights</div>
+        <div class="nbhd-list" id="nbhdList">
+          <div class="nbhd-row"><span class="nbhd-row-n">Ferry Plaza FM</span><span class="nbhd-row-d">0.8 mi</span></div>
+          <div class="nbhd-row"><span class="nbhd-row-n">Dandelion Chocolate</span><span class="nbhd-row-d">1.4 mi</span></div>
+          <div class="nbhd-row"><span class="nbhd-row-n">Bi-Rite Market</span><span class="nbhd-row-d">1.6 mi</span></div>
+          <div class="nbhd-row"><span class="nbhd-row-n">Rainbow Grocery</span><span class="nbhd-row-d">1.9 mi</span></div>
+          <div class="nbhd-row"><span class="nbhd-row-n">Civic Center FM</span><span class="nbhd-row-d">2.2 mi</span></div>
+        </div>
+        <div style="margin-top:16px;padding-top:14px;border-top:1px solid var(--border)">
+          <div class="kicker dim" style="margin-bottom:8px">What "Traced note" means</div>
+          <p style="font-size:12px;color:var(--muted);line-height:1.6">Each vendor is listed with a specific <em>why-it-belongs-here</em> explanation relative to the brands we investigate — not just a directory entry.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+
+<!-- ╔══════════════════════════════════════════╗
+     ║  TRACED STORIES                          ║
+     ╚══════════════════════════════════════════╝ -->
+<section class="section" id="stories">
+  <div class="W">
+    <div class="sec-head">
+      <div>
+        <div class="kicker">Traced Stories</div>
+        <h2 class="sec-title">Investigations you can finish in 60 seconds</h2>
+        <p class="sec-sub">Fast scan first. Expand for receipts. Every story links to owner webs, category indexes, and local alternatives.</p>
+      </div>
+      <a href="#indexes" class="sec-link">Browse all indexes →</a>
+    </div>
+    <div class="stories-scroll">
+      <a href="traced-annies.html" class="s-card feat">
+        <div class="kicker">Story · Featured</div>
+        <div class="s-title">Annie's</div>
+        <div class="s-desc">The organic mac & cheese icon built to rival Kraft. Acquired by General Mills in 2014 for $820M — while the bunny and "Homegrown" cues stayed intact on shelf.</div>
+        <div class="s-tags">
+          <span class="s-tag">Ownership web</span>
+          <span class="s-tag">Acquisition timeline</span>
+          <span class="s-tag">Local pasta alternatives</span>
+        </div>
+      </a>
+      <a href="traced-david.html" class="s-card">
+        <div class="kicker gold">Story</div>
+        <div class="s-title">David Protein Bar</div>
+        <div class="s-desc">Ingredient architecture, label reading methodology, and what the "clean" positioning actually signals about the brand's incentive structure.</div>
+        <div class="s-tags">
+          <span class="s-tag">Evidence cards</span>
+          <span class="s-tag">Label reading</span>
+          <span class="s-tag">Ingredient audit</span>
+        </div>
+      </a>
+      <a href="traced-reeses-hershey.html" class="s-card">
+        <div class="kicker">Story</div>
+        <div class="s-title">Reese's / Hershey</div>
+        <div class="s-desc">The supply chain behind America's best-selling candy. Hershey's cocoa sourcing record, child labor audit history, and what third-party certifications do and don't verify.</div>
+        <div class="s-tags">
+          <span class="s-tag">Supply chain</span>
+          <span class="s-tag">Labor record</span>
+          <span class="s-tag">Cocoa sourcing</span>
+        </div>
+      </a>
+      <a href="traced-halotop.html" class="s-card">
+        <div class="kicker">Story</div>
+        <div class="s-title">Halo Top</div>
+        <div class="s-desc">Diet positioning as a strategy. How "better-for-you" architecture is engineered, who owns it now, and what that ownership change meant for the product formula.</div>
+        <div class="s-tags">
+          <span class="s-tag">Formulation</span>
+          <span class="s-tag">PE acquisition</span>
+          <span class="s-tag">Incentive map</span>
+        </div>
+      </a>
+      <a href="traced-beyondmeat.html" class="s-card">
+        <div class="kicker">Story</div>
+        <div class="s-title">Beyond Meat</div>
+        <div class="s-desc">The plant-based promise, the IPO, and what public market pressure does to ingredient integrity and sourcing claims over time.</div>
+        <div class="s-tags">
+          <span class="s-tag">IPO incentives</span>
+          <span class="s-tag">Ingredient drift</span>
+          <span class="s-tag">Brand vs. product</span>
+        </div>
+      </a>
+      <a href="traced-ag1-deep-trace.html" class="s-card">
+        <div class="kicker gold">Deep Trace</div>
+        <div class="s-title">AG1</div>
+        <div class="s-desc">When a category lives on marketing and distribution, ownership and incentive mapping becomes the entire story. Full proprietary blend analysis.</div>
+        <div class="s-tags">
+          <span class="s-tag">Deep trace</span>
+          <span class="s-tag">Proprietary blend</span>
+          <span class="s-tag">Influencer economics</span>
+        </div>
+      </a>
+    </div>
+  </div>
+</section>
+
+
+<!-- ╔══════════════════════════════════════════╗
+     ║  INDEXES                                 ║
+     ╚══════════════════════════════════════════╝ -->
+<section class="section" id="indexes">
+  <div class="W">
+    <div class="sec-head">
+      <div>
+        <div class="kicker">Traced Indexes</div>
+        <h2 class="sec-title">Category transparency research</h2>
+        <p class="sec-sub">Every index scores brands across ownership, ingredient integrity, certifications, and labor record. Sortable, filterable, expandable.</p>
+      </div>
+    </div>
+    <div class="idx-grid">
+      <a href="traced-protein-supplements.html" class="idx-card">
+        <div class="kicker">Index · Live</div>
+        <div class="idx-title">Protein Supplements</div>
+        <div class="idx-desc">Ownership networks, heavy metal disclosures, influencer economics, and transparency scoring. 28 brands, 7-dimension methodology.</div>
+        <div class="idx-foot"><span class="idx-count">28 brands traced</span><span>Updated Feb 2025</span></div>
+      </a>
+      <a href="traced-protein-bars.html" class="idx-card">
+        <div class="kicker">Index · Live</div>
+        <div class="idx-title">Protein Bars</div>
+        <div class="idx-desc">Celebrity investment, private equity roll-ups, and ingredient positioning across performance snack brands. Includes the David deep trace.</div>
+        <div class="idx-foot"><span class="idx-count">12 brands traced</span><span>Updated Jan 2025</span></div>
+      </a>
+      <a href="traced-chocolate.html" class="idx-card">
+        <div class="kicker">Index · Live</div>
+        <div class="idx-title">Chocolate</div>
+        <div class="idx-desc">Ethical sourcing claims, conglomerate ownership, child labor audit records, and the bean-to-bar transparency gap.</div>
+        <div class="idx-foot"><span class="idx-count">11 brands traced</span><span>Updated Jan 2025</span></div>
+      </a>
+      <a href="traced-greens-powders.html" class="idx-card">
+        <div class="kicker">Index · Live</div>
+        <div class="idx-title">Greens Powders</div>
+        <div class="idx-desc">Proprietary blend opacity, influencer incentives, and what "clinically studied" actually means on a greens powder label.</div>
+        <div class="idx-foot"><span class="idx-count">8 brands traced</span><span>Updated Dec 2024</span></div>
+      </a>
+      <div class="idx-card coming">
+        <div class="kicker dim">Index · Coming soon</div>
+        <div class="idx-title">Olive Oil</div>
+        <div class="idx-desc">Harvest date opacity, single-estate vs. blend labeling, and why origin claims in olive oil are uniquely difficult to verify.</div>
+        <div class="idx-foot"><span style="font-size:12px;color:var(--dim)">In research</span></div>
+      </div>
+      <div class="idx-card coming">
+        <div class="kicker dim">Index · Coming soon</div>
+        <div class="idx-title">Coffee</div>
+        <div class="idx-desc">The JAB Holding empire, direct-trade claims, and the difference between Rainforest Alliance and genuine farmer transparency.</div>
+        <div class="idx-foot"><span style="font-size:12px;color:var(--dim)">In research</span></div>
+      </div>
+      <div class="idx-card coming">
+        <div class="kicker dim">Index · Coming soon</div>
+        <div class="idx-title">Dairy &amp; Eggs</div>
+        <div class="idx-desc">Supply chain traceability, pasture-raised vs. cage-free certification gaps, and who actually owns "happy farm" brands.</div>
+        <div class="idx-foot"><span style="font-size:12px;color:var(--dim)">In research</span></div>
+      </div>
+      <div class="idx-card coming">
+        <div class="kicker dim">Index · Coming soon</div>
+        <div class="idx-title">Electrolytes</div>
+        <div class="idx-desc">Hydration brands, VC backing, and whether the "clean electrolyte" category lives up to its ingredient transparency claims.</div>
+        <div class="idx-foot"><span style="font-size:12px;color:var(--dim)">In research</span></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+
+<!-- ╔══════════════════════════════════════════╗
+     ║  VENDOR CTA — the marketplace side       ║
+     ╚══════════════════════════════════════════╝ -->
+<section class="vendor-cta-section" id="vendors">
+  <div class="W">
+    <div class="vendor-inner">
+      <div>
+        <div class="vendor-kicker">For independent vendors</div>
+        <h2 class="vendor-h">Your sourcing story<br>deserves to be <em>found.</em></h2>
+        <p class="vendor-sub">Every day Traced users read about what a corporate brand isn't — then immediately want to know what's near them instead. If you're an independent maker, market, or shop with a real sourcing story, you belong in this network.</p>
+        <div class="vendor-perks">
+          <div class="vperk">
+            <div class="vperk-dot">✓</div>
+            <span>A <strong>Traced-vetted vendor profile</strong> — not a directory listing. We write the "why it belongs here" context for you, tied to specific brand investigations.</span>
+          </div>
+          <div class="vperk">
+            <div class="vperk-dot">✓</div>
+            <span>Appear in <strong>category-specific local discovery</strong> — when someone reads our chocolate investigation, they find your chocolate shop.</span>
+          </div>
+          <div class="vperk">
+            <div class="vperk-dot">✓</div>
+            <span><strong>Free during founding period.</strong> No affiliate swaps, no sponsored rankings. Independence is the product.</span>
+          </div>
+          <div class="vperk">
+            <div class="vperk-dot">✓</div>
+            <span>Your own <strong>vendor profile page</strong> on Traced — shareable, searchable, and linked from every relevant investigation.</span>
+          </div>
+        </div>
+      </div>
+      <div class="vendor-form">
+        <div class="vform-title">Get listed on Traced</div>
+        <label class="vform-label">Shop or market name</label>
+        <input class="vform-input" type="text" placeholder="e.g. Acme Specialty Foods">
+        <label class="vform-label">City + type</label>
+        <input class="vform-input" type="text" placeholder="e.g. Oakland · Specialty maker">
+        <label class="vform-label">Your sourcing claim (one line)</label>
+        <input class="vform-input" type="text" placeholder="e.g. Bean-to-bar, direct-trade cacao">
+        <label class="vform-label">Email</label>
+        <input class="vform-input" type="email" placeholder="you@yourshop.com">
+        <button class="vform-btn" onclick="this.textContent='Submitted ✓';this.style.background='#145c4e'">Request a profile →</button>
+        <div class="vform-note">We review every application. Responds within 5 business days.</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+
+<!-- ╔══════════════════════════════════════════╗
+     ║  FOOTER                                  ║
+     ╚══════════════════════════════════════════╝ -->
+<footer class="footer">
+  <div class="W">
+    <div class="footer-grid">
+      <div>
+        <div class="footer-brand-name">Traced</div>
+        <div class="footer-brand-desc">Food transparency research. Corporate ownership mapping. Independent discovery.</div>
+        <div class="footer-principle">Traced principle: map ownership + incentives. No affiliate engine. No sponsored rankings. Independence is the product.</div>
+      </div>
+      <div>
+        <div class="f-col-head">Investigations</div>
+        <div class="f-col-links">
+          <a href="traced-annies.html">Annie's → General Mills</a>
+          <a href="traced-david.html">David Protein Bar</a>
+          <a href="traced-reeses-hershey.html">Reese's / Hershey</a>
+          <a href="traced-ag1-deep-trace.html">AG1 Deep Trace</a>
+          <a href="traced-beyondmeat.html">Beyond Meat</a>
+        </div>
+      </div>
+      <div>
+        <div class="f-col-head">Indexes</div>
+        <div class="f-col-links">
+          <a href="traced-protein-supplements.html">Protein Supplements</a>
+          <a href="traced-protein-bars.html">Protein Bars</a>
+          <a href="traced-chocolate.html">Chocolate</a>
+          <a href="traced-greens-powders.html">Greens Powders</a>
+        </div>
+      </div>
+      <div>
+        <div class="f-col-head">Marketplace</div>
+        <div class="f-col-links">
+          <a href="#local">Find local alternatives</a>
+          <a href="#vendors">List your shop</a>
+          <a href="traced-archive.html">General Mills web</a>
+          <a href="traced-archive.html">Nestlé web</a>
+          <a href="traced-archive.html">Kellogg's web</a>
+        </div>
+      </div>
+    </div>
+    <div class="footer-bot">
+      <div class="footer-copy">© 2025 Traced. Built in San Francisco.</div>
+      <div class="footer-tag">ownership shock → 20-second story → independent discovery</div>
+    </div>
+  </div>
+
+<div class="traced-legal-bar" style="background:rgba(201,168,76,0.04);border-top:1px solid rgba(201,168,76,0.12);padding:20px 24px;margin-top:48px;">
+  <p style="font-family:var(--font-mono, 'DM Mono', monospace);font-size:10px;letter-spacing:0.12em;text-transform:uppercase;color:var(--text-muted, #7a7570);line-height:1.7;max-width:820px;margin:0 auto;text-align:center;">
+    <strong style="color:var(--text, #e8e4dc);">Editorial Assessment.</strong>
+    Traced scores are independent editorial assessments based on publicly available information.
+    They are not statements of product safety, legality, or consumer harm. Scores are editorial opinion.
+    Corrections: <a href="/cdn-cgi/l/email-protection#91f4f5f8e5fee3f8f0fdd1e5e3f0f2f4f5bff2fe" style="color:var(--accent, #C9A84C);"><span class="__cf_email__" data-cfemail="bbdedfd2cfd4c9d2dad7fbcfc9dad8dedf95d8d4">[email&#160;protected]</span></a>
+    &nbsp;·&nbsp;
+    <a href="traced-editorial-standards.html" style="color:var(--accent, #C9A84C);">Editorial Standards →</a>
+  </p>
+</div>
+</footer>
+
+
+<!-- ═══════════════════════════════════════════
+   SCRIPTS
+═══════════════════════════════════════════ -->
+<script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script>
+document.addEventListener("DOMContentLoaded", function(){
+
+/* ── Search dropdown ─────────────────────────── */
+  const input = document.getElementById('heroSearch');
+  const dd    = document.getElementById('heroDD');
+  if(!input || !dd) return;
+
+  const ROUTES = [
+    // ── Investigations ────────────────────────────────────────────
+    {label:"AG1 / Athletic Greens",     type:"Story",      keys:["ag1","athletic greens","greens powder","andrew huberman"],          href:"traced-ag1.html"},
+    {label:"Annie's Homegrown",         type:"Story",      keys:["annies","annie","mac","general mills","pasta","organic"],           href:"traced-annies.html"},
+    {label:"Beyond Meat",               type:"Story",      keys:["beyond meat","plant","vegan","plant based"],                        href:"traced-beyondmeat.html"},
+    {label:"Cheerios",                  type:"Story",      keys:["cheerios","general mills","oat","cholesterol","heart"],             href:"traced-cheerios.html"},
+    {label:"Chobani",                   type:"Story",      keys:["chobani","yogurt","greek yogurt","oat milk"],                       href:"traced-chobani.html"},
+    {label:"David Protein Bar",         type:"Story",      keys:["david","protein bar","david bar"],                                  href:"traced-david.html"},
+    {label:"Fairlife",                  type:"Story",      keys:["fairlife","milk","coca cola","ultra filtered","animal welfare"],     href:"traced-fairlife.html"},
+    {label:"Halo Top",                  type:"Story",      keys:["halo top","ice cream","low calorie","erythritol","diet"],           href:"traced-halotop.html"},
+    {label:"Jif Peanut Butter",         type:"Story",      keys:["jif","peanut butter","recall","salmonella","smucker"],              href:"traced-jif.html"},
+    {label:"Momentous",                 type:"Story",      keys:["momentous","protein","nsf","certified","huberman"],                 href:"traced-momentous.html"},
+    {label:"Muscle Milk",               type:"Story",      keys:["muscle milk","cytosport","hormel","protein","ftc"],                 href:"traced-muscle-milk.html"},
+    {label:"Oatly",                     type:"Story",      keys:["oatly","oat milk","blackstone","sweden"],                          href:"traced-oatly.html"},
+    {label:"Optimum Nutrition",         type:"Story",      keys:["optimum nutrition","gold standard","on protein","glanbia"],         href:"traced-optimum-nutrition.html"},
+    {label:"Reese's / Hershey",         type:"Story",      keys:["reeses","hershey","chocolate","compound coating","peanut butter"],  href:"traced-reeses-hershey.html"},
+    {label:"RXBAR",                     type:"Story",      keys:["rxbar","rx bar","clif","kellogg","dates","egg whites"],             href:"traced-rxbar.html"},
+    {label:"Salt & Straw",              type:"Story",      keys:["salt and straw","salt straw","ice cream","independent","portland"], href:"traced-saltstraw.html"},
+    {label:"Transparent Labs",          type:"Story",      keys:["transparent labs","transparentlabs","pre workout","certified"],     href:"traced-transparent-labs.html"},
+    {label:"Tropicana",                 type:"Story",      keys:["tropicana","orange juice","oj","pepsico","natural","flavor pack"],  href:"traced-tropicana.html"},
+    // ── Deep Traces ───────────────────────────────────────────────
+    {label:"AG1 — Deep Trace",          type:"Deep Trace", keys:["ag1 deep","athletic greens deep","ag1 full"],                      href:"traced-ag1-deep-trace.html"},
+    {label:"Annie's — Deep Trace",      type:"Deep Trace", keys:["annies deep","annie deep trace"],                                  href:"traced-annies-deep-trace.html"},
+    {label:"Beyond Meat — Deep Trace",  type:"Deep Trace", keys:["beyond meat deep","beyond deep trace"],                            href:"traced-beyondmeat-deep-trace.html"},
+    {label:"David — Deep Trace",        type:"Deep Trace", keys:["david deep","david bar deep"],                                     href:"traced-david-deep-trace.html"},
+    {label:"Ghost Whey — Deep Trace",   type:"Deep Trace", keys:["ghost","whey","ghost whey","ghost deep"],                          href:"traced-ghost-deep-trace.html"},
+    {label:"Halo Top — Deep Trace",     type:"Deep Trace", keys:["halo top deep","halo deep"],                                       href:"traced-halotop-deep-trace.html"},
+    {label:"MusclePharm — Deep Trace",  type:"Deep Trace", keys:["musclepharm","muscle pharm","sec","fraud","deep trace"],           href:"traced-musclepharm-deep-trace.html"},
+    {label:"Reese's — Deep Trace",      type:"Deep Trace", keys:["reeses deep","hershey deep","compound coating deep"],              href:"traced-reeses-deep-trace.html"},
+    // ── Category Indexes ──────────────────────────────────────────
+    {label:"Chocolate Index",           type:"Index",      keys:["chocolate","cocoa","cacao","dark chocolate"],                       href:"traced-chocolate.html"},
+    {label:"Electrolytes Index",        type:"Index",      keys:["electrolyte","lmnt","liquid iv","hydration","sodium"],             href:"traced-electrolytes.html"},
+    {label:"Greens Powders Index",      type:"Index",      keys:["greens powder","greens","superfood"],                              href:"traced-greens-powders.html"},
+    {label:"Protein Bars Index",        type:"Index",      keys:["protein bar","bar","rxbar","clif","kind"],                         href:"traced-protein-bars.html"},
+    {label:"Protein Supplements Index", type:"Index",      keys:["protein","supplement","whey","creatine","powder"],                 href:"traced-protein-supplements.html"},
+    // ── Site Pages ────────────────────────────────────────────────
+    {label:"All Investigations",        type:"Index",      keys:["archive","all","everything","list","browse","investigations"],      href:"traced-archive.html"},
+    {label:"How Scoring Works",         type:"Index",      keys:["methodology","scoring","how","score","rubric","dimensions"],       href:"traced-methodology.html"},
+    // ── Local ─────────────────────────────────────────────────────
+    {label:"Find local alternatives",   type:"Local",      keys:["local","near me","farmers market","independent","shop local"],     href:"#local"},
+  ];
+
+  function matches(q){
+    q = q.toLowerCase().trim();
+    if(!q) return ROUTES;
+    return ROUTES.filter(r => r.keys.some(k => k.includes(q) || q.includes(k)));
+  }
+
+  function render(q){
+    const list = (matches(q)||[]).slice(0,8);
+    if(!list.length){dd.classList.remove('open');return;}
+    const byType = {};
+    list.forEach(r=>{
+      if(!byType[r.type]) byType[r.type]=[];
+      byType[r.type].push(r);
+    });
+    let html='';
+    for(const [type,items] of Object.entries(byType)){
+      html+=`<div class="dd-label">${type}</div>`;
+      items.forEach(r=>{
+        html+=`<a href="${r.href}" class="dd-item">${r.label}<span class="dd-type">${r.type}</span></a>`;
+      });
+    }
+    dd.innerHTML = html;
+    dd.classList.add('open');
+  }
+
+  input.addEventListener('focus',  ()=>render(input.value));
+  input.addEventListener('input',  ()=>render(input.value));
+  input.addEventListener('keydown', e=>{
+    if(e.key==='Escape') dd.classList.remove('open');
+    if(e.key==='Enter'){
+      const first = matches(input.value)[0];
+      if(first) window.location.href = first.href;
+    }
+  });
+  document.addEventListener('click', e=>{
+    if(!input.contains(e.target)&&!dd.contains(e.target))
+      dd.classList.remove('open');
+  });
+
+/* ── NAV search ──────────────────────────────── */
+  // If a nav search input exists, share the same routing logic
+  const navInput = document.querySelector('.nav-search');
+  if(navInput){
+  // Simple: on Enter navigate
+  navInput.addEventListener('keydown', e=>{
+    if(e.key!=='Enter') return;
+    const q = navInput.value.toLowerCase().trim();
+    const map = [
+      ["annies","traced-annies.html"],["protein","traced-protein-supplements.html"],
+      ["chocolate","traced-chocolate.html"],["general mills","traced-archive.html"],
+      ["local","#local"],["farmers","#local"],["vendor","#vendors"],
+    ];
+    for(c

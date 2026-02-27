@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SOMA West Farmers Market — Traced Local</title>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=IBM+Plex+Mono:wght@300;400;500&display=swap" rel="stylesheet">
+  <style>
+    :root { --black:#080806; --cream:#f0ede4; --red:#c8392b; --green:#2d5a27; --green-light:#4a8a42; --muted:#8a8678; --border:#1a1a16; --border-mid:#222; }
+    * { margin:0; padding:0; box-sizing:border-box; }
+    body { background:var(--black); color:var(--cream); font-family:'IBM Plex Mono',monospace; min-height:100vh; }
+    header { display:flex; align-items:center; justify-content:space-between; padding:18px 20px; border-bottom:1px solid var(--border); position:sticky; top:0; background:var(--black); z-index:100; }
+    .logo-group { display:flex; align-items:baseline; gap:8px; }
+    .logo-traced { font-size:12px; letter-spacing:0.25em; color:var(--red); font-weight:500; }
+    .logo-divider { color:#222; }
+    .logo-local { font-family:'Playfair Display',serif; font-size:17px; color:var(--cream); }
+    .back-link { font-size:9px; letter-spacing:0.15em; color:var(--muted); text-decoration:none; border:1px solid var(--border); padding:5px 10px; }
+    .market-hero { padding:32px 20px 24px; border-bottom:1px solid var(--border); background:linear-gradient(180deg,rgba(45,90,39,0.05) 0%,transparent 100%); }
+    .market-eyebrow { font-size:7px; letter-spacing:0.25em; color:var(--green-light); margin-bottom:10px; }
+    .market-name { font-family:'Playfair Display',serif; font-size:clamp(24px,6vw,36px); line-height:1.1; color:var(--cream); margin-bottom:6px; }
+    .market-operator { font-size:9px; letter-spacing:0.12em; color:var(--muted); margin-bottom:18px; }
+    .market-hours-grid { display:grid; grid-template-columns:1fr 1fr; gap:8px; margin-bottom:16px; }
+    .hours-card { padding:10px 12px; border:1px solid var(--border-mid); background:rgba(255,255,255,0.02); }
+    .hours-day { font-size:8px; letter-spacing:0.2em; color:var(--green-light); margin-bottom:3px; }
+    .hours-time { font-size:12px; color:var(--cream); }
+    .hours-note { font-size:8px; color:var(--muted); margin-top:2px; }
+    .market-tags { display:flex; flex-wrap:wrap; gap:5px; margin-bottom:16px; }
+    .mtag { font-size:7px; letter-spacing:0.12em; color:var(--muted); border:1px solid var(--border-mid); padding:3px 8px; }
+    .mtag.green { color:var(--green-light); border-color:rgba(74,138,66,0.3); }
+    .mtag.yellow { color:#8a7a00; border-color:rgba(138,122,0,0.3); }
+    .map-btn { display:inline-flex; align-items:center; gap:6px; font-size:9px; letter-spacing:0.15em; color:var(--green-light); text-decoration:none; border:1px solid rgba(74,138,66,0.4); background:rgba(45,90,39,0.1); padding:8px 14px; }
+    .section { padding:24px 20px; border-bottom:1px solid var(--border); }
+    .section-label { font-size:7px; letter-spacing:0.22em; color:var(--muted); margin-bottom:16px; }
+    .section-label span { color:var(--green-light); }
+    .vendor-card { border:1px solid var(--border-mid); margin-bottom:12px; overflow:hidden; }
+    .vendor-card.featured { border-color:rgba(74,138,66,0.35); }
+    .vendor-header { padding:14px 14px 10px; cursor:pointer; display:flex; align-items:flex-start; justify-content:space-between; gap:8px; }
+    .vendor-left { flex:1; }
+    .vendor-name { font-family:'Playfair Display',serif; font-size:17px; color:var(--cream); line-height:1.2; margin-bottom:3px; }
+    .vendor-tagline { font-size:10px; color:var(--muted); line-height:1.4; }
+    .vendor-right { display:flex; flex-direction:column; align-items:flex-end; gap:4px; flex-shrink:0; }
+    .vendor-cert { font-size:7px; letter-spacing:0.12em; padding:2px 7px; color:var(--green-light); border:1px solid rgba(74,138,66,0.3); background:rgba(45,90,39,0.1); }
+    .vendor-chevron { font-size:10px; color:#444; margin-top:4px; transition:transform 0.2s; }
+    .vendor-chevron.open { transform:rotate(180deg); }
+    .vendor-body { display:none; padding:0 14px 14px; }
+    .vendor-body.open { display:block; }
+    .vendor-story { font-size:11px; color:#ccc; line-height:1.7; margin-bottom:12px; padding-bottom:12px; border-bottom:1px solid var(--border); }
+    .products-label { font-size:7px; letter-spacing:0.2em; color:var(--muted); margin-bottom:8px; }
+    .product-list { display:flex; flex-wrap:wrap; gap:5px; margin-bottom:12px; }
+    .product-tag { font-size:9px; letter-spacing:0.06em; color:#aaa; border:1px solid var(--border-mid); padding:3px 8px; }
+    .product-tag.seasonal { color:#8a7a00; border-color:rgba(138,122,0,0.3); }
+    .vendor-meta { font-size:9px; color:var(--muted); line-height:1.8; }
+    .vendor-meta strong { color:#888; font-weight:400; }
+    .vendor-days { display:flex; gap:5px; margin-top:10px; }
+    .day-pill { font-size:7px; letter-spacing:0.12em; padding:3px 8px; }
+    .day-pill.active { color:var(--green-light); border:1px solid rgba(74,138,66,0.3); background:rgba(45,90,39,0.1); }
+    .day-pill.inactive { color:#333; border:1px solid #1a1a1a; }
+    .season-grid { display:grid; grid-template-columns:1fr 1fr; gap:8px; }
+    .season-card { padding:10px 12px; border:1px solid var(--border); }
+    .season-month { font-size:7px; letter-spacing:0.15em; color:var(--green-light); margin-bottom:5px; }
+    .season-items { font-size:10px; color:#aaa; line-height:1.6; }
+    .about-text { font-size:11px; color:#bbb; line-height:1.8; }
+    .about-text + .about-text { margin-top:12px; }
+    footer { padding:20px; border-top:1px solid var(--border); display:flex; align-items:center; justify-content:space-between; }
+    .footer-logo { font-size:9px; letter-spacing:0.18em; color:#2a2a2a; }
+    .footer-logo span { color:var(--red); }
+    .footer-link { font-size:9px; color:#333; text-decoration:none; }
+  </style>
+</head>
+<body>
+
+  <header>
+    <div class="logo-group">
+      <span class="logo-traced">TRACED</span>
+      <span class="logo-divider">/</span>
+      <span class="logo-local">Local</span>
+    </div>
+    <a href="https://traced-local.vercel.app" class="back-link">← ALL MARKETS</a>
+  </header>
+
+  <section class="market-hero">
+    <div class="market-eyebrow">↑ SAN FRANCISCO · SOMA WEST</div>
+    <h1 class="market-name">SOMA West<br>Farmers Market</h1>
+    <div class="market-operator">Seasonal community market · July–November</div>
+    <div class="market-hours-grid">
+      <div class="hours-card">
+        <div class="hours-day">SATURDAY</div>
+        <div class="hours-time">9 AM – 1 PM</div>
+        <div class="hours-note">Seasonal · July–November</div>
+      </div>
+      <div class="hours-card">
+        <div class="hours-day">LOCATION</div>
+        <div class="hours-time">398 12th St</div>
+        <div class="hours-note">SOMA West neighborhood · near Civic Center</div>
+      </div>
+    </div>
+    <div class="market-tags">
+      <span class="mtag yellow">SEASONAL: JULY–NOV</span>
+      <span class="mtag green">CALFRESH / EBT</span>
+      <span class="mtag">SOMA WEST</span>
+      <span class="mtag">CALIFORNIA CERTIFIED</span>
+    </div>
+    <a href="https://maps.google.com/?q=398+12th+St+San+Francisco+CA" target="_blank" class="map-btn">
+      ↗ OPEN IN MAPS · 398 12th St, San Francisco
+    </a>
+  </section>
+
+  <section class="section">
+    <div class="section-label">MARKET OVERVIEW · <span>SEASONAL JULY–NOVEMBER</span></div>
+
+    <div class="vendor-card featured">
+      <div class="vendor-header" onclick="toggle(this)">
+        <div class="vendor-left">
+          <div class="vendor-name">About This Market</div>
+          <div class="vendor-tagline">Neighborhood-serving seasonal market in SOMA West</div>
+        </div>
+        <div class="vendor-right">
+          <span class="vendor-chevron">▼</span>
+        </div>
+      </div>
+      <div class="vendor-body">
+        <div class="vendor-story">
+          SOMA West Farmers Market runs on Saturdays from July through November — a compact seasonal market serving the SoMa West corridor between the Mission and Civic Center. The July opening aligns with peak California summer: stone fruit, dry-farmed tomatoes, peppers, and corn are all at their best when this market opens. The November close captures the fall transition — squash, apples, citrus, and pomegranates. Because the season is short and late-summer focused, the produce quality during market months is consistently strong.
+        </div>
+        <div class="products-label">IN SEASON DURING MARKET MONTHS</div>
+        <div class="product-list">
+          <span class="product-tag seasonal">☀ Tomatoes (Jul–Oct)</span>
+          <span class="product-tag seasonal">☀ Corn (Jul–Sep)</span>
+          <span class="product-tag seasonal">☀ Peaches & Nectarines (Jul–Sep)</span>
+          <span class="product-tag seasonal">☀ Peppers (Jul–Oct)</span>
+          <span class="product-tag seasonal">☀ Melons (Jul–Sep)</span>
+          <span class="product-tag seasonal">🍂 Winter squash (Sep–Nov)</span>
+          <span class="product-tag seasonal">🍂 Apples & Pears (Sep–Nov)</span>
+          <span class="product-tag seasonal">🍂 Pomegranates (Oct–Nov)</span>
+        </div>
+        <div class="vendor-meta">
+          <strong>Season:</strong> July through November<br>
+          <strong>Hours:</strong> Saturday, 9am–1pm<br>
+          <strong>Note:</strong> Vendor lineup varies; market is community-level scale
+        </div>
+        <div class="vendor-days">
+          <span class="day-pill active">SAT</span>
+        </div>
+      </div>
+    </div>
+
+  </section>
+
+  <section class="section">
+    <div class="section-label">WHAT'S IN SEASON WHEN MARKET IS OPEN · <span>JULY–NOVEMBER</span></div>
+    <div class="season-grid">
+      <div class="season-card">
+        <div class="season-month">SUMMER (JUL–AUG)</div>
+        <div class="season-items">Tomatoes · Corn · Peaches · Nectarines · Melons · Peppers · Eggplant · Basil · Cucumbers</div>
+      </div>
+      <div class="season-card">
+        <div class="season-month">FALL (SEP–NOV)</div>
+        <div class="season-items">Winter squash · Apples · Pears · Pomegranates · Grapes · Kale · Brussels sprouts · Root vegetables · Citrus (late)</div>
+      </div>
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="section-label">ABOUT THIS MARKET</div>
+    <p class="about-text">
+      SOMA West Farmers Market is a seasonal Saturday market at 398 12th Street, serving the SoMa West neighborhood — a residential pocket bounded by the Mission, Hayes Valley, and Civic Center. The market runs from July through November, overlapping with the peak of California's agricultural calendar. It provides fresh local produce access to a dense urban neighborhood that has relatively few alternative fresh food options within walking distance.
+    </p>
+  </section>
+
+  <footer>
+    <div class="footer-logo"><span>TRACED</span> / LOCAL</div>
+    <a href="https://traced-local.vercel.app" class="footer-link">← all markets</a>
+  </footer>
+
+  <script>
+    function toggle(header) {
+      const body = header.nextElementSibling;
+      const chevron = header.querySelector('.vendor-chevron');
+      const isOpen = body.classList.contains('open');
+      body.classList.toggle('open', !isOpen);
+      chevron.classList.toggle('open', !isOpen);
+    }
+  </script>
+</body>
+</html>

@@ -1,0 +1,374 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Specialty Goods — Traced Local</title>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=IBM+Plex+Mono:wght@300;400;500&display=swap" rel="stylesheet">
+  <style>
+    :root { --black:#080806; --cream:#f0ede4; --red:#c8392b; --green:#2d5a27; --green-light:#4a8a42; --muted:#8a8678; --border:#1e1e1a; --border-mid:#222; }
+    * { margin:0; padding:0; box-sizing:border-box; }
+    body { background:var(--black); color:var(--cream); font-family:'IBM Plex Mono',monospace; min-height:100vh; }
+
+    header { display:flex; align-items:center; justify-content:space-between; padding:20px 24px; border-bottom:1px solid var(--border); position:sticky; top:0; background:var(--black); z-index:100; }
+    .logo-group { display:flex; align-items:baseline; gap:10px; }
+    .logo-traced { font-size:13px; letter-spacing:0.25em; color:var(--red); font-weight:500; }
+    .logo-divider { color:var(--border); }
+    .logo-local { font-family:'Playfair Display',serif; font-size:18px; color:var(--cream); }
+    .back-link { font-size:9px; letter-spacing:0.18em; color:var(--muted); text-decoration:none; border:1px solid var(--border); padding:6px 12px; }
+    .back-link:hover { color:var(--cream); border-color:#444; }
+
+    .hero { padding:48px 24px 36px; border-bottom:1px solid var(--border); position:relative; overflow:hidden; }
+    .hero::before { content:''; position:absolute; top:-40px; right:-60px; width:280px; height:280px; background:radial-gradient(circle,rgba(138,122,0,0.08) 0%,transparent 70%); pointer-events:none; }
+    .hero-eyebrow { font-size:7px; letter-spacing:0.25em; color:var(--green-light); margin-bottom:14px; }
+    .hero-title { font-family:'Playfair Display',serif; font-size:clamp(28px,7vw,44px); line-height:1.1; color:var(--cream); margin-bottom:16px; }
+    .hero-sub { font-size:11px; color:var(--muted); line-height:1.75; max-width:400px; margin-bottom:24px; }
+    .hero-sub strong { color:var(--cream); font-weight:400; }
+
+    .editorial { padding:28px 24px; border-bottom:1px solid var(--border); background:#0a0a08; }
+    .editorial-label { font-size:7px; letter-spacing:0.22em; color:var(--red); margin-bottom:10px; }
+    .editorial-text { font-family:'Playfair Display',serif; font-size:14px; line-height:1.75; color:#bbb; max-width:440px; }
+    .editorial-text strong { color:var(--cream); font-style:italic; }
+
+    /* SUB-CATEGORY TABS */
+    .subcat-bar { padding:14px 24px; border-bottom:1px solid var(--border); display:flex; gap:6px; flex-wrap:wrap; align-items:center; }
+    .subcat-label { font-size:7px; letter-spacing:0.2em; color:var(--muted); margin-right:4px; }
+    .subcat-btn { font-size:8px; letter-spacing:0.12em; padding:5px 10px; border:1px solid var(--border-mid); color:var(--muted); background:transparent; cursor:pointer; font-family:'IBM Plex Mono',monospace; transition:all 0.15s; }
+    .subcat-btn.active, .subcat-btn:hover { color:var(--green-light); border-color:rgba(74,138,66,0.4); background:rgba(45,90,39,0.08); }
+
+    .listings-section { padding:28px 24px; border-bottom:1px solid var(--border); }
+    .section-eyebrow { font-size:7px; letter-spacing:0.22em; color:var(--muted); margin-bottom:6px; }
+    .section-eyebrow span { color:var(--green-light); }
+    .section-note { font-size:9px; color:#444; margin-bottom:18px; }
+
+    .subcat-group { margin-bottom:28px; }
+    .subcat-header { font-size:7px; letter-spacing:0.2em; color:var(--muted); padding-bottom:8px; border-bottom:1px solid var(--border); margin-bottom:12px; }
+    .subcat-header span { color:var(--green-light); }
+
+    .vendor-card { border:1px solid var(--border-mid); margin-bottom:10px; overflow:hidden; }
+    .vendor-card.featured { border-color:rgba(74,138,66,0.35); }
+    .vendor-header { padding:15px 16px 11px; cursor:pointer; display:flex; align-items:flex-start; justify-content:space-between; gap:8px; }
+    .vendor-left { flex:1; }
+    .vendor-name { font-family:'Playfair Display',serif; font-size:16px; color:var(--cream); line-height:1.2; margin-bottom:3px; }
+    .vendor-tagline { font-size:10px; color:var(--muted); line-height:1.4; }
+    .vendor-right { display:flex; flex-direction:column; align-items:flex-end; gap:4px; flex-shrink:0; }
+    .vendor-badge { font-size:7px; letter-spacing:0.12em; padding:2px 7px; color:var(--green-light); border:1px solid rgba(74,138,66,0.3); background:rgba(45,90,39,0.1); }
+    .vendor-chevron { font-size:10px; color:#444; margin-top:4px; transition:transform 0.2s; }
+    .vendor-chevron.open { transform:rotate(180deg); }
+    .vendor-body { display:none; padding:0 16px 16px; }
+    .vendor-body.open { display:block; }
+    .vendor-story { font-size:11px; color:#ccc; line-height:1.7; margin-bottom:12px; padding-bottom:12px; border-bottom:1px solid var(--border); }
+    .detail-label { font-size:7px; letter-spacing:0.2em; color:var(--muted); margin-bottom:7px; }
+    .product-list { display:flex; flex-wrap:wrap; gap:5px; margin-bottom:12px; }
+    .ptag { font-size:9px; color:#aaa; border:1px solid var(--border-mid); padding:3px 8px; }
+    .vendor-meta { font-size:9px; color:var(--muted); line-height:1.8; }
+    .vendor-meta strong { color:#888; font-weight:400; }
+
+    .horizon-section { padding:24px; background:#0a0a08; border-bottom:1px solid var(--border); }
+    .horizon-text { font-family:'Playfair Display',serif; font-size:14px; line-height:1.7; color:#bbb; max-width:420px; }
+    .horizon-text strong { color:var(--cream); font-style:italic; }
+
+    footer { padding:22px 24px; border-top:1px solid var(--border); display:flex; align-items:center; justify-content:space-between; }
+    .footer-logo { font-size:9px; letter-spacing:0.2em; color:#333; }
+    .footer-logo span { color:var(--red); }
+    .footer-link { font-size:9px; color:#444; text-decoration:none; }
+
+    .subcat-group.hidden { display:none; }
+  </style>
+</head>
+<body>
+
+  <header>
+    <div class="logo-group">
+      <span class="logo-traced">TRACED</span>
+      <span class="logo-divider">/</span>
+      <span class="logo-local">Local</span>
+    </div>
+    <a href="index.html" class="back-link">← ALL CATEGORIES</a>
+  </header>
+
+  <section class="hero">
+    <div class="hero-eyebrow">↑ TRACED LOCAL · SAN FRANCISCO</div>
+    <h1 class="hero-title">Specialty<br>Goods</h1>
+    <p class="hero-sub">
+      Producers who do one thing and do it completely. Olive oil pressed from a single grove. Chocolate made from beans sourced from one farm. Bread from a single milling tradition. Honey from hives with a known address.<br><br>
+      <strong>Single-origin, single-ingredient, fully traceable.</strong>
+    </p>
+  </section>
+
+  <section class="editorial">
+    <div class="editorial-label">THE POINT</div>
+    <p class="editorial-text">
+      Most specialty food is marketed as special but made at commodity scale. "Artisan" bread from a 50,000-loaf-per-day facility. "Cold-pressed" olive oil blended from five countries. "Small-batch" chocolate that isn't.<br><br>
+      The producers in this guide <strong>make something specific, from a specific source, in limited quantity</strong> — and they can tell you exactly what it is.
+    </p>
+  </section>
+
+  <div class="subcat-bar">
+    <span class="subcat-label">FILTER →</span>
+    <button class="subcat-btn active" onclick="filterCat('all',this)">ALL</button>
+    <button class="subcat-btn" onclick="filterCat('bread',this)">BREAD</button>
+    <button class="subcat-btn" onclick="filterCat('chocolate',this)">CHOCOLATE</button>
+    <button class="subcat-btn" onclick="filterCat('olive-oil',this)">OLIVE OIL</button>
+    <button class="subcat-btn" onclick="filterCat('cheese',this)">CHEESE</button>
+    <button class="subcat-btn" onclick="filterCat('honey',this)">HONEY</button>
+    <button class="subcat-btn" onclick="filterCat('mushrooms',this)">MUSHROOMS</button>
+  </div>
+
+  <section class="listings-section">
+    <div class="section-eyebrow">SF SPECIALTY PRODUCERS · <span>PROFILED</span></div>
+
+    <!-- BREAD -->
+    <div class="subcat-group" data-cat="bread">
+      <div class="subcat-header">BREAD <span>— SLOW FERMENTATION, LOCAL GRAIN</span></div>
+
+      <div class="vendor-card featured">
+        <div class="vendor-header" onclick="toggle(this)">
+          <div class="vendor-left">
+            <div class="vendor-name">Tartine Bakery</div>
+            <div class="vendor-tagline">Country loaves & morning pastries · Mission · Est. 2002</div>
+          </div>
+          <div class="vendor-right"><span class="vendor-badge">SLOW FERMENT</span><span class="vendor-chevron">▼</span></div>
+        </div>
+        <div class="vendor-body">
+          <div class="vendor-story">Chad Robertson's country loaf — thick dark crust, open crumb, 4-hour window to buy on weekdays — defined a generation of American bread baking. Tartine uses slow-fermented levain, stone-milled heritage grain flours, and a wood-fired oven. The Manufactory on Alabama Street expanded the operation significantly, but the Guerrero Street original remains the most coveted loaf in SF.</div>
+          <div class="detail-label">WHAT THEY MAKE</div>
+          <div class="product-list"><span class="ptag">Country loaf (levain)</span><span class="ptag">Whole wheat loaf</span><span class="ptag">Morning buns</span><span class="ptag">Croissants</span><span class="ptag">Seasonal pastries</span></div>
+          <div class="vendor-meta"><strong>Address:</strong> 600 Guerrero St, Mission (original) · 595 Alabama St (Manufactory)<br><strong>Loaves:</strong> Weekdays ~5 PM, Sat/Sun ~8 AM (sell out fast)</div>
+        </div>
+      </div>
+
+      <div class="vendor-card featured">
+        <div class="vendor-header" onclick="toggle(this)">
+          <div class="vendor-left">
+            <div class="vendor-name">Josey Baker Bread</div>
+            <div class="vendor-tagline">Heritage grain, stone-milled · The Mill, Western Addition</div>
+          </div>
+          <div class="vendor-right"><span class="vendor-badge">HERITAGE GRAIN</span><span class="vendor-chevron">▼</span></div>
+        </div>
+        <div class="vendor-body">
+          <div class="vendor-story">Josey Baker mills his own flour from heritage grains — emmer, einkorn, rye — at The Mill on Divisadero, a collaboration with Four Barrel Coffee (now independent). He is one of the few American bakers who controls the grain-to-loaf chain entirely. His bread has more flavor and nutrition than anything made from commodity white flour, and his approach to whole-grain baking has influenced bakers across the country.</div>
+          <div class="detail-label">WHAT THEY MAKE</div>
+          <div class="product-list"><span class="ptag">Heritage whole grain loaves</span><span class="ptag">Emmer bread</span><span class="ptag">Rye bread</span><span class="ptag">Milled grain for sale</span></div>
+          <div class="vendor-meta"><strong>Address:</strong> 736 Divisadero St, Western Addition (The Mill)<br><strong>Also:</strong> Sells freshly milled flour by the bag</div>
+        </div>
+      </div>
+
+      <div class="vendor-card">
+        <div class="vendor-header" onclick="toggle(this)">
+          <div class="vendor-left">
+            <div class="vendor-name">Marla Bakery</div>
+            <div class="vendor-tagline">Wood-fired breads & pastries · Inner Richmond · Exclusive at Clement St Market</div>
+          </div>
+          <div class="vendor-right"><span class="vendor-badge">MARKET EXCLUSIVE</span><span class="vendor-chevron">▼</span></div>
+        </div>
+        <div class="vendor-body">
+          <div class="vendor-story">Marla Bakery holds an exclusive vendor spot at the Clement Street Farmers Market — one of only three bakeries with that designation. Their breads are wood-fired with long fermentation, and their pastry work leans savory: galettes, hand pies, and seasonal preparations that use whatever the surrounding produce vendors are selling. The combination of their Inner Richmond retail presence and Clement Street exclusivity makes them a neighborhood institution.</div>
+          <div class="detail-label">WHAT THEY MAKE</div>
+          <div class="product-list"><span class="ptag">Wood-fired country loaves</span><span class="ptag">Pastries</span><span class="ptag">Savory galettes</span><span class="ptag">Seasonal preparations</span></div>
+          <div class="vendor-meta"><strong>Retail:</strong> 3619 Balboa St, Inner Richmond<br><strong>Market:</strong> Clement Street Farmers Market (Sun) — exclusive</div>
+        </div>
+      </div>
+
+      <div class="vendor-card">
+        <div class="vendor-header" onclick="toggle(this)">
+          <div class="vendor-left">
+            <div class="vendor-name">Daymoon Bread</div>
+            <div class="vendor-tagline">Naturally leavened · Clement Street Market exclusive</div>
+          </div>
+          <div class="vendor-right"><span class="vendor-badge">MARKET EXCLUSIVE</span><span class="vendor-chevron">▼</span></div>
+        </div>
+        <div class="vendor-body">
+          <div class="vendor-story">Daymoon holds the third exclusive bakery spot at Clement Street, alongside Marla and Saltwater. Naturally leavened loaves with extended fermentation — the approach prioritizes flavor development and digestibility over speed. Their presence at Clement Street is Sunday-only and quantities are limited.</div>
+          <div class="detail-label">WHAT THEY MAKE</div>
+          <div class="product-list"><span class="ptag">Naturally leavened loaves</span><span class="ptag">Sourdough varieties</span><span class="ptag">Seasonal pastries</span></div>
+          <div class="vendor-meta"><strong>Market:</strong> Clement Street Farmers Market (Sun) — exclusive</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- CHOCOLATE -->
+    <div class="subcat-group" data-cat="chocolate">
+      <div class="subcat-header">CHOCOLATE <span>— BEAN-TO-BAR, SINGLE ORIGIN</span></div>
+
+      <div class="vendor-card featured">
+        <div class="vendor-header" onclick="toggle(this)">
+          <div class="vendor-left">
+            <div class="vendor-name">Dandelion Chocolate</div>
+            <div class="vendor-tagline">Bean-to-bar · Mission · Founded 2010</div>
+          </div>
+          <div class="vendor-right"><span class="vendor-badge">BEAN-TO-BAR</span><span class="vendor-chevron">▼</span></div>
+        </div>
+        <div class="vendor-body">
+          <div class="vendor-story">Dandelion is one of the original American bean-to-bar chocolate makers and among the best in the world at what they do. Each bar is made from a single origin — meaning cacao from one farm or cooperative in one country, processed entirely in-house on Valencia Street. Two ingredients only: cacao and sugar. Every bar has a harvest date and a farm name. The tasting room on Valencia is worth visiting to understand what single-origin chocolate can actually taste like compared to commodity chocolate.</div>
+          <div class="detail-label">WHAT THEY MAKE</div>
+          <div class="product-list"><span class="ptag">Single-origin dark chocolate bars</span><span class="ptag">Drinking chocolate</span><span class="ptag">Bonbons (seasonal)</span><span class="ptag">Baked goods</span></div>
+          <div class="vendor-meta"><strong>Address:</strong> 740 Valencia St, Mission<br><strong>Also:</strong> Ferry Building retail shop</div>
+        </div>
+      </div>
+
+      <div class="vendor-card">
+        <div class="vendor-header" onclick="toggle(this)">
+          <div class="vendor-left">
+            <div class="vendor-name">TCHO Chocolate</div>
+            <div class="vendor-tagline">Mission-based manufacturer · Direct farmer partnerships</div>
+          </div>
+          <div class="vendor-right"><span class="vendor-chevron">▼</span></div>
+        </div>
+        <div class="vendor-body">
+          <div class="vendor-story">TCHO pioneered direct relationships with cacao farmers and a flavor profiling system that helps farmers understand how their beans translate to finished chocolate — creating a feedback loop that improves quality at the source. They work with cooperatives in Ghana, Peru, Ecuador, and Madagascar. Their approach is less artisan-romantic than Dandelion but more systematically committed to traceable farmer relationships.</div>
+          <div class="detail-label">WHAT THEY MAKE</div>
+          <div class="product-list"><span class="ptag">Direct-trade dark chocolate</span><span class="ptag">Milk chocolate</span><span class="ptag">Baking chocolate</span><span class="ptag">Chocolate chips</span></div>
+          <div class="vendor-meta"><strong>Available:</strong> Bi-Rite, Rainbow Grocery, Ferry Building shops</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- OLIVE OIL -->
+    <div class="subcat-group" data-cat="olive-oil">
+      <div class="subcat-header">OLIVE OIL <span>— CALIFORNIA SINGLE-ESTATE</span></div>
+
+      <div class="vendor-card featured">
+        <div class="vendor-header" onclick="toggle(this)">
+          <div class="vendor-left">
+            <div class="vendor-name">California Olive Ranch</div>
+            <div class="vendor-tagline">Single-estate · Artisan tier · Oroville, CA</div>
+          </div>
+          <div class="vendor-right"><span class="vendor-badge">CALIFORNIA GROWN</span><span class="vendor-chevron">▼</span></div>
+        </div>
+        <div class="vendor-body">
+          <div class="vendor-story">California Olive Ranch's artisan tier (distinct from their mass-market bottles) is cold-pressed from California-grown olives within hours of harvest. California olive oil has a distinct profile — grassy, peppery, high polyphenol content — compared to the mellow Italian or Spanish oils most Americans know. Fresh California oil, harvested in fall and pressed immediately, is one of the most underappreciated pantry items available in the state.</div>
+          <div class="detail-label">WHAT THEY PRODUCE</div>
+          <div class="product-list"><span class="ptag">Single-estate EVOO</span><span class="ptag">Arbequina varietal</span><span class="ptag">Arbosana varietal</span><span class="ptag">Koroneiki varietal</span></div>
+          <div class="vendor-meta"><strong>Available:</strong> Bi-Rite, Gus's, Rainbow Grocery, specialty shops<br><strong>Note:</strong> Look for harvest date on label — buy within 18 months</div>
+        </div>
+      </div>
+
+      <div class="vendor-card">
+        <div class="vendor-header" onclick="toggle(this)">
+          <div class="vendor-left">
+            <div class="vendor-name">McEvoy Ranch</div>
+            <div class="vendor-tagline">Estate olive oil · Petaluma, Marin County</div>
+          </div>
+          <div class="vendor-right"><span class="vendor-badge">MARIN COUNTY</span><span class="vendor-chevron">▼</span></div>
+        </div>
+        <div class="vendor-body">
+          <div class="vendor-story">McEvoy Ranch in Petaluma produces certified organic estate olive oil from Italian varietals grown in Marin County's unique climate. The ranch is one of the pioneers of California artisan olive oil and sells at the Ferry Plaza Farmers Market and in the Ferry Building. Marin's fog and temperature conditions produce oil with a distinctive quality — bright, fresh, with pronounced grassiness.</div>
+          <div class="detail-label">WHAT THEY PRODUCE</div>
+          <div class="product-list"><span class="ptag">Certified organic EVOO</span><span class="ptag">Estate blends</span><span class="ptag">Flavored oils (seasonal)</span></div>
+          <div class="vendor-meta"><strong>At:</strong> Ferry Plaza Farmers Market (Sat) · Ferry Building retail<br><strong>Ranch:</strong> Petaluma, Marin County</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- CHEESE -->
+    <div class="subcat-group" data-cat="cheese">
+      <div class="subcat-header">CHEESE <span>— FARMSTEAD & ARTISAN, BAY AREA</span></div>
+
+      <div class="vendor-card featured">
+        <div class="vendor-header" onclick="toggle(this)">
+          <div class="vendor-left">
+            <div class="vendor-name">Cowgirl Creamery</div>
+            <div class="vendor-tagline">Certified organic, Point Reyes · Ferry Building & Pt Reyes Station</div>
+          </div>
+          <div class="vendor-right"><span class="vendor-badge">CERTIFIED ORGANIC</span><span class="vendor-chevron">▼</span></div>
+        </div>
+        <div class="vendor-body">
+          <div class="vendor-story">Sue Conley and Peggy Smith founded Cowgirl Creamery in Point Reyes Station in 1997, sourcing certified organic milk from Strauss Family Creamery. Their Mt. Tam — a triple-cream soft-ripened cheese — is one of the defining cheeses of the American artisan movement. The Ferry Building shop in SF lets city residents access the full range without driving to West Marin. Cowgirl also appears at the Ferry Plaza Saturday market.</div>
+          <div class="detail-label">WHAT THEY MAKE</div>
+          <div class="product-list"><span class="ptag">Mt. Tam (triple cream)</span><span class="ptag">Red Hawk (washed rind)</span><span class="ptag">Cottage cheese</span><span class="ptag">Crème fraîche</span><span class="ptag">Seasonal varieties</span></div>
+          <div class="vendor-meta"><strong>Address:</strong> Ferry Building, Shop 17<br><strong>Original creamery:</strong> Point Reyes Station, Marin</div>
+        </div>
+      </div>
+
+      <div class="vendor-card">
+        <div class="vendor-header" onclick="toggle(this)">
+          <div class="vendor-left">
+            <div class="vendor-name">Achadinha Cheese Company</div>
+            <div class="vendor-tagline">Farmstead goat cheese · Petaluma · at Divisadero Market</div>
+          </div>
+          <div class="vendor-right"><span class="vendor-badge">FARMSTEAD</span><span class="vendor-chevron">▼</span></div>
+        </div>
+        <div class="vendor-body">
+          <div class="vendor-story">The Pacheco family makes farmstead goat cheese in Petaluma — milk from their own animals, cheese made on-site. Their aged Capricious and fresh chèvre appear at several Bay Area farmers markets including the Divisadero Sunday market. Farmstead means the milk never leaves the farm before it becomes cheese, producing a more direct expression of the animals' diet and the specific landscape.</div>
+          <div class="detail-label">WHAT THEY MAKE</div>
+          <div class="product-list"><span class="ptag">Fresh chèvre</span><span class="ptag">Capricious (aged)</span><span class="ptag">Seasonal flavored varieties</span></div>
+          <div class="vendor-meta"><strong>At:</strong> Divisadero Farmers Market (Sun) · Multiple Bay Area markets<br><strong>Farm:</strong> Petaluma, Sonoma County</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- HONEY -->
+    <div class="subcat-group" data-cat="honey">
+      <div class="subcat-header">HONEY <span>— SINGLE-SOURCE, BAY AREA HIVES</span></div>
+
+      <div class="vendor-card featured">
+        <div class="vendor-header" onclick="toggle(this)">
+          <div class="vendor-left">
+            <div class="vendor-name">Alex's Family Bee Farm</div>
+            <div class="vendor-tagline">Raw varietal honey · Fillmore Farmers Market</div>
+          </div>
+          <div class="vendor-right"><span class="vendor-badge">RAW HONEY</span><span class="vendor-chevron">▼</span></div>
+        </div>
+        <div class="vendor-body">
+          <div class="vendor-story">Alex's Family Bee Farm keeps hives in multiple Northern California locations and produces raw varietal honey — meaning each jar reflects what was blooming in a specific location during a specific season. Wildflower honey from hives near the coast tastes completely different from sage honey from inland hives. They appear regularly at the Fillmore Farmers Market, bringing multiple varietal options to the Western Addition every Saturday.</div>
+          <div class="detail-label">WHAT THEY PRODUCE</div>
+          <div class="product-list"><span class="ptag">Raw wildflower honey</span><span class="ptag">Varietal single-source honeys</span><span class="ptag">Seasonal varieties</span></div>
+          <div class="vendor-meta"><strong>At:</strong> Fillmore Farmers Market (Sat 9 AM–1 PM)</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- MUSHROOMS -->
+    <div class="subcat-group" data-cat="mushrooms">
+      <div class="subcat-header">MUSHROOMS <span>— CULTIVATED & FORAGED, COASTAL CALIFORNIA</span></div>
+
+      <div class="vendor-card featured">
+        <div class="vendor-header" onclick="toggle(this)">
+          <div class="vendor-left">
+            <div class="vendor-name">Far West Fungi</div>
+            <div class="vendor-tagline">Specialty & medicinal mushrooms · Moss Landing · 6 SF markets</div>
+          </div>
+          <div class="vendor-right"><span class="vendor-badge">6 MARKETS</span><span class="vendor-chevron">▼</span></div>
+        </div>
+        <div class="vendor-body">
+          <div class="vendor-story">The Garrone family has been cultivating specialty mushrooms in Moss Landing, Monterey County since the late 1980s. They appear at six SF farmers markets weekly — Ferry Plaza, Alemany, Castro, Mission Community, and others — making them the most consistently available specialty mushroom source in the city. Their range spans everyday shiitake and oyster mushrooms through lion's mane, maitake, and medicinal reishi and turkey tail.</div>
+          <div class="detail-label">WHAT THEY GROW</div>
+          <div class="product-list"><span class="ptag">Lion's Mane</span><span class="ptag">Maitake</span><span class="ptag">Shiitake</span><span class="ptag">King Trumpet</span><span class="ptag">Oyster (multiple colors)</span><span class="ptag">Reishi</span><span class="ptag">Turkey Tail</span><span class="ptag">Dried mushrooms</span></div>
+          <div class="vendor-meta"><strong>At:</strong> Ferry Plaza (Sat/Tue/Thu) · Alemany (Sat) · Castro (Wed) · Mission Community (Thu)<br><strong>Farm:</strong> Moss Landing, Monterey County</div>
+        </div>
+      </div>
+    </div>
+
+  </section>
+
+  <section class="horizon-section">
+    <div class="section-eyebrow">TRACED LOCAL · <span>EXPANDING</span></div>
+    <p class="horizon-text">
+      The SF specialty goods guide is the foundation. <strong>California produces some of the world's best olive oil, wine vinegar, stone fruit preserves, and artisan chocolate</strong> — most of it unknown outside the state. The next phase maps these producers across the Central Valley, Central Coast, and Southern California, building a guide to the full California specialty food system.
+    </p>
+  </section>
+
+  <footer>
+    <div class="footer-logo"><span>TRACED</span> / LOCAL</div>
+    <a href="index.html" class="footer-link">← all categories</a>
+  </footer>
+
+  <script>
+    function toggle(header) {
+      const body = header.nextElementSibling;
+      const chevron = header.querySelector('.vendor-chevron');
+      body.classList.toggle('open');
+      chevron.classList.toggle('open');
+    }
+    function filterCat(cat, btn) {
+      document.querySelectorAll('.subcat-btn').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      document.querySelectorAll('.subcat-group').forEach(g => {
+        if (cat === 'all') { g.classList.remove('hidden'); return; }
+        g.classList.toggle('hidden', g.dataset.cat !== cat);
+      });
+    }
+  </script>
+</body>
+</html>

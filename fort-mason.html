@@ -1,0 +1,276 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Fort Mason Farmers Market — Traced Local</title>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=IBM+Plex+Mono:wght@300;400;500&display=swap" rel="stylesheet">
+  <style>
+    :root { --black:#080806; --cream:#f0ede4; --red:#c8392b; --green:#2d5a27; --green-light:#4a8a42; --muted:#8a8678; --border:#1a1a16; --border-mid:#222; }
+    * { margin:0; padding:0; box-sizing:border-box; }
+    body { background:var(--black); color:var(--cream); font-family:'IBM Plex Mono',monospace; min-height:100vh; }
+    header { display:flex; align-items:center; justify-content:space-between; padding:18px 20px; border-bottom:1px solid var(--border); position:sticky; top:0; background:var(--black); z-index:100; }
+    .logo-group { display:flex; align-items:baseline; gap:8px; }
+    .logo-traced { font-size:12px; letter-spacing:0.25em; color:var(--red); font-weight:500; }
+    .logo-divider { color:#222; }
+    .logo-local { font-family:'Playfair Display',serif; font-size:17px; color:var(--cream); }
+    .back-link { font-size:9px; letter-spacing:0.15em; color:var(--muted); text-decoration:none; border:1px solid var(--border); padding:5px 10px; }
+    .market-hero { padding:32px 20px 24px; border-bottom:1px solid var(--border); background:linear-gradient(180deg,rgba(45,90,39,0.05) 0%,transparent 100%); }
+    .market-eyebrow { font-size:7px; letter-spacing:0.25em; color:var(--green-light); margin-bottom:10px; }
+    .market-name { font-family:'Playfair Display',serif; font-size:clamp(24px,6vw,36px); line-height:1.1; color:var(--cream); margin-bottom:6px; }
+    .market-operator { font-size:9px; letter-spacing:0.12em; color:var(--muted); margin-bottom:18px; }
+    .market-hours-grid { display:grid; grid-template-columns:1fr 1fr; gap:8px; margin-bottom:16px; }
+    .hours-card { padding:10px 12px; border:1px solid var(--border-mid); background:rgba(255,255,255,0.02); }
+    .hours-day { font-size:8px; letter-spacing:0.2em; color:var(--green-light); margin-bottom:3px; }
+    .hours-time { font-size:12px; color:var(--cream); }
+    .hours-note { font-size:8px; color:var(--muted); margin-top:2px; }
+    .market-tags { display:flex; flex-wrap:wrap; gap:5px; margin-bottom:16px; }
+    .mtag { font-size:7px; letter-spacing:0.12em; color:var(--muted); border:1px solid var(--border-mid); padding:3px 8px; }
+    .mtag.green { color:var(--green-light); border-color:rgba(74,138,66,0.3); }
+    .map-btn { display:inline-flex; align-items:center; gap:6px; font-size:9px; letter-spacing:0.15em; color:var(--green-light); text-decoration:none; border:1px solid rgba(74,138,66,0.4); background:rgba(45,90,39,0.1); padding:8px 14px; }
+    .section { padding:24px 20px; border-bottom:1px solid var(--border); }
+    .section-label { font-size:7px; letter-spacing:0.22em; color:var(--muted); margin-bottom:16px; }
+    .section-label span { color:var(--green-light); }
+    .vendor-card { border:1px solid var(--border-mid); margin-bottom:12px; overflow:hidden; }
+    .vendor-card.featured { border-color:rgba(74,138,66,0.35); }
+    .vendor-header { padding:14px 14px 10px; cursor:pointer; display:flex; align-items:flex-start; justify-content:space-between; gap:8px; }
+    .vendor-left { flex:1; }
+    .vendor-name { font-family:'Playfair Display',serif; font-size:17px; color:var(--cream); line-height:1.2; margin-bottom:3px; }
+    .vendor-tagline { font-size:10px; color:var(--muted); line-height:1.4; }
+    .vendor-right { display:flex; flex-direction:column; align-items:flex-end; gap:4px; flex-shrink:0; }
+    .vendor-cert { font-size:7px; letter-spacing:0.12em; padding:2px 7px; color:var(--green-light); border:1px solid rgba(74,138,66,0.3); background:rgba(45,90,39,0.1); }
+    .vendor-chevron { font-size:10px; color:#444; margin-top:4px; transition:transform 0.2s; }
+    .vendor-chevron.open { transform:rotate(180deg); }
+    .vendor-body { display:none; padding:0 14px 14px; }
+    .vendor-body.open { display:block; }
+    .vendor-story { font-size:11px; color:#ccc; line-height:1.7; margin-bottom:12px; padding-bottom:12px; border-bottom:1px solid var(--border); }
+    .products-label { font-size:7px; letter-spacing:0.2em; color:var(--muted); margin-bottom:8px; }
+    .product-list { display:flex; flex-wrap:wrap; gap:5px; margin-bottom:12px; }
+    .product-tag { font-size:9px; letter-spacing:0.06em; color:#aaa; border:1px solid var(--border-mid); padding:3px 8px; }
+    .product-tag.seasonal { color:#8a7a00; border-color:rgba(138,122,0,0.3); }
+    .vendor-meta { font-size:9px; color:var(--muted); line-height:1.8; }
+    .vendor-meta strong { color:#888; font-weight:400; }
+    .vendor-days { display:flex; gap:5px; margin-top:10px; }
+    .day-pill { font-size:7px; letter-spacing:0.12em; padding:3px 8px; }
+    .day-pill.active { color:var(--green-light); border:1px solid rgba(74,138,66,0.3); background:rgba(45,90,39,0.1); }
+    .day-pill.inactive { color:#333; border:1px solid #1a1a1a; }
+    .season-grid { display:grid; grid-template-columns:1fr 1fr; gap:8px; }
+    .season-card { padding:10px 12px; border:1px solid var(--border); }
+    .season-month { font-size:7px; letter-spacing:0.15em; color:var(--green-light); margin-bottom:5px; }
+    .season-items { font-size:10px; color:#aaa; line-height:1.6; }
+    .about-text { font-size:11px; color:#bbb; line-height:1.8; }
+    .about-text + .about-text { margin-top:12px; }
+    footer { padding:20px; border-top:1px solid var(--border); display:flex; align-items:center; justify-content:space-between; }
+    .footer-logo { font-size:9px; letter-spacing:0.18em; color:#2a2a2a; }
+    .footer-logo span { color:var(--red); }
+    .footer-link { font-size:9px; color:#333; text-decoration:none; }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="logo-group">
+      <span class="logo-traced">TRACED</span><span class="logo-divider">/</span><span class="logo-local">Local</span>
+    </div>
+    <a href="https://traced-local.vercel.app" class="back-link">← ALL MARKETS</a>
+  </header>
+
+  <section class="market-hero">
+    <div class="market-eyebrow">↑ SAN FRANCISCO · MARINA / FORT MASON</div>
+    <h1 class="market-name">Fort Mason<br>Farmers Market</h1>
+    <div class="market-operator">Operated by CAFF (Community Alliance with Family Farmers) · Year-round</div>
+    <div class="market-hours-grid">
+      <div class="hours-card">
+        <div class="hours-day">SUNDAY</div>
+        <div class="hours-time">9:30 AM – 1:30 PM</div>
+        <div class="hours-note">35+ vendors · waterfront setting</div>
+      </div>
+      <div class="hours-card">
+        <div class="hours-day">SETTING</div>
+        <div class="hours-time">Golden Gate Views</div>
+        <div class="hours-note">Former US Army HQ · waterfront promenade</div>
+      </div>
+    </div>
+    <div class="market-tags">
+      <span class="mtag green">YEAR-ROUND</span>
+      <span class="mtag green">CALFRESH / EBT</span>
+      <span class="mtag green">MARKET MATCH</span>
+      <span class="mtag">35+ VENDORS</span>
+      <span class="mtag">GOLDEN GATE VIEWS</span>
+      <span class="mtag">FREE PARKING ON-SITE</span>
+      <span class="mtag">TRANSIT ACCESSIBLE</span>
+      <span class="mtag">CALIFORNIA CERTIFIED</span>
+    </div>
+    <a href="https://maps.google.com/?q=Fort+Mason+Center+Marina+Blvd+San+Francisco+CA" target="_blank" class="map-btn">
+      ↗ OPEN IN MAPS · Fort Mason Center, Marina Blvd, San Francisco
+    </a>
+  </section>
+
+  <section class="section">
+    <div class="section-label">FEATURED VENDORS · <span>SUNDAY MARKET</span></div>
+
+    <div class="vendor-card featured">
+      <div class="vendor-header" onclick="toggle(this)">
+        <div class="vendor-left">
+          <div class="vendor-name">Resendiz Brothers Protea</div>
+          <div class="vendor-tagline">Specialty cherries & exotic fruit · Fallbrook, CA</div>
+        </div>
+        <div class="vendor-right">
+          <span class="vendor-chevron">▼</span>
+        </div>
+      </div>
+      <div class="vendor-body">
+        <div class="vendor-story">
+          The Resendiz family grows specialty cherries and exotic fruits in Fallbrook, San Diego County — an inland valley with the ideal microclimate for unusual fruit cultivation. Their cherries are a Fort Mason highlight: multiple varieties sold at peak ripeness, including late-season types that extend the cherry window beyond what most farms can offer. They also grow and sell varieties that rarely appear at Northern California markets, making their stall a reliable discovery stop for serious fruit shoppers.
+        </div>
+        <div class="products-label">WHAT THEY BRING</div>
+        <div class="product-list">
+          <span class="product-tag seasonal">☀ Specialty cherries (May–Jul)</span>
+          <span class="product-tag seasonal">☀ Exotic tropical fruit (summer)</span>
+          <span class="product-tag">Dried cherries</span>
+          <span class="product-tag">Cherry jam</span>
+        </div>
+        <div class="vendor-meta">
+          <strong>Location:</strong> Fallbrook, San Diego County<br>
+          <strong>Specialty:</strong> Multiple cherry varieties, extended season
+        </div>
+        <div class="vendor-days">
+          <span class="day-pill active">SUN</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="vendor-card featured">
+      <div class="vendor-header" onclick="toggle(this)">
+        <div class="vendor-left">
+          <div class="vendor-name">Hmong Farm (Asian Greens)</div>
+          <div class="vendor-tagline">Chinese broccoli, Asian greens & specialty vegetables · Central Valley</div>
+        </div>
+        <div class="vendor-right">
+          <span class="vendor-chevron">▼</span>
+        </div>
+      </div>
+      <div class="vendor-body">
+        <div class="vendor-story">
+          Fort Mason is specifically called out by SF Standard food writers for its Hmong farm vendor selling Chinese broccoli (gai lan) and other Asian greens that are difficult to source in fresh, farm-direct form at Marina-area markets. Hmong agricultural communities in the Central Valley have been growing Southeast and East Asian specialty vegetables for Bay Area markets for decades. The farm brings gai lan, bok choy, water spinach, bitter melon, and other crops that rarely appear at farmer-facing markets north of downtown.
+        </div>
+        <div class="products-label">WHAT THEY BRING</div>
+        <div class="product-list">
+          <span class="product-tag">Chinese broccoli (gai lan)</span>
+          <span class="product-tag">Bok choy</span>
+          <span class="product-tag">Yu choy</span>
+          <span class="product-tag">Water spinach (on yong)</span>
+          <span class="product-tag seasonal">☀ Bitter melon (summer)</span>
+          <span class="product-tag">Long beans</span>
+        </div>
+        <div class="vendor-meta">
+          <strong>Region:</strong> Central Valley, CA<br>
+          <strong>Community:</strong> Hmong farming tradition
+        </div>
+        <div class="vendor-days">
+          <span class="day-pill active">SUN</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="vendor-card">
+      <div class="vendor-header" onclick="toggle(this)">
+        <div class="vendor-left">
+          <div class="vendor-name">Triple Delight Blueberries</div>
+          <div class="vendor-tagline">Specialty blueberries & jam · Placer County, CA</div>
+        </div>
+        <div class="vendor-right">
+          <span class="vendor-chevron">▼</span>
+        </div>
+      </div>
+      <div class="vendor-body">
+        <div class="vendor-story">
+          Triple Delight grows multiple blueberry varieties in Placer County, extending the season by staggering variety plantings. Their blueberry jam — frequently cited by Fort Mason regulars — is made from same-farm fruit with no artificial pectin. A summer seasonal anchor for the Fort Mason market's north SF shoppers.
+        </div>
+        <div class="products-label">WHAT THEY BRING</div>
+        <div class="product-list">
+          <span class="product-tag seasonal">☀ Fresh blueberries (Jun–Aug)</span>
+          <span class="product-tag">Blueberry jam</span>
+          <span class="product-tag">Dried blueberries</span>
+        </div>
+        <div class="vendor-meta">
+          <strong>Location:</strong> Placer County (Sierra foothills)<br>
+          <strong>Also at:</strong> Noe Valley Saturday
+        </div>
+        <div class="vendor-days">
+          <span class="day-pill active">SUN</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="vendor-card">
+      <div class="vendor-header" onclick="toggle(this)">
+        <div class="vendor-left">
+          <div class="vendor-name">Boffo Cart</div>
+          <div class="vendor-tagline">Breakfast sandwiches & coffee · SF-based</div>
+        </div>
+        <div class="vendor-right">
+          <span class="vendor-chevron">▼</span>
+        </div>
+      </div>
+      <div class="vendor-body">
+        <div class="vendor-story">
+          Boffo Cart is a Fort Mason fixture — a breakfast sandwich and coffee vendor that has become part of the market ritual for regular Sunday shoppers. The cart uses market ingredients where possible. A breakfast sandwich from Boffo, a walk along the waterfront toward the Golden Gate, and a bag of produce is the standard Fort Mason Sunday format for Marina residents.
+        </div>
+        <div class="products-label">WHAT THEY SERVE</div>
+        <div class="product-list">
+          <span class="product-tag">Breakfast sandwiches</span>
+          <span class="product-tag">Coffee</span>
+          <span class="product-tag">Seasonal specials</span>
+        </div>
+        <div class="vendor-meta">
+          <strong>Type:</strong> Prepared food / coffee cart<br>
+          <strong>Tip:</strong> Combine with a post-market waterfront walk
+        </div>
+        <div class="vendor-days">
+          <span class="day-pill active">SUN</span>
+        </div>
+      </div>
+    </div>
+
+  </section>
+
+  <section class="section">
+    <div class="section-label">WHAT'S IN SEASON · <span>BAY AREA · FEBRUARY–MARCH</span></div>
+    <div class="season-grid">
+      <div class="season-card">
+        <div class="season-month">NOW</div>
+        <div class="season-items">Citrus · Meyer lemons · Blood oranges · Kale & chard · Root vegetables · Winter squash · Leeks · Mushrooms</div>
+      </div>
+      <div class="season-card">
+        <div class="season-month">COMING SOON</div>
+        <div class="season-items">Strawberries (Mar–Apr) · Asparagus · Artichokes · Spring peas · Fava beans · Cherries (May)</div>
+      </div>
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="section-label">ABOUT THIS MARKET</div>
+    <p class="about-text">
+      Fort Mason Farmers Market is hosted by the Golden Gate National Park Service at Fort Mason Center — the former U.S. Army West Coast Headquarters on the Marina waterfront, with direct views of the Golden Gate Bridge and Alcatraz. The market runs every Sunday year-round with 35+ vendors covering farm produce, sustainable meat and seafood, artisan breads, cut flowers, and prepared foods.
+    </p>
+    <p class="about-text">
+      The setting gives Fort Mason a character distinct from any other SF market — the combination of waterfront access, Golden Gate views, and proximity to the Marina Green makes Sunday morning here a full experience, not just a shopping trip. Parking is free on-site, and the market is accessible by transit via the 28 and 30 Muni lines. Farmer spotlights and seasonal recipes are featured on the market website.
+    </p>
+  </section>
+
+  <footer>
+    <div class="footer-logo"><span>TRACED</span> / LOCAL</div>
+    <a href="https://traced-local.vercel.app" class="footer-link">← all markets</a>
+  </footer>
+
+  <script>
+    function toggle(header) {
+      const body = header.nextElementSibling;
+      const chevron = header.querySelector('.vendor-chevron');
+      const isOpen = body.classList.contains('open');
+      body.classList.toggle('open', !isOpen);
+      chevron.classList.toggle('open', !isOpen);
+    }
+  </script>
+</body>
+</html>

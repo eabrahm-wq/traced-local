@@ -1,0 +1,405 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Farmers Markets — Traced Local</title>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=IBM+Plex+Mono:wght@300;400;500&display=swap" rel="stylesheet">
+  <style>
+    :root { --black:#080806; --cream:#f0ede4; --red:#c8392b; --green:#2d5a27; --green-light:#4a8a42; --muted:#8a8678; --border:#1e1e1a; --border-mid:#222; }
+    * { margin:0; padding:0; box-sizing:border-box; }
+    body { background:var(--black); color:var(--cream); font-family:'IBM Plex Mono',monospace; min-height:100vh; }
+
+    header { display:flex; align-items:center; justify-content:space-between; padding:20px 24px; border-bottom:1px solid var(--border); position:sticky; top:0; background:var(--black); z-index:100; }
+    .logo-group { display:flex; align-items:baseline; gap:10px; }
+    .logo-traced { font-size:13px; letter-spacing:0.25em; color:var(--red); font-weight:500; }
+    .logo-divider { color:var(--border); }
+    .logo-local { font-family:'Playfair Display',serif; font-size:18px; color:var(--cream); }
+    .back-link { font-size:9px; letter-spacing:0.18em; color:var(--muted); text-decoration:none; border:1px solid var(--border); padding:6px 12px; }
+    .back-link:hover { color:var(--cream); border-color:#444; }
+
+    .hero { padding:48px 24px 36px; border-bottom:1px solid var(--border); position:relative; overflow:hidden; }
+    .hero::before { content:''; position:absolute; top:-40px; right:-60px; width:280px; height:280px; background:radial-gradient(circle,rgba(45,90,39,0.12) 0%,transparent 70%); pointer-events:none; }
+    .hero-eyebrow { font-size:7px; letter-spacing:0.25em; color:var(--green-light); margin-bottom:14px; }
+    .hero-title { font-family:'Playfair Display',serif; font-size:clamp(28px,7vw,44px); line-height:1.1; color:var(--cream); margin-bottom:16px; }
+    .hero-sub { font-size:11px; color:var(--muted); line-height:1.75; max-width:400px; margin-bottom:24px; }
+    .hero-sub strong { color:var(--cream); font-weight:400; }
+    .hero-stats { display:flex; gap:20px; flex-wrap:wrap; }
+    .stat-num { font-family:'Playfair Display',serif; font-size:20px; color:var(--cream); display:block; }
+    .stat-label { font-size:7px; letter-spacing:0.15em; color:var(--muted); margin-top:1px; display:block; }
+
+    .filter-bar { padding:14px 24px; border-bottom:1px solid var(--border); display:flex; gap:6px; flex-wrap:wrap; align-items:center; }
+    .filter-label { font-size:7px; letter-spacing:0.2em; color:var(--muted); margin-right:4px; }
+    .filter-btn { font-size:8px; letter-spacing:0.12em; padding:5px 10px; border:1px solid var(--border-mid); color:var(--muted); background:transparent; cursor:pointer; font-family:'IBM Plex Mono',monospace; transition:all 0.15s; }
+    .filter-btn.active, .filter-btn:hover { color:var(--green-light); border-color:rgba(74,138,66,0.4); background:rgba(45,90,39,0.08); }
+
+    .day-section { padding:24px 24px 8px; }
+    .day-header { font-size:7px; letter-spacing:0.25em; color:var(--muted); margin-bottom:12px; padding-bottom:8px; border-bottom:1px solid var(--border); }
+    .day-header span { color:var(--green-light); }
+
+    .market-row { display:flex; align-items:stretch; border:1px solid var(--border-mid); text-decoration:none; margin-bottom:8px; transition:border-color 0.15s,background 0.15s; }
+    .market-row:hover { border-color:rgba(74,138,66,0.4); background:rgba(45,90,39,0.05); }
+    .market-row:hover .row-arrow { color:var(--green-light); }
+    .market-row.featured { border-color:rgba(74,138,66,0.3); }
+    .row-day { width:42px; flex-shrink:0; display:flex; align-items:center; justify-content:center; background:rgba(45,90,39,0.07); border-right:1px solid var(--border-mid); font-size:7px; letter-spacing:0.1em; color:var(--green-light); writing-mode:vertical-rl; padding:8px 4px; text-align:center; }
+    .row-info { flex:1; padding:11px 14px; }
+    .row-name { font-family:'Playfair Display',serif; font-size:14px; color:var(--cream); margin-bottom:2px; }
+    .row-meta { font-size:9px; color:var(--muted); line-height:1.6; }
+    .row-tags { display:flex; gap:4px; flex-wrap:wrap; margin-top:5px; }
+    .rtag { font-size:7px; letter-spacing:0.08em; padding:2px 6px; color:var(--muted); border:1px solid var(--border-mid); }
+    .rtag.green { color:var(--green-light); border-color:rgba(74,138,66,0.25); }
+    .rtag.yellow { color:#8a7a00; border-color:rgba(138,122,0,0.3); }
+    .row-arrow { display:flex; align-items:center; padding:0 12px; color:#2a2a2a; font-size:11px; flex-shrink:0; transition:color 0.15s; }
+
+    .seasonal-section { padding:24px; border-top:1px solid var(--border); border-bottom:1px solid var(--border); background:#0a0a08; }
+    .section-eyebrow { font-size:7px; letter-spacing:0.22em; color:var(--muted); margin-bottom:12px; }
+    .section-eyebrow span { color:var(--green-light); }
+    .season-grid { display:grid; grid-template-columns:1fr 1fr; gap:8px; }
+    .season-card { padding:10px 12px; border:1px solid var(--border); }
+    .season-month { font-size:7px; letter-spacing:0.15em; color:var(--green-light); margin-bottom:5px; }
+    .season-items { font-size:10px; color:#aaa; line-height:1.6; }
+
+    .operators-section { padding:24px; border-bottom:1px solid var(--border); }
+    .ops-grid { display:grid; grid-template-columns:1fr 1fr; gap:8px; margin-top:14px; }
+    .op-card { padding:12px; border:1px solid var(--border-mid); }
+    .op-name { font-size:10px; color:var(--cream); margin-bottom:3px; letter-spacing:0.05em; }
+    .op-detail { font-size:9px; color:var(--muted); line-height:1.55; }
+    .op-count { font-size:7px; letter-spacing:0.12em; color:var(--green-light); margin-top:6px; }
+
+    .horizon-section { padding:24px; background:#0a0a08; border-bottom:1px solid var(--border); }
+    .horizon-text { font-family:'Playfair Display',serif; font-size:14px; line-height:1.7; color:#bbb; max-width:420px; }
+    .horizon-text strong { color:var(--cream); font-style:italic; }
+
+    footer { padding:22px 24px; border-top:1px solid var(--border); display:flex; align-items:center; justify-content:space-between; }
+    .footer-logo { font-size:9px; letter-spacing:0.2em; color:#333; }
+    .footer-logo span { color:var(--red); }
+    .footer-link { font-size:9px; color:#444; text-decoration:none; }
+    .footer-link:hover { color:var(--muted); }
+
+    .market-row.hidden { display:none; }
+  </style>
+</head>
+<body>
+
+  <header>
+    <div class="logo-group">
+      <span class="logo-traced">TRACED</span>
+      <span class="logo-divider">/</span>
+      <span class="logo-local">Local</span>
+    </div>
+    <a href="index.html" class="back-link">← ALL CATEGORIES</a>
+  </header>
+
+  <section class="hero">
+    <div class="hero-eyebrow">↑ TRACED LOCAL · SAN FRANCISCO</div>
+    <h1 class="hero-title">Farmers<br>Markets</h1>
+    <p class="hero-sub">
+      Every certified farmers market in San Francisco — hours, vendors, what's in season, and food assistance programs. From California's oldest market at Alemany to Thursday evening shopping in the Mission.<br><br>
+      <strong>17 markets. 7 days a week. Year-round and seasonal.</strong>
+    </p>
+    <div class="hero-stats">
+      <div><span class="stat-num">17</span><span class="stat-label">MARKETS</span></div>
+      <div><span class="stat-num">4</span><span class="stat-label">OPERATORS</span></div>
+      <div><span class="stat-num">7</span><span class="stat-label">DAYS COVERED</span></div>
+    </div>
+  </section>
+
+  <div class="filter-bar">
+    <span class="filter-label">FILTER →</span>
+    <button class="filter-btn active" onclick="filterDay('all',this)">ALL</button>
+    <button class="filter-btn" onclick="filterDay('sat',this)">SAT</button>
+    <button class="filter-btn" onclick="filterDay('sun',this)">SUN</button>
+    <button class="filter-btn" onclick="filterDay('tue',this)">TUE</button>
+    <button class="filter-btn" onclick="filterDay('wed',this)">WED</button>
+    <button class="filter-btn" onclick="filterDay('thu',this)">THU</button>
+  </div>
+
+  <!-- SATURDAY -->
+  <div class="day-section">
+    <div class="day-header">SATURDAY <span>— 6 MARKETS</span></div>
+
+    <a href="alemany.html" class="market-row featured" data-days="sat">
+      <div class="row-day">SAT</div>
+      <div class="row-info">
+        <div class="row-name">Alemany Farmers Market</div>
+        <div class="row-meta">100 Alemany Blvd · Bernal Heights · 6:00 AM – 3:00 PM · Year-round</div>
+        <div class="row-tags"><span class="rtag green">OLDEST IN CA · EST. 1943</span><span class="rtag green">EBT · MARKET MATCH</span><span class="rtag">75–90 VENDORS</span><span class="rtag">FREE PARKING</span></div>
+      </div>
+      <div class="row-arrow">→</div>
+    </a>
+
+    <a href="ferry-plaza.html" class="market-row featured" data-days="sat tue thu">
+      <div class="row-day">SAT<br>TUE<br>THU</div>
+      <div class="row-info">
+        <div class="row-name">Ferry Plaza Farmers Market</div>
+        <div class="row-meta">Ferry Building, Embarcadero · Sat 8 AM–2 PM · Tue & Thu 10 AM–2 PM · Year-round</div>
+        <div class="row-tags"><span class="rtag green">100+ VENDORS SAT</span><span class="rtag green">EBT · MARKET MATCH</span><span class="rtag">FOODWISE</span></div>
+      </div>
+      <div class="row-arrow">→</div>
+    </a>
+
+    <a href="fillmore.html" class="market-row" data-days="sat">
+      <div class="row-day">SAT</div>
+      <div class="row-info">
+        <div class="row-name">Fillmore Farmers Market</div>
+        <div class="row-meta">1730 O'Farrell St · Western Addition · 9:00 AM – 1:00 PM · Year-round</div>
+        <div class="row-tags"><span class="rtag green">LIVE JAZZ WEEKLY</span><span class="rtag green">EBT · WIC</span><span class="rtag">~14 VENDORS</span></div>
+      </div>
+      <div class="row-arrow">→</div>
+    </a>
+
+    <a href="noe-valley.html" class="market-row" data-days="sat">
+      <div class="row-day">SAT</div>
+      <div class="row-info">
+        <div class="row-name">Noe Valley Farmers Market</div>
+        <div class="row-meta">3861 24th St · Noe Valley Town Square · 8:00 AM – 1:00 PM · Year-round</div>
+        <div class="row-tags"><span class="rtag green">EBT ACCEPTED</span><span class="rtag">LIVE MUSIC</span><span class="rtag">EST. 2003</span></div>
+      </div>
+      <div class="row-arrow">→</div>
+    </a>
+
+    <a href="north-beach.html" class="market-row" data-days="sat">
+      <div class="row-day">SAT</div>
+      <div class="row-info">
+        <div class="row-name">North Beach Farmers Market</div>
+        <div class="row-meta">659 Columbus Ave · North Beach · 9:00 AM – 1:00 PM · Seasonal May–Nov</div>
+        <div class="row-tags"><span class="rtag yellow">SEASONAL: MAY–NOV</span><span class="rtag green">EBT ACCEPTED</span></div>
+      </div>
+      <div class="row-arrow">→</div>
+    </a>
+
+    <a href="soma-west.html" class="market-row" data-days="sat">
+      <div class="row-day">SAT</div>
+      <div class="row-info">
+        <div class="row-name">SOMA West Farmers Market</div>
+        <div class="row-meta">398 12th St · SoMa · 9:00 AM – 1:00 PM · Seasonal Jul–Nov</div>
+        <div class="row-tags"><span class="rtag yellow">SEASONAL: JUL–NOV</span><span class="rtag green">EBT ACCEPTED</span></div>
+      </div>
+      <div class="row-arrow">→</div>
+    </a>
+  </div>
+
+  <!-- SUNDAY -->
+  <div class="day-section">
+    <div class="day-header">SUNDAY <span>— 7 MARKETS</span></div>
+
+    <a href="clement-street.html" class="market-row featured" data-days="sun">
+      <div class="row-day">SUN</div>
+      <div class="row-info">
+        <div class="row-name">Clement Street Farmers Market</div>
+        <div class="row-meta">200 Clement St · Inner Richmond · 9:00 AM – 2:00 PM · Year-round · 3 city blocks</div>
+        <div class="row-tags"><span class="rtag green">60+ VENDORS</span><span class="rtag green">EBT · MARKET MATCH</span><span class="rtag">3 EXCLUSIVE BAKERIES</span></div>
+      </div>
+      <div class="row-arrow">→</div>
+    </a>
+
+    <a href="divisadero.html" class="market-row" data-days="sun">
+      <div class="row-day">SUN</div>
+      <div class="row-info">
+        <div class="row-name">Divisadero Farmers Market</div>
+        <div class="row-meta">1377 Fell St (DMV lot) · Lower Haight · 9:00 AM – 1:00 PM · Year-round</div>
+        <div class="row-tags"><span class="rtag green">EBT · WIC</span><span class="rtag">PANHANDLE ADJACENT</span></div>
+      </div>
+      <div class="row-arrow">→</div>
+    </a>
+
+    <a href="fort-mason.html" class="market-row featured" data-days="sun">
+      <div class="row-day">SUN</div>
+      <div class="row-info">
+        <div class="row-name">Fort Mason Farmers Market</div>
+        <div class="row-meta">Fort Mason Center · Marina · 9:30 AM – 1:30 PM · Year-round</div>
+        <div class="row-tags"><span class="rtag green">EBT ACCEPTED</span><span class="rtag">BAY VIEWS</span><span class="rtag">35+ VENDORS</span></div>
+      </div>
+      <div class="row-arrow">→</div>
+    </a>
+
+    <a href="heart-of-city.html" class="market-row featured" data-days="sun wed">
+      <div class="row-day">SUN<br>WED</div>
+      <div class="row-info">
+        <div class="row-name">Heart of the City</div>
+        <div class="row-meta">Fulton Plaza · Civic Center · 7:00 AM – 4:00 PM · Year-round</div>
+        <div class="row-tags"><span class="rtag green">$4M+ FOOD ASSISTANCE/YR</span><span class="rtag green">EBT · MARKET MATCH · WIC</span><span class="rtag">BART</span></div>
+      </div>
+      <div class="row-arrow">→</div>
+    </a>
+
+    <a href="inner-sunset.html" class="market-row" data-days="sun">
+      <div class="row-day">SUN</div>
+      <div class="row-info">
+        <div class="row-name">Inner Sunset Farmers Market</div>
+        <div class="row-meta">1315 8th Ave · Inner Sunset · 9:00 AM – 1:00 PM · Year-round</div>
+        <div class="row-tags"><span class="rtag green">EBT · WIC</span><span class="rtag">FAMILY MARKET</span></div>
+      </div>
+      <div class="row-arrow">→</div>
+    </a>
+
+    <a href="outer-sunset.html" class="market-row" data-days="sun">
+      <div class="row-day">SUN</div>
+      <div class="row-info">
+        <div class="row-name">Outer Sunset Farmers Market & Mercantile</div>
+        <div class="row-meta">37th Ave btw Ortega & Pacheco · 9:00 AM – 2:00 PM · Year-round</div>
+        <div class="row-tags"><span class="rtag green">EBT ACCEPTED</span><span class="rtag">100 VENDORS</span><span class="rtag">LIVE MUSIC</span><span class="rtag">ART + FOOD</span></div>
+      </div>
+      <div class="row-arrow">→</div>
+    </a>
+
+    <a href="stonestown.html" class="market-row" data-days="sun">
+      <div class="row-day">SUN</div>
+      <div class="row-info">
+        <div class="row-name">Stonestown Farmers Market</div>
+        <div class="row-meta">501 Buckingham Way · West SF · 9:00 AM – 1:00 PM · Year-round</div>
+        <div class="row-tags"><span class="rtag green">EBT · MARKET MATCH</span><span class="rtag">FREE PARKING</span><span class="rtag">FAMILY MARKET</span></div>
+      </div>
+      <div class="row-arrow">→</div>
+    </a>
+  </div>
+
+  <!-- TUESDAY -->
+  <div class="day-section">
+    <div class="day-header">TUESDAY <span>— 1 MARKET</span></div>
+    <a href="ferry-plaza.html" class="market-row" data-days="tue">
+      <div class="row-day">TUE</div>
+      <div class="row-info">
+        <div class="row-name">Ferry Plaza Farmers Market</div>
+        <div class="row-meta">Ferry Building · 10:00 AM – 2:00 PM · Year-round · Weekday market</div>
+        <div class="row-tags"><span class="rtag green">EBT · MARKET MATCH</span><span class="rtag">15–35 VENDORS</span></div>
+      </div>
+      <div class="row-arrow">→</div>
+    </a>
+  </div>
+
+  <!-- WEDNESDAY -->
+  <div class="day-section">
+    <div class="day-header">WEDNESDAY <span>— 2 MARKETS</span></div>
+    <a href="castro.html" class="market-row" data-days="wed">
+      <div class="row-day">WED</div>
+      <div class="row-info">
+        <div class="row-name">Castro Farmers Market</div>
+        <div class="row-meta">Noe St at Market St · Castro · 3:00 PM – 7:00 PM · Seasonal Mar–Nov</div>
+        <div class="row-tags"><span class="rtag yellow">SEASONAL: MAR–NOV</span><span class="rtag green">EBT · WIC</span><span class="rtag">EVENING MARKET</span></div>
+      </div>
+      <div class="row-arrow">→</div>
+    </a>
+    <a href="heart-of-city.html" class="market-row" data-days="wed">
+      <div class="row-day">WED</div>
+      <div class="row-info">
+        <div class="row-name">Heart of the City</div>
+        <div class="row-meta">Fulton Plaza · Civic Center · 7:00 AM – 4:00 PM · Year-round</div>
+        <div class="row-tags"><span class="rtag green">EBT · MARKET MATCH · WIC</span><span class="rtag">BART</span></div>
+      </div>
+      <div class="row-arrow">→</div>
+    </a>
+  </div>
+
+  <!-- THURSDAY -->
+  <div class="day-section" style="padding-bottom:24px;">
+    <div class="day-header">THURSDAY <span>— 3 MARKETS</span></div>
+    <a href="ferry-plaza.html" class="market-row" data-days="thu">
+      <div class="row-day">THU</div>
+      <div class="row-info">
+        <div class="row-name">Ferry Plaza Farmers Market</div>
+        <div class="row-meta">Ferry Building · 10:00 AM – 2:00 PM · Year-round</div>
+        <div class="row-tags"><span class="rtag green">EBT · MARKET MATCH</span></div>
+      </div>
+      <div class="row-arrow">→</div>
+    </a>
+    <a href="mission-community.html" class="market-row" data-days="thu">
+      <div class="row-day">THU</div>
+      <div class="row-info">
+        <div class="row-name">Mission Community Market</div>
+        <div class="row-meta">84 Bartlett St · Mission · 3:00 PM – 7:00 PM · Seasonal Mar–Nov</div>
+        <div class="row-tags"><span class="rtag yellow">SEASONAL: MAR–NOV</span><span class="rtag green">EBT · MARKET MATCH</span><span class="rtag">EVENING</span></div>
+      </div>
+      <div class="row-arrow">→</div>
+    </a>
+    <a href="dragonspunk.html" class="market-row" data-days="thu">
+      <div class="row-day">THU</div>
+      <div class="row-info">
+        <div class="row-name">Dragonspunk Farmers Market</div>
+        <div class="row-meta">1550 Evans Ave · Bayview · 3:00 PM – 7:30 PM</div>
+        <div class="row-tags"><span class="rtag green">EBT ACCEPTED</span><span class="rtag">FOOD JUSTICE</span><span class="rtag">BAYVIEW</span></div>
+      </div>
+      <div class="row-arrow">→</div>
+    </a>
+  </div>
+
+  <!-- SEASONAL GUIDE -->
+  <section class="seasonal-section">
+    <div class="section-eyebrow">WHAT'S IN SEASON · <span>BAY AREA · NOW</span></div>
+    <div class="season-grid">
+      <div class="season-card">
+        <div class="season-month">FEB – MAR</div>
+        <div class="season-items">Citrus · Blood oranges · Meyer lemons · Kale & chard · Brassicas · Root vegetables · Leeks · Mushrooms · Dungeness crab</div>
+      </div>
+      <div class="season-card">
+        <div class="season-month">COMING SOON</div>
+        <div class="season-items">Strawberries (Mar) · Asparagus · Artichokes · Fava beans · Spring onions · English peas · Radishes</div>
+      </div>
+      <div class="season-card">
+        <div class="season-month">SUMMER PEAK</div>
+        <div class="season-items">Dry-farmed tomatoes · Peaches · Corn · Peppers · Melons · Eggplant · Basil · Figs · Cucumbers</div>
+      </div>
+      <div class="season-card">
+        <div class="season-month">FALL</div>
+        <div class="season-items">Apples · Winter squash · Pears · Pomegranates · Persimmons · Brussels sprouts · Cauliflower</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- OPERATORS -->
+  <section class="operators-section">
+    <div class="section-eyebrow">MARKET OPERATORS · <span>WHO RUNS WHAT</span></div>
+    <div class="ops-grid">
+      <div class="op-card">
+        <div class="op-name">Foodwise</div>
+        <div class="op-detail">Nonprofit. Runs Ferry Plaza, Alemany, Mission Community. Education and food access focus.</div>
+        <div class="op-count">3 MARKETS</div>
+      </div>
+      <div class="op-card">
+        <div class="op-name">PCFMA</div>
+        <div class="op-detail">Pacific Coast Farmers' Market Assoc. Fillmore, Divisadero, Inner Sunset, Castro, Noe Valley, North Beach.</div>
+        <div class="op-count">6 MARKETS</div>
+      </div>
+      <div class="op-card">
+        <div class="op-name">AIM</div>
+        <div class="op-detail">Agricultural Institute of Marin. Clement Street, Stonestown. Known for exclusive baker and specialty vendor programs.</div>
+        <div class="op-count">2 MARKETS</div>
+      </div>
+      <div class="op-card">
+        <div class="op-name">Community / Independent</div>
+        <div class="op-detail">Heart of the City (farmer-run nonprofit), Outer Sunset, Dragonspunk, Fort Mason (CAFF), SOMA West.</div>
+        <div class="op-count">5 MARKETS</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- HORIZON -->
+  <section class="horizon-section">
+    <div class="section-eyebrow">TRACED LOCAL · <span>NEXT</span></div>
+    <p class="horizon-text">
+      San Francisco is the demo. The same depth of vendor profiles, operator history, and seasonal guides is being built for <strong>Los Angeles, Oakland, Berkeley, Marin, and the Central Coast</strong> — and eventually every major market in California. The goal is a single source of truth for the American farmers market system.
+    </p>
+  </section>
+
+  <footer>
+    <div class="footer-logo"><span>TRACED</span> / LOCAL</div>
+    <a href="index.html" class="footer-link">← all categories</a>
+  </footer>
+
+  <script>
+    function filterDay(day, btn) {
+      document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      document.querySelectorAll('.market-row').forEach(row => {
+        if (day === 'all') { row.classList.remove('hidden'); return; }
+        const days = row.dataset.days || '';
+        row.classList.toggle('hidden', !days.includes(day));
+      });
+      document.querySelectorAll('.day-section').forEach(sec => {
+        const visible = sec.querySelectorAll('.market-row:not(.hidden)').length;
+        sec.style.display = (day !== 'all' && visible === 0) ? 'none' : '';
+      });
+    }
+  </script>
+</body>
+</html>
