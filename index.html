@@ -1,742 +1,167 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Traced Local — Find Real Food Near You</title>
-  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=IBM+Plex+Mono:wght@300;400;500&display=swap" rel="stylesheet">
-  <style>
-    :root {
-      --black: #080806;
-      --cream: #f0ede4;
-      --red: #c8392b;
-      --green: #2d5a27;
-      --green-light: #4a8a42;
-      --muted: #8a8678;
-      --border: #1e1e1a;
-      --border-mid: #222;
-    }
-
-    * { margin: 0; padding: 0; box-sizing: border-box; }
-
-    body {
-      background: var(--black);
-      color: var(--cream);
-      font-family: 'IBM Plex Mono', monospace;
-      min-height: 100vh;
-      overflow-x: hidden;
-    }
-
-    /* ── HEADER ── */
-    header {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      padding: 20px 24px;
-      border-bottom: 1px solid var(--border);
-      position: sticky;
-      top: 0;
-      background: var(--black);
-      z-index: 100;
-    }
-
-    .logo-group {
-      display: flex;
-      align-items: baseline;
-      gap: 10px;
-    }
-
-    .logo-traced {
-      font-size: 13px;
-      letter-spacing: 0.25em;
-      color: var(--red);
-      font-weight: 500;
-    }
-
-    .logo-divider { color: var(--border); font-size: 13px; }
-
-    .logo-local {
-      font-family: 'Playfair Display', serif;
-      font-size: 18px;
-      color: var(--cream);
-      letter-spacing: 0.05em;
-    }
-
-    .back-link {
-      font-size: 9px;
-      letter-spacing: 0.18em;
-      color: var(--muted);
-      text-decoration: none;
-      border: 1px solid var(--border);
-      padding: 6px 12px;
-      transition: color 0.2s, border-color 0.2s;
-    }
-
-    .back-link:hover { color: var(--cream); border-color: #444; }
-
-    /* ── HERO ── */
-    .hero {
-      padding: 56px 24px 44px;
-      border-bottom: 1px solid var(--border);
-      position: relative;
-      overflow: hidden;
-    }
-
-    .hero::before {
-      content: '';
-      position: absolute;
-      top: -40px; right: -60px;
-      width: 300px; height: 300px;
-      background: radial-gradient(circle, rgba(45,90,39,0.12) 0%, transparent 70%);
-      pointer-events: none;
-    }
-
-    .hero-eyebrow {
-      font-size: 8px;
-      letter-spacing: 0.25em;
-      color: var(--green-light);
-      margin-bottom: 16px;
-    }
-
-    .hero-headline {
-      font-family: 'Playfair Display', serif;
-      font-size: clamp(30px, 8vw, 50px);
-      line-height: 1.1;
-      color: var(--cream);
-      margin-bottom: 20px;
-      max-width: 420px;
-    }
-
-    .hero-headline em {
-      font-style: italic;
-      color: var(--green-light);
-    }
-
-    .hero-sub {
-      font-size: 12px;
-      color: var(--muted);
-      line-height: 1.7;
-      max-width: 360px;
-      margin-bottom: 28px;
-    }
-
-    .hero-sub strong { color: var(--cream); font-weight: 400; }
-
-    .hero-stats {
-      display: flex;
-      gap: 24px;
-      flex-wrap: wrap;
-    }
-
-    .stat-num {
-      font-family: 'Playfair Display', serif;
-      font-size: 22px;
-      color: var(--cream);
-      display: block;
-    }
-
-    .stat-label {
-      font-size: 7px;
-      letter-spacing: 0.18em;
-      color: var(--muted);
-      margin-top: 2px;
-      display: block;
-    }
-
-    /* ── BRIDGE ── */
-    .bridge {
-      padding: 28px 24px;
-      border-bottom: 1px solid var(--border);
-      background: #0a0a08;
-    }
-
-    .bridge-label {
-      font-size: 7px;
-      letter-spacing: 0.22em;
-      color: var(--red);
-      margin-bottom: 10px;
-    }
-
-    .bridge-text {
-      font-family: 'Playfair Display', serif;
-      font-size: 15px;
-      line-height: 1.65;
-      color: #bbb;
-      max-width: 400px;
-    }
-
-    .bridge-text strong { color: var(--cream); font-style: italic; }
-
-    /* ── CATEGORY NAV ── */
-    .categories-section {
-      padding: 36px 24px 28px;
-      border-bottom: 1px solid var(--border);
-    }
-
-    .section-eyebrow {
-      font-size: 7px;
-      letter-spacing: 0.25em;
-      color: var(--muted);
-      margin-bottom: 20px;
-    }
-
-    .section-eyebrow span { color: var(--green-light); }
-
-    .category-grid {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 10px;
-    }
-
-    .category-card {
-      display: block;
-      text-decoration: none;
-      border: 1px solid var(--border-mid);
-      padding: 18px 16px;
-      position: relative;
-      overflow: hidden;
-      transition: border-color 0.2s, background 0.2s;
-      background: rgba(255,255,255,0.01);
-    }
-
-    .category-card:hover {
-      border-color: rgba(74,138,66,0.45);
-      background: rgba(45,90,39,0.06);
-    }
-
-    .category-card:hover .cat-arrow { color: var(--green-light); }
-
-    .category-card.wide {
-      grid-column: span 2;
-    }
-
-    .cat-icon {
-      font-size: 20px;
-      margin-bottom: 10px;
-      display: block;
-    }
-
-    .cat-name {
-      font-family: 'Playfair Display', serif;
-      font-size: 15px;
-      color: var(--cream);
-      margin-bottom: 4px;
-      line-height: 1.2;
-    }
-
-    .cat-desc {
-      font-size: 9px;
-      color: var(--muted);
-      line-height: 1.55;
-      margin-bottom: 10px;
-    }
-
-    .cat-meta {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-    }
-
-    .cat-count {
-      font-size: 8px;
-      letter-spacing: 0.12em;
-      color: var(--green-light);
-      border: 1px solid rgba(74,138,66,0.25);
-      padding: 2px 8px;
-    }
-
-    .cat-arrow {
-      font-size: 11px;
-      color: #333;
-      transition: color 0.2s;
-    }
-
-    /* ── FEATURED MARKETS STRIP ── */
-    .featured-section {
-      padding: 32px 24px;
-      border-bottom: 1px solid var(--border);
-    }
-
-    .section-header {
-      display: flex;
-      align-items: baseline;
-      justify-content: space-between;
-      margin-bottom: 18px;
-    }
-
-    .section-label {
-      font-size: 7px;
-      letter-spacing: 0.22em;
-      color: var(--muted);
-    }
-
-    .section-label span { color: var(--green-light); }
-
-    .section-link {
-      font-size: 8px;
-      letter-spacing: 0.12em;
-      color: var(--green-light);
-      text-decoration: none;
-      border-bottom: 1px solid rgba(74,138,66,0.3);
-    }
-
-    /* MARKET ROW */
-    .market-row {
-      display: flex;
-      align-items: stretch;
-      border: 1px solid var(--border-mid);
-      text-decoration: none;
-      margin-bottom: 8px;
-      transition: border-color 0.15s, background 0.15s;
-    }
-
-    .market-row:hover { border-color: rgba(74,138,66,0.4); background: rgba(45,90,39,0.05); }
-    .market-row:hover .row-arrow { color: var(--green-light); }
-    .market-row.featured { border-color: rgba(74,138,66,0.3); }
-
-    .row-day {
-      width: 42px;
-      flex-shrink: 0;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      background: rgba(45,90,39,0.07);
-      border-right: 1px solid var(--border-mid);
-      font-size: 7px;
-      letter-spacing: 0.1em;
-      color: var(--green-light);
-      writing-mode: vertical-rl;
-      padding: 8px 4px;
-    }
-
-    .row-info { flex: 1; padding: 11px 14px; }
-
-    .row-name {
-      font-family: 'Playfair Display', serif;
-      font-size: 14px;
-      color: var(--cream);
-      margin-bottom: 2px;
-    }
-
-    .row-meta { font-size: 9px; color: var(--muted); line-height: 1.5; }
-
-    .row-tags {
-      display: flex;
-      gap: 4px;
-      flex-wrap: wrap;
-      margin-top: 5px;
-    }
-
-    .rtag {
-      font-size: 7px;
-      letter-spacing: 0.08em;
-      padding: 2px 6px;
-      color: var(--muted);
-      border: 1px solid var(--border-mid);
-    }
-
-    .rtag.green { color: var(--green-light); border-color: rgba(74,138,66,0.25); }
-    .rtag.yellow { color: #8a7a00; border-color: rgba(138,122,0,0.3); }
-
-    .row-arrow {
-      display: flex;
-      align-items: center;
-      padding: 0 12px;
-      color: #2a2a2a;
-      font-size: 11px;
-      flex-shrink: 0;
-      transition: color 0.15s;
-    }
-
-    /* ── SPOTLIGHT VENDORS ── */
-    .spotlight-section {
-      padding: 32px 24px;
-      border-bottom: 1px solid var(--border);
-      background: #0a0a08;
-    }
-
-    .vendor-grid {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 8px;
-      margin-top: 16px;
-    }
-
-    .vendor-tile {
-      border: 1px solid var(--border-mid);
-      padding: 14px 12px;
-      text-decoration: none;
-      display: block;
-      transition: border-color 0.15s;
-    }
-
-    .vendor-tile:hover { border-color: rgba(74,138,66,0.35); }
-
-    .vt-category {
-      font-size: 7px;
-      letter-spacing: 0.15em;
-      color: var(--red);
-      margin-bottom: 6px;
-    }
-
-    .vt-name {
-      font-family: 'Playfair Display', serif;
-      font-size: 14px;
-      color: var(--cream);
-      line-height: 1.2;
-      margin-bottom: 4px;
-    }
-
-    .vt-note { font-size: 9px; color: var(--muted); line-height: 1.4; }
-
-    /* ── SEASONAL STRIP ── */
-    .seasonal-strip {
-      padding: 20px 24px;
-      border-bottom: 1px solid var(--border);
-      display: flex;
-      gap: 6px;
-      flex-wrap: wrap;
-      align-items: center;
-    }
-
-    .seasonal-label {
-      font-size: 7px;
-      letter-spacing: 0.2em;
-      color: var(--muted);
-      margin-right: 8px;
-    }
-
-    .season-tag {
-      font-size: 9px;
-      color: #8a7a00;
-      border: 1px solid rgba(138,122,0,0.25);
-      padding: 3px 9px;
-    }
-
-    /* ── NOTIFY ── */
-    .notify-section {
-      padding: 32px 24px;
-      border-top: 1px solid var(--border);
-      background: #0a0a08;
-    }
-
-    .notify-label {
-      font-size: 8px;
-      letter-spacing: 0.22em;
-      color: var(--muted);
-      margin-bottom: 8px;
-    }
-
-    .notify-headline {
-      font-family: 'Playfair Display', serif;
-      font-size: 20px;
-      color: var(--cream);
-      margin-bottom: 6px;
-      line-height: 1.3;
-    }
-
-    .notify-sub {
-      font-size: 10px;
-      color: var(--muted);
-      margin-bottom: 20px;
-      line-height: 1.6;
-    }
-
-    .notify-form { display: flex; gap: 0; }
-
-    .notify-input {
-      flex: 1;
-      background: #0d0d0b;
-      border: 1px solid #222;
-      border-right: none;
-      color: var(--cream);
-      font-family: 'IBM Plex Mono', monospace;
-      font-size: 12px;
-      padding: 12px 14px;
-      outline: none;
-    }
-
-    .notify-input::placeholder { color: #333; }
-    .notify-input:focus { border-color: #333; }
-
-    .notify-btn {
-      background: var(--green);
-      border: none;
-      color: var(--cream);
-      font-family: 'IBM Plex Mono', monospace;
-      font-size: 9px;
-      letter-spacing: 0.15em;
-      padding: 12px 16px;
-      cursor: pointer;
-      transition: background 0.2s;
-      white-space: nowrap;
-    }
-
-    .notify-btn:hover { background: var(--green-light); }
-
-    /* ── FOOTER ── */
-    footer {
-      padding: 22px 24px;
-      border-top: 1px solid var(--border);
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-    }
-
-    .footer-logo { font-size: 9px; letter-spacing: 0.2em; color: #333; }
-    .footer-logo span { color: var(--red); }
-    .footer-link { font-size: 9px; letter-spacing: 0.15em; color: #444; text-decoration: none; }
-    .footer-link:hover { color: var(--muted); }
-  </style>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Daily Mind Games Directory</title>
+<link rel="icon" href="./logo.png">
+<style>
+body{
+  margin:0;
+  font-family:system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial;
+  background:#0b0b0c;
+  color:#f5f5f8;
+}
+.wrap{max-width:1100px;margin:0 auto;padding:24px}
+header{
+ display:flex;
+ justify-content:space-between;
+ align-items:center;
+ border-bottom:1px solid #222;
+ padding-bottom:12px;
+}
+.brand{
+ display:flex;
+ gap:12px;
+ align-items:center;
+ text-decoration:none;
+ color:inherit;
+}
+.logo{width:44px;height:44px;border-radius:12px}
+.right{display:flex;gap:8px}
+.btn{
+ padding:8px 12px;
+ border-radius:12px;
+ border:1px solid #333;
+ background:#18181c;
+ color:#eee;
+ cursor:pointer;
+}
+.grid{margin-top:18px}
+.card{
+ background:#141418;
+ border-radius:16px;
+ border:1px solid #262630;
+ padding:14px;
+ margin-bottom:14px;
+}
+input{
+ width:100%;
+ padding:10px;
+ border-radius:12px;
+ border:1px solid #333;
+ background:#0e0e12;
+ color:white;
+}
+.game{
+ margin-top:10px;
+ padding:12px;
+ border-radius:14px;
+ border:1px solid #333;
+ background:#101014;
+ transition:.15s;
+}
+.game:hover{
+ transform:translateY(-3px);
+ border-color:#555;
+}
+mark{
+ background:rgba(255,255,255,.2);
+ border-radius:4px;
+ padding:2px 4px;
+}
+</style>
 </head>
+
 <body>
+<div class="wrap">
 
-  <!-- HEADER -->
-  <header>
-    <div class="logo-group">
-      <span class="logo-traced">TRACED</span>
-      <span class="logo-divider">/</span>
-      <span class="logo-local">Local</span>
-    </div>
-    <a href="https://traced-app.vercel.app" class="back-link">← BACK TO SCANNER</a>
-  </header>
+<header>
+<a href="./" class="brand">
+<img src="./logo.png" class="logo">
+<div>
+<h2 style="margin:0">Daily Mind Games Directory</h2>
+<div style="opacity:.6">One bookmark for your daily puzzle routine.</div>
+</div>
+</a>
 
-  <!-- HERO -->
-  <section class="hero">
-    <div class="hero-eyebrow">↑ THE EXIT RAMP FROM BIG FOOD</div>
-    <h1 class="hero-headline">
-      Now find <em>real food</em><br>near you.
-    </h1>
-    <p class="hero-sub">
-      You scanned the label. You know who owns it.<br><br>
-      <strong>Traced Local</strong> is the Bay Area directory for farmers markets, butchers, fishmongers, specialty producers, and independent grocers — the food system the scanner can't reach.
-    </p>
-    <div class="hero-stats">
-      <div>
-        <span class="stat-num">17</span>
-        <span class="stat-label">SF MARKETS</span>
-      </div>
-      <div>
-        <span class="stat-num">5</span>
-        <span class="stat-label">CATEGORIES</span>
-      </div>
-      <div>
-        <span class="stat-num">SF</span>
-        <span class="stat-label">LAUNCHING HERE</span>
-      </div>
-    </div>
-  </section>
+<div class="right">
+<button class="btn" id="clear">Clear search</button>
+</div>
+</header>
 
-  <!-- BRIDGE -->
-  <section class="bridge">
-    <div class="bridge-label">WHY THIS EXISTS</div>
-    <p class="bridge-text">
-      Traced tells you what <strong>isn't on the label</strong>. Traced Local tells you where to find food that doesn't need explaining.
-    </p>
-  </section>
+<div class="grid">
 
-  <!-- CATEGORIES -->
-  <section class="categories-section">
-    <div class="section-eyebrow">BROWSE BY CATEGORY · <span>SAN FRANCISCO</span></div>
+<div class="card">
+<label>Search</label>
+<input id="search" placeholder="Try: chess, wordle, sudoku">
+</div>
 
-    <div class="category-grid">
+<div class="card">
+<div id="games"></div>
+</div>
 
-      <!-- Farmers Markets — wide card, flagship -->
-      <a href="farmers-markets.html" class="category-card wide">
-        <span class="cat-icon">🌾</span>
-        <div class="cat-name">Farmers Markets</div>
-        <div class="cat-desc">Every certified market in SF — hours, vendors, what's in season, and food assistance programs. From Alemany (1943) to evening markets in the Mission.</div>
-        <div class="cat-meta">
-          <span class="cat-count">17 MARKETS PROFILED</span>
-          <span class="cat-arrow">→</span>
-        </div>
-      </a>
+</div>
+</div>
 
-      <!-- Butchers -->
-      <a href="butchers.html" class="category-card">
-        <span class="cat-icon">🥩</span>
-        <div class="cat-name">Butchers</div>
-        <div class="cat-desc">Independent butchers sourcing whole animals from local ranchers. Nose-to-tail, humanely raised, no feedlot.</div>
-        <div class="cat-meta">
-          <span class="cat-count">COMING SOON</span>
-          <span class="cat-arrow">→</span>
-        </div>
-      </a>
+<script>
+(function(){
 
-      <!-- Seafood -->
-      <a href="seafood.html" class="category-card">
-        <span class="cat-icon">🐟</span>
-        <div class="cat-name">Seafood Markets</div>
-        <div class="cat-desc">Fishmongers and boat-to-table sources. Day boat catch, sustainable harvest, and wild Bay Area species.</div>
-        <div class="cat-meta">
-          <span class="cat-count">COMING SOON</span>
-          <span class="cat-arrow">→</span>
-        </div>
-      </a>
+const games=[
+{name:"Chess.com Daily Puzzle",desc:"One tactical chess puzzle each day."},
+{name:"Lichess Daily Puzzle",desc:"Daily tactics challenge on Lichess."},
+{name:"Wordle",desc:"Guess the daily five‑letter word."},
+{name:"NYT Crossword",desc:"Classic crossword challenge."}
+];
 
-      <!-- Specialty Goods -->
-      <a href="specialty-goods.html" class="category-card">
-        <span class="cat-icon">🫙</span>
-        <div class="cat-name">Specialty Goods</div>
-        <div class="cat-desc">Olive oil, chocolate, bread, cheese, honey, vinegar, and other single-ingredient producers doing one thing exceptionally.</div>
-        <div class="cat-meta">
-          <span class="cat-count">COMING SOON</span>
-          <span class="cat-arrow">→</span>
-        </div>
-      </a>
+const search=document.getElementById("search");
+const gamesDiv=document.getElementById("games");
 
-      <!-- Specialty Grocery -->
-      <a href="specialty-grocery.html" class="category-card wide">
-        <span class="cat-icon">🏪</span>
-        <div class="cat-name">Specialty Grocery</div>
-        <div class="cat-desc">Independent grocers — Bi-Rite, Rainbow Grocery, Gus's, and others — that buy from local producers, pay fair prices, and tell you where the food comes from.</div>
-        <div class="cat-meta">
-          <span class="cat-count">COMING SOON</span>
-          <span class="cat-arrow">→</span>
-        </div>
-      </a>
+function highlight(text,q){
+ if(!q)return text;
+ const safe=q.replace(/[.*+?^${}()|[\]\\]/g,'\\$&');
+ return text.replace(new RegExp(`(${safe})`,'ig'),"<mark>$1</mark>");
+}
 
-    </div>
-  </section>
+function render(){
 
-  <!-- FEATURED MARKETS -->
-  <section class="featured-section">
-    <div class="section-header">
-      <div class="section-label">FEATURED MARKETS · <span>THIS WEEKEND</span></div>
-      <a href="farmers-markets.html" class="section-link">ALL 17 MARKETS →</a>
-    </div>
+ const q=search.value.trim().toLowerCase();
 
-    <a href="alemany.html" class="market-row featured">
-      <div class="row-day">SAT</div>
-      <div class="row-info">
-        <div class="row-name">Alemany Farmers Market</div>
-        <div class="row-meta">100 Alemany Blvd · 6 AM – 3 PM · Year-round · 75–90 vendors</div>
-        <div class="row-tags">
-          <span class="rtag green">OLDEST MARKET IN CA · 1943</span>
-          <span class="rtag green">EBT · MARKET MATCH</span>
-        </div>
-      </div>
-      <div class="row-arrow">→</div>
-    </a>
+ gamesDiv.innerHTML="";
 
-    <a href="ferry-plaza.html" class="market-row featured">
-      <div class="row-day">SAT<br>TUE<br>THU</div>
-      <div class="row-info">
-        <div class="row-name">Ferry Plaza Farmers Market</div>
-        <div class="row-meta">1 Ferry Building · Sat 8 AM–2 PM · Tue & Thu 10 AM–2 PM</div>
-        <div class="row-tags">
-          <span class="rtag green">100+ VENDORS SAT</span>
-          <span class="rtag green">EBT · MARKET MATCH</span>
-          <span class="rtag">FOODWISE OPERATED</span>
-        </div>
-      </div>
-      <div class="row-arrow">→</div>
-    </a>
+ games
+ .filter(g=>!q || g.name.toLowerCase().includes(q) || g.desc.toLowerCase().includes(q))
+ .forEach(g=>{
 
-    <a href="clement-street.html" class="market-row">
-      <div class="row-day">SUN</div>
-      <div class="row-info">
-        <div class="row-name">Clement Street Farmers Market</div>
-        <div class="row-meta">200 Clement St · 9 AM – 2 PM · 3 city blocks · 60+ vendors</div>
-        <div class="row-tags">
-          <span class="rtag green">3 EXCLUSIVE BAKERIES</span>
-          <span class="rtag">AIM OPERATED</span>
-        </div>
-      </div>
-      <div class="row-arrow">→</div>
-    </a>
+   const div=document.createElement("div");
+   div.className="game";
 
-    <a href="heart-of-city.html" class="market-row">
-      <div class="row-day">WED<br>SUN</div>
-      <div class="row-info">
-        <div class="row-name">Heart of the City</div>
-        <div class="row-meta">Fulton Plaza · 7 AM – 4 PM · Year-round · Farmer-run nonprofit</div>
-        <div class="row-tags">
-          <span class="rtag green">$4M+ FOOD ASSISTANCE/YR</span>
-          <span class="rtag">BART ACCESSIBLE</span>
-        </div>
-      </div>
-      <div class="row-arrow">→</div>
-    </a>
+   div.innerHTML=`
+     <div style="font-weight:700">
+       ${highlight(g.name,q)}
+     </div>
+     <div style="opacity:.7;margin-top:4px">
+       ${highlight(g.desc,q)}
+     </div>
+   `;
 
-    <a href="mission-community.html" class="market-row">
-      <div class="row-day">THU</div>
-      <div class="row-info">
-        <div class="row-name">Mission Community Market</div>
-        <div class="row-meta">84 Bartlett St · 3–7 PM · Seasonal Mar–Nov · Foodwise</div>
-        <div class="row-tags">
-          <span class="rtag yellow">SEASONAL</span>
-          <span class="rtag green">EBT · MARKET MATCH</span>
-          <span class="rtag">EVENING MARKET</span>
-        </div>
-      </div>
-      <div class="row-arrow">→</div>
-    </a>
+   gamesDiv.appendChild(div);
 
-  </section>
+ });
 
-  <!-- SPOTLIGHT VENDORS (teaser for other categories) -->
-  <section class="spotlight-section">
-    <div class="section-eyebrow">SPOTLIGHT · <span>LOCAL PRODUCERS</span></div>
-    <div class="vendor-grid">
+}
 
-      <div class="vendor-tile">
-        <div class="vt-category">BUTCHERS</div>
-        <div class="vt-name">Drewes Bros. Meats</div>
-        <div class="vt-note">California's oldest operating butcher. Est. 1889, Noe Valley. Whole-animal, local ranch sourcing.</div>
-      </div>
+search.addEventListener("input",render);
 
-      <div class="vendor-tile">
-        <div class="vt-category">SEAFOOD</div>
-        <div class="vt-name">H&H Fresh Fish</div>
-        <div class="vt-note">Clement Street market anchor. Day-boat catch, direct from Pillar Point and Bodega Bay.</div>
-      </div>
+document.getElementById("clear").onclick=()=>{
+ search.value="";
+ render();
+};
 
-      <div class="vendor-tile">
-        <div class="vt-category">SPECIALTY GOODS</div>
-        <div class="vt-name">Far West Fungi</div>
-        <div class="vt-note">Moss Landing growers. Lion's mane, maitake, reishi — at 6 SF markets weekly.</div>
-      </div>
+render();
 
-      <div class="vendor-tile">
-        <div class="vt-category">SPECIALTY GROCERY</div>
-        <div class="vt-name">Bi-Rite Market</div>
-        <div class="vt-note">Mission + Divisadero. The gold standard for SF independent grocery — every supplier named.</div>
-      </div>
-
-    </div>
-  </section>
-
-  <!-- SEASONAL STRIP -->
-  <div class="seasonal-strip">
-    <span class="seasonal-label">IN SEASON NOW · FEB/MAR →</span>
-    <span class="season-tag">Citrus</span>
-    <span class="season-tag">Blood Oranges</span>
-    <span class="season-tag">Meyer Lemons</span>
-    <span class="season-tag">Kale & Chard</span>
-    <span class="season-tag">Root Vegetables</span>
-    <span class="season-tag">Brassicas</span>
-    <span class="season-tag">Leeks</span>
-    <span class="season-tag">Mushrooms</span>
-    <span class="season-tag">Dungeness Crab ↑</span>
-  </div>
-
-  <!-- NOTIFY -->
-  <section class="notify-section">
-    <div class="notify-label">GET EARLY ACCESS</div>
-    <h2 class="notify-headline">New categories launching this spring.</h2>
-    <p class="notify-sub">Butchers, fishmongers, specialty goods, and independent grocers — all with the same depth as the markets directory. Enter your email to be notified.</p>
-    <div class="notify-form">
-      <input type="email" class="notify-input" placeholder="your@email.com" />
-      <button class="notify-btn">NOTIFY ME</button>
-    </div>
-  </section>
-
-  <!-- FOOTER -->
-  <footer>
-    <div class="footer-logo"><span>TRACED</span> / LOCAL</div>
-    <a href="https://traced-app.vercel.app" class="footer-link">traced-app.vercel.app →</a>
-  </footer>
+})();
+</script>
 
 </body>
 </html>
