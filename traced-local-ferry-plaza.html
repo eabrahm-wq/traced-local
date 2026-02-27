@@ -1,0 +1,562 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Ferry Plaza Farmers Market — Traced Local</title>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=IBM+Plex+Mono:wght@300;400;500&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --black: #080806;
+      --cream: #f0ede4;
+      --red: #c8392b;
+      --green: #2d5a27;
+      --green-light: #4a8a42;
+      --green-dim: rgba(45,90,39,0.08);
+      --muted: #8a8678;
+      --border: #1a1a16;
+      --border-mid: #222;
+    }
+    * { margin:0; padding:0; box-sizing:border-box; }
+    body {
+      background: var(--black);
+      color: var(--cream);
+      font-family: 'IBM Plex Mono', monospace;
+      min-height: 100vh;
+    }
+
+    /* ── HEADER ── */
+    header {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 18px 20px;
+      border-bottom: 1px solid var(--border);
+      position: sticky; top: 0; background: var(--black); z-index: 100;
+    }
+    .logo-group { display:flex; align-items:baseline; gap:8px; }
+    .logo-traced { font-size:12px; letter-spacing:0.25em; color:var(--red); font-weight:500; }
+    .logo-divider { color:#222; }
+    .logo-local { font-family:'Playfair Display',serif; font-size:17px; color:var(--cream); }
+    .back-link {
+      font-size:9px; letter-spacing:0.15em; color:var(--muted);
+      text-decoration:none; border:1px solid var(--border); padding:5px 10px;
+    }
+
+    /* ── MARKET HERO ── */
+    .market-hero {
+      padding: 32px 20px 24px;
+      border-bottom: 1px solid var(--border);
+      background: linear-gradient(180deg, rgba(45,90,39,0.05) 0%, transparent 100%);
+    }
+    .market-eyebrow {
+      font-size: 7px; letter-spacing:0.25em; color:var(--green-light); margin-bottom:10px;
+    }
+    .market-name {
+      font-family:'Playfair Display',serif;
+      font-size: clamp(24px,6vw,36px);
+      line-height:1.1; color:var(--cream); margin-bottom:6px;
+    }
+    .market-operator {
+      font-size:9px; letter-spacing:0.12em; color:var(--muted); margin-bottom:18px;
+    }
+    .market-hours-grid {
+      display:grid; grid-template-columns:1fr 1fr; gap:8px; margin-bottom:16px;
+    }
+    .hours-card {
+      padding:10px 12px;
+      border:1px solid var(--border-mid);
+      background: rgba(255,255,255,0.02);
+    }
+    .hours-day { font-size:8px; letter-spacing:0.2em; color:var(--green-light); margin-bottom:3px; }
+    .hours-time { font-size:12px; color:var(--cream); }
+    .hours-note { font-size:8px; color:var(--muted); margin-top:2px; }
+    .market-tags { display:flex; flex-wrap:wrap; gap:5px; margin-bottom:16px; }
+    .mtag {
+      font-size:7px; letter-spacing:0.12em; color:var(--muted);
+      border:1px solid var(--border-mid); padding:3px 8px;
+    }
+    .mtag.green { color:var(--green-light); border-color:rgba(74,138,66,0.3); }
+    .map-btn {
+      display:inline-flex; align-items:center; gap:6px;
+      font-size:9px; letter-spacing:0.15em; color:var(--green-light);
+      text-decoration:none;
+      border:1px solid rgba(74,138,66,0.4);
+      background:rgba(45,90,39,0.1);
+      padding:8px 14px;
+    }
+
+    /* ── SECTION ── */
+    .section { padding:24px 20px; border-bottom:1px solid var(--border); }
+    .section-label {
+      font-size:7px; letter-spacing:0.22em; color:var(--muted); margin-bottom:16px;
+    }
+    .section-label span { color:var(--green-light); }
+
+    /* ── VENDOR CARDS ── */
+    .vendor-card {
+      border:1px solid var(--border-mid);
+      margin-bottom:12px;
+      overflow:hidden;
+    }
+    .vendor-card.featured { border-color:rgba(74,138,66,0.35); }
+    .vendor-header {
+      padding:14px 14px 10px;
+      cursor:pointer;
+      display:flex; align-items:flex-start; justify-content:space-between; gap:8px;
+    }
+    .vendor-left { flex:1; }
+    .vendor-name {
+      font-family:'Playfair Display',serif;
+      font-size:17px; color:var(--cream); line-height:1.2; margin-bottom:3px;
+    }
+    .vendor-tagline { font-size:10px; color:var(--muted); line-height:1.4; }
+    .vendor-right { display:flex; flex-direction:column; align-items:flex-end; gap:4px; flex-shrink:0; }
+    .vendor-cert {
+      font-size:7px; letter-spacing:0.12em; padding:2px 7px;
+      color:var(--green-light); border:1px solid rgba(74,138,66,0.3);
+      background:rgba(45,90,39,0.1);
+    }
+    .vendor-chevron { font-size:10px; color:#444; margin-top:4px; transition:transform 0.2s; }
+    .vendor-chevron.open { transform:rotate(180deg); }
+
+    .vendor-body { display:none; padding:0 14px 14px; }
+    .vendor-body.open { display:block; }
+
+    .vendor-story {
+      font-size:11px; color:#ccc; line-height:1.7;
+      margin-bottom:12px; padding-bottom:12px;
+      border-bottom:1px solid var(--border);
+    }
+
+    .products-label {
+      font-size:7px; letter-spacing:0.2em; color:var(--muted); margin-bottom:8px;
+    }
+    .product-list { display:flex; flex-wrap:wrap; gap:5px; margin-bottom:12px; }
+    .product-tag {
+      font-size:9px; letter-spacing:0.06em; color:#aaa;
+      border:1px solid var(--border-mid); padding:3px 8px;
+    }
+    .product-tag.seasonal { color:#8a7a00; border-color:rgba(138,122,0,0.3); }
+
+    .vendor-meta { font-size:9px; color:var(--muted); line-height:1.8; }
+    .vendor-meta strong { color:#888; font-weight:400; }
+
+    .vendor-days {
+      display:flex; gap:5px; margin-top:10px;
+    }
+    .day-pill {
+      font-size:7px; letter-spacing:0.12em; padding:3px 8px;
+    }
+    .day-pill.active {
+      color:var(--green-light);
+      border:1px solid rgba(74,138,66,0.3);
+      background:rgba(45,90,39,0.1);
+    }
+    .day-pill.inactive { color:#333; border:1px solid #1a1a1a; }
+
+    /* ── WHAT'S IN SEASON ── */
+    .season-grid { display:grid; grid-template-columns:1fr 1fr; gap:8px; }
+    .season-card { padding:10px 12px; border:1px solid var(--border); }
+    .season-month { font-size:7px; letter-spacing:0.15em; color:var(--green-light); margin-bottom:5px; }
+    .season-items { font-size:10px; color:#aaa; line-height:1.6; }
+
+    /* ── ABOUT SECTION ── */
+    .about-text { font-size:11px; color:#bbb; line-height:1.8; }
+    .about-text + .about-text { margin-top:12px; }
+
+    /* ── FOOTER ── */
+    footer {
+      padding:20px; border-top:1px solid var(--border);
+      display:flex; align-items:center; justify-content:space-between;
+    }
+    .footer-logo { font-size:9px; letter-spacing:0.18em; color:#2a2a2a; }
+    .footer-logo span { color:var(--red); }
+    .footer-link { font-size:9px; color:#333; text-decoration:none; }
+  </style>
+</head>
+<body>
+
+  <header>
+    <div class="logo-group">
+      <span class="logo-traced">TRACED</span>
+      <span class="logo-divider">/</span>
+      <span class="logo-local">Local</span>
+    </div>
+    <a href="https://traced-local.vercel.app" class="back-link">← ALL MARKETS</a>
+  </header>
+
+  <!-- MARKET HERO -->
+  <section class="market-hero">
+    <div class="market-eyebrow">↑ SAN FRANCISCO · FERRY BUILDING</div>
+    <h1 class="market-name">Ferry Plaza<br>Farmers Market</h1>
+    <div class="market-operator">Operated by Foodwise (formerly CUESA) · Est. 1993</div>
+
+    <div class="market-hours-grid">
+      <div class="hours-card">
+        <div class="hours-day">SATURDAY</div>
+        <div class="hours-time">8 AM – 2 PM</div>
+        <div class="hours-note">100+ vendors · full market</div>
+      </div>
+      <div class="hours-card">
+        <div class="hours-day">TUE & THU</div>
+        <div class="hours-time">10 AM – 2 PM</div>
+        <div class="hours-note">15–35 vendors · weekday</div>
+      </div>
+    </div>
+
+    <div class="market-tags">
+      <span class="mtag green">YEAR-ROUND</span>
+      <span class="mtag green">CALFRESH / EBT</span>
+      <span class="mtag green">MARKET MATCH</span>
+      <span class="mtag">CALIFORNIA CERTIFIED</span>
+      <span class="mtag">FREE COOKING DEMOS SAT</span>
+      <span class="mtag">VEGGIE VALET</span>
+    </div>
+
+    <a href="https://maps.google.com/?q=Ferry+Building+San+Francisco+CA" target="_blank" class="map-btn">
+      ↗ OPEN IN MAPS · 1 Ferry Building, San Francisco
+    </a>
+  </section>
+
+  <!-- VENDORS -->
+  <section class="section">
+    <div class="section-label">FEATURED VENDORS · <span>SATURDAY MARKET</span></div>
+
+    <!-- FROG HOLLOW FARM -->
+    <div class="vendor-card featured">
+      <div class="vendor-header" onclick="toggle(this)">
+        <div class="vendor-left">
+          <div class="vendor-name">Frog Hollow Farm</div>
+          <div class="vendor-tagline">Legendary stone fruit · Brentwood, CA · 280 acres</div>
+        </div>
+        <div class="vendor-right">
+          <span class="vendor-cert">CCOF ORGANIC</span>
+          <span class="vendor-chevron">▼</span>
+        </div>
+      </div>
+      <div class="vendor-body">
+        <div class="vendor-story">
+          Al Courchesne — "Farmer Al" — planted his first peaches on 13 acres in Brentwood in 1976 after a teaching career in Hawaii. He went fully organic in 1989, one of the first large-scale farms in California to do so, and has been growing certified organic stone fruit ever since. The farm now covers 280 acres with nearly 100 varieties of stone and tree fruit. Chez Panisse has been a customer for over 40 years. Farmer Al's Cal Red peach — a high-Brix, deep-flavor variety he planted in 1978 — is the most anticipated fruit of the summer. The fruit is picked tree-ripe, not road-ripe. This is the difference between a peach that tastes like a peach and one that tastes like packaging.
+        </div>
+        <div class="products-label">WHAT THEY BRING</div>
+        <div class="product-list">
+          <span class="product-tag seasonal">☀ Peaches (Jun–Sep)</span>
+          <span class="product-tag seasonal">☀ Nectarines (Jun–Sep)</span>
+          <span class="product-tag seasonal">☀ Cherries (May–Jun)</span>
+          <span class="product-tag seasonal">☀ Apricots (May–Jun)</span>
+          <span class="product-tag seasonal">🍂 Pears (Sep–Jan)</span>
+          <span class="product-tag seasonal">🍂 Pluots (Jul–Sep)</span>
+          <span class="product-tag">Conserves & Jams</span>
+          <span class="product-tag">Pastries</span>
+          <span class="product-tag">Dried Fruit</span>
+          <span class="product-tag">Olive Oil</span>
+        </div>
+        <div class="vendor-meta">
+          <strong>Location:</strong> Brentwood, Contra Costa County<br>
+          <strong>Certifications:</strong> CCOF Organic since 1989<br>
+          <strong>Also at:</strong> Ferry Building café (year-round), Berkeley markets<br>
+          <strong>Web:</strong> froghollow.com
+        </div>
+        <div class="vendor-days">
+          <span class="day-pill active">SAT</span>
+          <span class="day-pill inactive">TUE</span>
+          <span class="day-pill inactive">THU</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- BLUE HOUSE FARM -->
+    <div class="vendor-card">
+      <div class="vendor-header" onclick="toggle(this)">
+        <div class="vendor-left">
+          <div class="vendor-name">Blue House Farm</div>
+          <div class="vendor-tagline">Mixed vegetables & flowers · Pescadero, CA</div>
+        </div>
+        <div class="vendor-right">
+          <span class="vendor-cert">CERTIFIED ORGANIC</span>
+          <span class="vendor-chevron">▼</span>
+        </div>
+      </div>
+      <div class="vendor-body">
+        <div class="vendor-story">
+          Blue House Farm sits on the San Mateo Coast in Pescadero, one of the last stretches of working farmland between San Francisco and Santa Cruz. The farm grows a diverse rotation of certified organic vegetables, herbs, and cut flowers — the kind of mixed production that requires intimate knowledge of a specific piece of land. Blue House has been at the Ferry Plaza market for years and is known for bringing unusual and heirloom varieties that don't survive commercial distribution.
+        </div>
+        <div class="products-label">WHAT THEY BRING</div>
+        <div class="product-list">
+          <span class="product-tag">Salad Greens</span>
+          <span class="product-tag">Heirloom Tomatoes</span>
+          <span class="product-tag">Herbs</span>
+          <span class="product-tag">Root Vegetables</span>
+          <span class="product-tag">Cut Flowers</span>
+          <span class="product-tag">Winter Squash</span>
+        </div>
+        <div class="vendor-meta">
+          <strong>Location:</strong> Pescadero, San Mateo County<br>
+          <strong>Certifications:</strong> Certified Organic
+        </div>
+        <div class="vendor-days">
+          <span class="day-pill active">SAT</span>
+          <span class="day-pill inactive">TUE</span>
+          <span class="day-pill inactive">THU</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- DIRTY GIRL PRODUCE -->
+    <div class="vendor-card">
+      <div class="vendor-header" onclick="toggle(this)">
+        <div class="vendor-left">
+          <div class="vendor-name">Dirty Girl Produce</div>
+          <div class="vendor-tagline">Dry-farmed tomatoes · Santa Cruz, CA</div>
+        </div>
+        <div class="vendor-right">
+          <span class="vendor-cert">CERTIFIED ORGANIC</span>
+          <span class="vendor-chevron">▼</span>
+        </div>
+      </div>
+      <div class="vendor-body">
+        <div class="vendor-story">
+          Dirty Girl is best known for its dry-farmed Early Girl tomatoes — a technique that withholds irrigation to stress the plants, concentrating sugars and producing smaller, intensely flavored fruit. Dry farming is rare because it requires precise timing and produces lower yields than irrigated farming. The tomatoes are impossible to find in any grocery store. The season is short — late summer into fall — which is part of why people line up for them.
+        </div>
+        <div class="products-label">WHAT THEY BRING</div>
+        <div class="product-list">
+          <span class="product-tag seasonal">☀ Dry-farmed Early Girls (Aug–Oct)</span>
+          <span class="product-tag seasonal">☀ Heirloom Tomatoes (Aug–Oct)</span>
+          <span class="product-tag">Mixed Vegetables</span>
+          <span class="product-tag">Winter Squash</span>
+          <span class="product-tag">Peppers</span>
+        </div>
+        <div class="vendor-meta">
+          <strong>Location:</strong> Santa Cruz County<br>
+          <strong>Technique:</strong> Dry-farmed tomatoes — no irrigation after transplant
+        </div>
+        <div class="vendor-days">
+          <span class="day-pill active">SAT</span>
+          <span class="day-pill inactive">TUE</span>
+          <span class="day-pill inactive">THU</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- ACME BREAD -->
+    <div class="vendor-card">
+      <div class="vendor-header" onclick="toggle(this)">
+        <div class="vendor-left">
+          <div class="vendor-name">Acme Bread Company</div>
+          <div class="vendor-tagline">Artisan sourdough · Berkeley, CA · Est. 1983</div>
+        </div>
+        <div class="vendor-right">
+          <span class="vendor-chevron">▼</span>
+        </div>
+      </div>
+      <div class="vendor-body">
+        <div class="vendor-story">
+          Steve Sullivan founded Acme in 1983 after working as a busboy at Chez Panisse and becoming obsessed with the bread Alice Waters was sourcing from a small bakery in France. He taught himself to bake, opened Acme in Berkeley, and helped start the American artisan bread movement. Acme uses a natural levain (sourdough starter), high-quality flour, and long fermentation. The bread has no commercial yeast, no dough conditioners, no preservatives. It goes stale in two days, which is a feature, not a bug.
+        </div>
+        <div class="products-label">WHAT THEY BRING</div>
+        <div class="product-list">
+          <span class="product-tag">Levain Loaves</span>
+          <span class="product-tag">Sourdough Baguettes</span>
+          <span class="product-tag">Walnut Levain</span>
+          <span class="product-tag">Pain de Mie</span>
+          <span class="product-tag">Semolina Bread</span>
+          <span class="product-tag">Focaccia</span>
+        </div>
+        <div class="vendor-meta">
+          <strong>Location:</strong> Berkeley, CA<br>
+          <strong>Founded:</strong> 1983 by Steve Sullivan<br>
+          <strong>Method:</strong> Natural levain, long fermentation, no commercial yeast
+        </div>
+        <div class="vendor-days">
+          <span class="day-pill active">SAT</span>
+          <span class="day-pill active">TUE</span>
+          <span class="day-pill active">THU</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- ALLSTAR ORGANICS -->
+    <div class="vendor-card">
+      <div class="vendor-header" onclick="toggle(this)">
+        <div class="vendor-left">
+          <div class="vendor-name">Allstar Organics</div>
+          <div class="vendor-tagline">Mixed organic vegetables · Novato, CA</div>
+        </div>
+        <div class="vendor-right">
+          <span class="vendor-cert">CCOF ORGANIC</span>
+          <span class="vendor-chevron">▼</span>
+        </div>
+      </div>
+      <div class="vendor-body">
+        <div class="vendor-story">
+          Janet Brown and Marty Jacobson have farmed in Marin County for over 25 years, growing a rotating mix of certified organic vegetables with a focus on unusual and heirloom varieties. Janet has been a visible advocate for market access programs — she was among the farmers who traveled to Sacramento to defend Market Match, the CalFresh matching program that doubles EBT benefits at farmers markets. The farm is small, the production is diverse, and the varieties change with the season.
+        </div>
+        <div class="products-label">WHAT THEY BRING</div>
+        <div class="product-list">
+          <span class="product-tag">Salad Mix</span>
+          <span class="product-tag">Specialty Greens</span>
+          <span class="product-tag">Heirloom Vegetables</span>
+          <span class="product-tag">Herbs</span>
+          <span class="product-tag">Edible Flowers</span>
+        </div>
+        <div class="vendor-meta">
+          <strong>Location:</strong> Novato, Marin County<br>
+          <strong>Certifications:</strong> CCOF Organic<br>
+          <strong>Farmers:</strong> Janet Brown & Marty Jacobson
+        </div>
+        <div class="vendor-days">
+          <span class="day-pill active">SAT</span>
+          <span class="day-pill inactive">TUE</span>
+          <span class="day-pill inactive">THU</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- BISOU CHOCOLATE -->
+    <div class="vendor-card">
+      <div class="vendor-header" onclick="toggle(this)">
+        <div class="vendor-left">
+          <div class="vendor-name">Bisou Chocolate</div>
+          <div class="vendor-tagline">Bean-to-bar chocolate · San Francisco, CA</div>
+        </div>
+        <div class="vendor-right">
+          <span class="vendor-chevron">▼</span>
+        </div>
+      </div>
+      <div class="vendor-body">
+        <div class="vendor-story">
+          Bisou is a small-batch bean-to-bar chocolate maker based in San Francisco. Bean-to-bar means they source cacao directly from farms, roast it themselves, and control every step from raw bean to finished bar. This is the opposite of how mass-market chocolate is made — where commodity cacao is processed industrially and flavored to a consistent profile. Bisou's bars taste different because the cacao tastes different, and they preserve that difference instead of engineering it away.
+        </div>
+        <div class="products-label">WHAT THEY BRING</div>
+        <div class="product-list">
+          <span class="product-tag">Single-origin dark chocolate</span>
+          <span class="product-tag">Flavored bars</span>
+          <span class="product-tag">Drinking chocolate</span>
+          <span class="product-tag">Truffles</span>
+        </div>
+        <div class="vendor-meta">
+          <strong>Location:</strong> San Francisco, CA<br>
+          <strong>Method:</strong> Bean-to-bar, direct cacao sourcing
+        </div>
+        <div class="vendor-days">
+          <span class="day-pill active">SAT</span>
+          <span class="day-pill inactive">TUE</span>
+          <span class="day-pill inactive">THU</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- BLOSSOM BLUFF ORCHARDS -->
+    <div class="vendor-card">
+      <div class="vendor-header" onclick="toggle(this)">
+        <div class="vendor-left">
+          <div class="vendor-name">Blossom Bluff Orchards</div>
+          <div class="vendor-tagline">Stone fruit · Parlier, Fresno County</div>
+        </div>
+        <div class="vendor-right">
+          <span class="vendor-chevron">▼</span>
+        </div>
+      </div>
+      <div class="vendor-body">
+        <div class="vendor-story">
+          The Kraus family has farmed stone fruit in the San Joaquin Valley for three generations. They grow an unusually wide range of peach, nectarine, plum, and apricot varieties — many of them heirloom or specialty types selected for flavor rather than shelf life. The fruit travels 200 miles to reach the Ferry Plaza market, which makes it more perishable than supermarket stone fruit, and more flavorful for exactly the same reason.
+        </div>
+        <div class="products-label">WHAT THEY BRING</div>
+        <div class="product-list">
+          <span class="product-tag seasonal">☀ Peaches (Jun–Sep)</span>
+          <span class="product-tag seasonal">☀ Nectarines (Jun–Sep)</span>
+          <span class="product-tag seasonal">☀ Plums & Pluots (Jul–Sep)</span>
+          <span class="product-tag seasonal">☀ Apricots (May–Jun)</span>
+          <span class="product-tag seasonal">🍂 Pomegranates (Oct–Nov)</span>
+        </div>
+        <div class="vendor-meta">
+          <strong>Location:</strong> Parlier, Fresno County<br>
+          <strong>Farming:</strong> Third-generation family farm
+        </div>
+        <div class="vendor-days">
+          <span class="day-pill active">SAT</span>
+          <span class="day-pill inactive">TUE</span>
+          <span class="day-pill inactive">THU</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- CANTEEN MEATS -->
+    <div class="vendor-card">
+      <div class="vendor-header" onclick="toggle(this)">
+        <div class="vendor-left">
+          <div class="vendor-name">Canteen Meats</div>
+          <div class="vendor-tagline">Whole animal butchery & charcuterie · Bay Area</div>
+        </div>
+        <div class="vendor-right">
+          <span class="vendor-chevron">▼</span>
+        </div>
+      </div>
+      <div class="vendor-body">
+        <div class="vendor-story">
+          Canteen Meats practices whole-animal butchery — sourcing from farms they know personally and using every part of the animal. Charcuterie, sausages, cured meats, and fresh cuts made in-house with transparency about where the animals came from and how they were raised. This is the counterpoint to the Applegate Farms acquisition story: meat where you can ask the person selling it exactly which farm raised it.
+        </div>
+        <div class="products-label">WHAT THEY BRING</div>
+        <div class="product-list">
+          <span class="product-tag">Charcuterie</span>
+          <span class="product-tag">Sausages</span>
+          <span class="product-tag">Cured Meats</span>
+          <span class="product-tag">Fresh Cuts</span>
+          <span class="product-tag">Pâtés</span>
+        </div>
+        <div class="vendor-meta">
+          <strong>Method:</strong> Whole-animal, direct farm sourcing<br>
+          <strong>Butcher:</strong> John Ginanni
+        </div>
+        <div class="vendor-days">
+          <span class="day-pill active">SAT</span>
+          <span class="day-pill inactive">TUE</span>
+          <span class="day-pill inactive">THU</span>
+        </div>
+      </div>
+    </div>
+
+  </section>
+
+  <!-- WHAT'S IN SEASON -->
+  <section class="section">
+    <div class="section-label">WHAT'S IN SEASON · <span>BAY AREA · FEBRUARY–MARCH</span></div>
+    <div class="season-grid">
+      <div class="season-card">
+        <div class="season-month">NOW</div>
+        <div class="season-items">Citrus · Meyer lemons · Blood oranges · Mandarins · Root vegetables · Kale & chard · Artichokes · Leeks</div>
+      </div>
+      <div class="season-card">
+        <div class="season-month">COMING SOON</div>
+        <div class="season-items">Strawberries (Apr) · Asparagus (Mar–May) · Fava beans (Mar–Apr) · Spring onions · Peas</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ABOUT THE MARKET -->
+  <section class="section">
+    <div class="section-label">ABOUT THIS MARKET</div>
+    <p class="about-text">
+      The Ferry Plaza Farmers Market opened in 1993 at the San Francisco Ferry Building, founded after the Loma Prieta earthquake by people who wanted to rebuild a public gathering space centered on local food. It is operated by Foodwise (formerly CUESA), a nonprofit whose mission is to cultivate a sustainable food system through farmers markets and education.
+    </p>
+    <p class="about-text" style="margin-top:12px;">
+      The Saturday market draws over 100 vendors and is one of the most visited farmers markets in the United States. Foodwise offers CalFresh EBT acceptance and Market Match — a program that doubles the value of EBT benefits spent at the market, making locally grown food financially accessible. Free cooking demos run every Saturday at the Foodwise Classroom tent.
+    </p>
+  </section>
+
+  <footer>
+    <div class="footer-logo"><span>TRACED</span> / LOCAL</div>
+    <a href="https://traced-local.vercel.app" class="footer-link">← all markets</a>
+  </footer>
+
+  <script>
+    function toggle(header) {
+      const body = header.nextElementSibling;
+      const chevron = header.querySelector('.vendor-chevron');
+      const isOpen = body.classList.contains('open');
+      body.classList.toggle('open', !isOpen);
+      chevron.classList.toggle('open', !isOpen);
+    }
+  </script>
+
+</body>
+</html>
